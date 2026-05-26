@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-void: #0D0E12;
+  --color-surface: #13141A;
+  --color-surface-2: #1A1B22;
+  --color-border: #2A2B33;
+  --color-text: #E5E5E5;
+  --color-text-secondary: #888888;
+  --color-text-muted: rgba(229, 229, 229, 0.45);
+  --color-accent: #00B67A;
+  --color-accent-light: #00D48A;
+  --color-accent-glow: rgba(0, 182, 122, 0.4);
+  --font-heading: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto; /* GSAP handles scrolling */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: radial-gradient(ellipse at 50% 40%, #111520 0%, #0D0E12 60%, #080a0d 100%);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(0, 182, 122, 0.3);
+  color: #fff;
+}
+
+/* ─── Ambient glow behind emblem ─── */
+.emblem-glow {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(0, 182, 122, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* ─── Text reveal animations ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.15s; }
+.reveal-delay-2 { transition-delay: 0.3s; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-void); }
+::-webkit-scrollbar-thumb { background: rgba(0, 182, 122, 0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 182, 122, 0.35); }
