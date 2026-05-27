@@ -7,7 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+.env
+.env.*
 node_modules
+public/generated/**
+!public/generated/.gitkeep
+scripts/.cache/
+dist-scripts
 dist
 dist-ssr
 *.local
