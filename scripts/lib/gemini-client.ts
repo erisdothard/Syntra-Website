@@ -27,7 +27,7 @@ function getClient(): GoogleGenAI {
 }
 
 let lastRequestTime = 0
-const MIN_INTERVAL_MS = 31_000
+const MIN_INTERVAL_MS = 10_000
 
 async function waitForSlot(): Promise<void> {
   const now = Date.now()
@@ -59,24 +59,22 @@ export async function generateImage(
 
   console.log(`  🎨 Generating (${aspectRatio}, ${count}x): ${fullPrompt.slice(0, 80)}...`)
 
-  const config: Record<string, unknown> = {
-    numberOfImages: count,
-    aspectRatio,
-  }
-
   let attempts = 0
   const maxAttempts = 3
 
   while (attempts < maxAttempts) {
     try {
       const response = await ai.models.generateImages({
-        model: 'imagen-3.0-generate-002',
+        model: 'imagen-4.0-generate-001',
         prompt: fullPrompt,
-        config,
+        config: {
+          numberOfImages: count,
+          aspectRatio,
+        },
       })
 
       if (!response.generatedImages || response.generatedImages.length === 0) {
-        throw new Error('No images returned from Imagen 3')
+        throw new Error('No images returned from Imagen 4')
       }
 
       return response.generatedImages.map(img => {
@@ -88,7 +86,7 @@ export async function generateImage(
       attempts++
       const message = err instanceof Error ? err.message : String(err)
       if (message.includes('429') && attempts < maxAttempts) {
-        const backoff = 60_000 * attempts
+        const backoff = 30_000 * attempts
         console.log(`  ⚠️  Rate limited (429). Backing off ${backoff / 1000}s...`)
         await new Promise(resolve => setTimeout(resolve, backoff))
         continue

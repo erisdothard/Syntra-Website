@@ -25,6 +25,10 @@ type GLTFResult = {
   materials: Record<string, THREE.MeshStandardMaterial>
 }
 
+/* Emissive morph targets: current shade ↔ a hair lighter */
+const GREEN_EMISSIVE_BASE  = new THREE.Color(0.0, 0.25, 0.12)
+const GREEN_EMISSIVE_LIGHT = new THREE.Color(0.0, 0.38, 0.20)
+
 /* Ring animation config — big tilts + spins, tiltEase in useFrame prevents sphere clipping */
 const RING_ANIM = {
   RingGreen: { z: 3.3,  tiltX: 0.33,  tiltY: 0.28,  spin: 0.076, delay: 0 },
@@ -52,11 +56,11 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
   const ringMaterials = useMemo(() => {
     const greenRing = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color('#0a3d2a'),
-      roughness: 0.15,
+      roughness: 0.22,
       metalness: 0.9,
-      envMapIntensity: 1.2,
-      emissive: new THREE.Color(0.0, 0.55, 0.42),
-      emissiveIntensity: 2.0,
+      envMapIntensity: 0.6,
+      emissive: new THREE.Color(0.0, 0.25, 0.12),
+      emissiveIntensity: 0.8,
       clearcoat: 1.0,
       clearcoatRoughness: 0.05,
       reflectivity: 0.8,
@@ -176,7 +180,9 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
     }
 
     // ── GreenRing: ramp emissive glow during explode ──
-    ringMaterials.greenRing.emissiveIntensity = 2.0 + explode * 1.5
+    const morphFactor = (Math.sin(t * 0.8) + 1) * 0.5
+    ringMaterials.greenRing.emissive.lerpColors(GREEN_EMISSIVE_BASE, GREEN_EMISSIVE_LIGHT, morphFactor)
+    ringMaterials.greenRing.emissiveIntensity = 0.8 + morphFactor * 0.4 + explode * 0.6
 
     // ── Core: Fresnel pulse when exposed ──
     if (coreRef.current) {

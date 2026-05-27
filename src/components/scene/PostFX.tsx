@@ -15,13 +15,13 @@ export function PostFX() {
 
     if (bloomRef.current) {
       bloomRef.current.intensity = THREE.MathUtils.lerp(
-        bloomRef.current.intensity, 0.6 + explode * 0.8, 0.05
+        bloomRef.current.intensity, 0.6 + explode * 0.8, 0.1
       )
     }
 
     if (vignetteRef.current) {
       vignetteRef.current.darkness = THREE.MathUtils.lerp(
-        vignetteRef.current.darkness, 0.7 - explode * 0.3, 0.05
+        vignetteRef.current.darkness, 0.7 - explode * 0.3, 0.1
       )
     }
 
