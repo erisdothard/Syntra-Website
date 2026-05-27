@@ -37,19 +37,16 @@ body {
 
 #root { min-height: 100vh; }
 
-::selection { background: rgba(0, 182, 122, 0.3); color: #fff; }
-
-/* ─── Ambient glow behind emblem ─── */
+/* ─── Emblem glow ─── */
 .emblem-glow {
   position: fixed;
-  top: 50%; left: 50%;
-  width: 500px; height: 500px;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(0, 182, 122, 0.08) 0%, transparent 70%);
-  pointer-events: none;
+  inset: 0;
   z-index: 0;
-  transition: opacity 0.6s ease;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, rgba(0, 182, 122, 0.03) 0%, transparent 55%);
 }
+
+::selection { background: rgba(0, 182, 122, 0.3); color: #fff; }
 
 /* ─── Glassmorphism panels ─── */
 .glass-panel {
@@ -139,65 +136,9 @@ body {
   animation: shimmer-sweep 1.8s ease-in-out infinite;
 }
 
-/* ─── Floating panel ─── */
-.floating-panel {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  translate: -50% 0;
-  z-index: 20;
-  background: rgba(19, 20, 26, 0.7);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 16px 24px;
-  pointer-events: none;
-  max-width: min(90vw, 640px);
-  will-change: transform, opacity;
-}
-.floating-panel-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-.floating-panel-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.floating-panel-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-accent);
-  opacity: 0.6;
-}
-.floating-panel-title {
-  font-family: var(--font-heading);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text);
-}
-.floating-panel-value {
-  font-size: 11px;
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
 /* ─── Mobile perf ─── */
 @media (max-width: 768px) {
   .glass-panel {
-    backdrop-filter: blur(12px) saturate(1.2);
-    -webkit-backdrop-filter: blur(12px) saturate(1.2);
-  }
-  .floating-panel-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .floating-panel {
-    bottom: 16px;
-    padding: 12px 16px;
     backdrop-filter: blur(12px) saturate(1.2);
     -webkit-backdrop-filter: blur(12px) saturate(1.2);
   }

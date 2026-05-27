@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { Environment, Lightformer, ContactShadows } from '@react-three/drei'
+import { Environment, Lightformer } from '@react-three/drei'
 import { SyntraEmblem3D } from '../SyntraEmblem3D'
 import { ParticleField } from '../ParticleField'
 import { CrystalCore } from '../CrystalCore'
@@ -10,7 +10,7 @@ import { scrollState } from '../../lib/scrollState'
 
 export function SceneCanvas() {
   return (
-    <div className="fixed inset-0 z-0" style={{ pointerEvents: 'none' }}>
+    <div className="fixed inset-0 z-0 pointer-events-none">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 40 }}
         dpr={[1, 1.5]}
@@ -48,7 +48,6 @@ export function SceneCanvas() {
             }} />
           </group>
         </Suspense>
-        <ContactShadows position={[0, -2.5, 0]} opacity={0.4} scale={10} blur={2.5} far={4} resolution={256} color="#00b67a" frames={1} />
         <PostFX />
       </Canvas>
     </div>

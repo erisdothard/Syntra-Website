@@ -15,13 +15,13 @@ export function PostFX() {
 
     if (bloomRef.current) {
       bloomRef.current.intensity = THREE.MathUtils.lerp(
-        bloomRef.current.intensity, 0.6 + explode * 0.8, 0.1
+        bloomRef.current.intensity, 0.5 + explode * 1.0, 0.1
       )
     }
 
     if (vignetteRef.current) {
       vignetteRef.current.darkness = THREE.MathUtils.lerp(
-        vignetteRef.current.darkness, 0.7 - explode * 0.3, 0.1
+        vignetteRef.current.darkness, 0.35 - explode * 0.15, 0.1
       )
     }
 
@@ -33,8 +33,8 @@ export function PostFX() {
 
   return (
     <EffectComposer>
-      <Bloom ref={bloomRef} luminanceThreshold={0.4} luminanceSmoothing={0.8} intensity={0.6} mipmapBlur />
-      <Vignette ref={vignetteRef} offset={0.3} darkness={0.7} />
+      <Bloom ref={bloomRef} luminanceThreshold={0.35} luminanceSmoothing={0.8} intensity={0.5} mipmapBlur />
+      <Vignette ref={vignetteRef} offset={0.3} darkness={0.35} />
       <ChromaticAberration ref={chromaRef} blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.0008, 0.0008)} />
       <Noise opacity={0.06} blendFunction={BlendFunction.SOFT_LIGHT} />
     </EffectComposer>
