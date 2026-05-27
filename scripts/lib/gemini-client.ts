@@ -52,13 +52,17 @@ export async function generateImage(
 
   await waitForSlot()
 
-  console.log(`  🎨 Generating (${aspectRatio}, ${count}x): ${prompt.slice(0, 80)}...`)
+  // Developer API doesn't support negativePrompt param — fold into prompt
+  const fullPrompt = negativePrompt
+    ? `${prompt}. Avoid: ${negativePrompt}`
+    : prompt
+
+  console.log(`  🎨 Generating (${aspectRatio}, ${count}x): ${fullPrompt.slice(0, 80)}...`)
 
   const config: Record<string, unknown> = {
     numberOfImages: count,
     aspectRatio,
   }
-  if (negativePrompt) config.negativePrompt = negativePrompt
 
   let attempts = 0
   const maxAttempts = 3
@@ -67,7 +71,7 @@ export async function generateImage(
     try {
       const response = await ai.models.generateImages({
         model: 'imagen-3.0-generate-002',
-        prompt,
+        prompt: fullPrompt,
         config,
       })
 
