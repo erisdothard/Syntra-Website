@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, memo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { Environment, Lightformer } from '@react-three/drei'
 import { SyntraEmblem3D } from '../SyntraEmblem3D'
@@ -8,9 +8,9 @@ import { CameraRig } from './CameraRig'
 import { PostFX } from './PostFX'
 import { scrollState } from '../../lib/scrollState'
 
-export function SceneCanvas() {
+export const SceneCanvas = memo(function SceneCanvas() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <div id="scene-canvas" className="fixed inset-0 z-0 pointer-events-none will-change-transform">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 40 }}
         dpr={[1, 1.5]}
@@ -52,4 +52,4 @@ export function SceneCanvas() {
       </Canvas>
     </div>
   )
-}
+})

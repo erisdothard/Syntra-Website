@@ -1,57 +1,30 @@
-import { useEffect, useRef, useState } from 'react'
-
-const metrics = [
-  { value: '3x', suffix: '', label: 'Faster Deployment' },
-  { value: '40', suffix: '%', label: 'Cost Reduction' },
-  { value: '24/7', suffix: '', label: 'Autonomous Operation' },
+const timeline = [
+  { date: '2024 – Now', role: 'Founder', org: 'Syntra AI' },
+  { date: '2022 – 2024', role: 'Impl. Engineer', org: 'CPI Card Group' },
+  { date: '2020 – 2022', role: 'Network Infra', org: 'Google Fiber' },
 ]
-
-function MetricCard({ value, suffix, label, index }: { value: string; suffix: string; label: string; index: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [display, setDisplay] = useState('0')
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    if (!ref.current) return
-    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setVisible(true) }, { threshold: 0.3 })
-    observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!visible) return
-    const num = parseInt(value)
-    if (isNaN(num)) { setDisplay(value); return }
-    let current = 0
-    const step = Math.max(1, Math.floor(num / 30))
-    const interval = setInterval(() => {
-      current += step
-      if (current >= num) { current = num; clearInterval(interval) }
-      setDisplay(String(current))
-    }, 40)
-    return () => clearInterval(interval)
-  }, [value, visible])
-
-  return (
-    <div ref={ref} className={`reveal reveal-delay-${index + 1} text-center`}>
-      <div className="text-5xl md:text-7xl lg:text-8xl font-bold font-heading text-white mb-2">
-        {display}<span className="text-accent">{suffix}</span>
-      </div>
-      <p className="text-text-secondary text-sm md:text-base uppercase tracking-[0.15em] font-mono">{label}</p>
-    </div>
-  )
-}
 
 export function MetricsSection() {
   return (
-    <section id="section-6" className="min-h-screen flex flex-col justify-center px-6 md:px-16 lg:px-24 py-24">
-      <div className="max-w-5xl mx-auto w-full">
-        <p className="reveal text-[10px] uppercase tracking-[0.3em] text-accent mb-4 font-mono text-center">05 &mdash; Impact</p>
-        <h2 className="reveal reveal-delay-1 text-3xl md:text-4xl font-bold text-white leading-tight mb-16 font-heading text-center">
-          Results that <span className="text-accent">compound</span>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-          {metrics.map((m, i) => <MetricCard key={m.label} {...m} index={i} />)}
+    <section id="section-6" className="relative" style={{ minHeight: '200vh' }}>
+      <div className="sticky top-0 h-screen flex flex-col justify-center py-32 px-6 md:px-12 lg:px-16">
+        <div className="max-w-xl bg-void/40 backdrop-blur-md rounded-2xl p-8 border border-white/5">
+          <div className="relative mb-10">
+            <span className="section-number">03</span>
+            <p className="reveal section-label mb-4">About</p>
+            <h2 className="reveal reveal-delay-1 text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight font-heading">
+              Eris <span className="text-accent">Dothard</span>
+            </h2>
+          </div>
+          <div className="reveal reveal-delay-2">
+            {timeline.map((item, i) => (
+              <div key={item.date} className={`bg-transparent backdrop-blur-[2px] border-l border-white/10 pl-6 py-3.5 ${i < timeline.length - 1 ? 'mb-4' : ''}`}>
+                <p className="text-sm font-semibold text-white">{item.role}</p>
+                <p className="text-xs text-text-secondary">{item.org}</p>
+                <span className="text-[11px] font-mono text-text-muted mt-1 block">{item.date}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

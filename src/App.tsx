@@ -1,24 +1,36 @@
+import { useState } from 'react'
 import { SceneCanvas } from './components/scene/SceneCanvas'
 import { useMouseTracking } from './hooks/useMouseTracking'
 import { useScrollAnimations } from './hooks/useScrollAnimations'
+import { useTextReveals } from './hooks/useTextReveals'
+import { Navbar } from './components/layout/Navbar'
+import { TabOverlay } from './components/TabOverlay'
+import { HeroSection } from './components/sections/HeroSection'
+import { DeconstructSection } from './components/sections/DeconstructSection'
+import { CoreSection } from './components/sections/CoreSection'
+import { CrystalSection } from './components/sections/CrystalSection'
+import { ReconstructSection } from './components/sections/ReconstructSection'
 
 export default function App() {
   useMouseTracking()
   useScrollAnimations()
+  useTextReveals()
+
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'services' | null>(null)
 
   return (
     <>
       <SceneCanvas />
-      {/* Subtle green glow behind emblem */}
       <div className="emblem-glow" />
-      {/* Invisible spacers — ScrollTrigger reads section IDs */}
-      <div id="section-1" className="h-screen" />
-      <div id="section-2" className="h-screen" />
-      <div id="section-3" className="h-screen" />
-      <div id="section-4" className="h-screen" />
-      <div id="section-5" className="h-screen" />
-      <div id="section-6" className="h-screen" />
-      <div id="section-7" className="h-screen" />
+      <Navbar onTabOpen={setActiveTab} />
+      <TabOverlay activeTab={activeTab} onClose={() => setActiveTab(null)} />
+      <div className="relative z-10 pointer-events-none [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+        <HeroSection />
+        <DeconstructSection />
+        <CoreSection />
+        <CrystalSection />
+        <ReconstructSection />
+      </div>
     </>
   )
 }

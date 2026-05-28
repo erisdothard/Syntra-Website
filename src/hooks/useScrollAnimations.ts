@@ -5,68 +5,67 @@ import { scrollState } from '../lib/scrollState'
 
 gsap.registerPlugin(ScrollTrigger)
 
+/** Hermite smoothstep — C1 continuous (no derivative jumps) */
+function smoothstep(edge0: number, edge1: number, x: number): number {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
+  return t * t * (3 - 2 * t)
+}
+
 export function useScrollAnimations() {
   useEffect(() => {
     const timer = setTimeout(() => ScrollTrigger.refresh(), 100)
 
     const ctx = gsap.context(() => {
-      // Section 2: Rings separate + deconstruct
+      // ONE global trigger — entire page drives one continuous motion
       ScrollTrigger.create({
-        trigger: '#section-2',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.5,
+        trigger: '#section-1',
+        start: 'top top',
+        endTrigger: '#section-5',
+        end: 'bottom bottom',
+        scrub: 1,
         onUpdate: (self) => {
-          scrollState.explode = self.progress
-          scrollState.rotationY = self.progress * Math.PI * 1.5
-          scrollState.envRotation = self.progress * Math.PI * 0.5
+          const p = self.progress
+
+          // One continuous 360° rotation — smoothstep eased for gentle start/end
+          const rotEase = smoothstep(0, 1, p)
+          scrollState.rotationY = rotEase * Math.PI * 2
+
+          // Explode: smooth ramp up (0–0.25), smooth ramp down (0.35–0.85)
+          // No hard corners — both edges are C1 continuous
+          const explodeUp = smoothstep(0.05, 0.25, p)
+          const explodeDown = 1 - smoothstep(0.35, 0.85, p)
+          scrollState.explode = Math.min(explodeUp, explodeDown)
+
+          // Scale: smooth arc — peaks mid-page
+          const scaleArc = Math.sin(smoothstep(0, 1, p) * Math.PI)
+          scrollState.scale = 1 + scaleArc * 0.3
+
+          // Camera drift — same smooth arc
+          scrollState.cameraY = scaleArc * 0.8
+          scrollState.lookAtY = -scaleArc * 0.4
+
+          // Env rotation — continuous, eased
+          scrollState.envRotation = rotEase * Math.PI
         },
       })
 
-      // Section 3: Hold open + scale up + camera shift
+      // Section 5: CrystalCore reveal (separate 3D object)
       ScrollTrigger.create({
-        trigger: '#section-3',
+        trigger: '#section-4',
         start: 'top bottom',
         end: 'bottom top',
-        scrub: 1.5,
+        scrub: 1,
         onUpdate: (self) => {
-          scrollState.scale = 1 + self.progress * 0.3
-          scrollState.cameraY = self.progress * 0.8
-          scrollState.lookAtY = self.progress * -0.4
-          scrollState.envRotation = Math.PI * 0.3 + self.progress * Math.PI * 0.2
+          const t = self.progress
+          const up = smoothstep(0, 0.45, t)
+          const down = 1 - smoothstep(0.55, 1, t)
+          scrollState.crystalExplode = Math.min(up, down)
+          scrollState.crystalRotationY = smoothstep(0, 1, t) * Math.PI * 2
+          scrollState.crystalScale = 1 + smoothstep(0, 0.5, t) * 0.2
         },
       })
 
-      // Section 5: CrystalCore reveal
-      ScrollTrigger.create({
-        trigger: '#section-5',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.5,
-        onUpdate: (self) => {
-          scrollState.crystalExplode = self.progress < 0.5
-            ? self.progress * 2
-            : 2 - self.progress * 2
-          scrollState.crystalRotationY = self.progress * Math.PI * 2
-          scrollState.crystalScale = 1 + self.progress * 0.2
-        },
-      })
-
-      // Section 7: Reconstruct — rings converge
-      ScrollTrigger.create({
-        trigger: '#section-7',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.5,
-        onUpdate: (self) => {
-          scrollState.explode = 1 - self.progress
-          scrollState.rotationY = Math.PI * 1.5 + self.progress * Math.PI * 1.5
-          scrollState.scale = 1.3 - self.progress * 0.3
-          scrollState.cameraY = 0.8 - self.progress * 0.8
-          scrollState.lookAtY = -0.4 + self.progress * 0.4
-          scrollState.envRotation = Math.PI * 0.5 + self.progress * Math.PI * 0.5
-        },
-      })
+      // No canvas slide — 3D stays fullscreen, text overlays with glassmorphism
     })
 
     return () => {

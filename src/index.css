@@ -8,8 +8,8 @@
   --color-border: rgba(255, 255, 255, 0.06);
   --color-border-accent: rgba(0, 182, 122, 0.2);
   --color-text: #E8E8EC;
-  --color-text-secondary: #8A8A96;
-  --color-text-muted: rgba(229, 229, 229, 0.35);
+  --color-text-secondary: #A0A0AC;
+  --color-text-muted: rgba(229, 229, 229, 0.5);
   --color-accent: #00B67A;
   --color-accent-light: #00D48A;
   --color-accent-glow: rgba(0, 182, 122, 0.15);
@@ -93,6 +93,16 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(0, 182, 122, 0.15); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0, 182, 122, 0.35); }
 
+/* ─── Tab overlay animations ─── */
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes overlay-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ─── Reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: none; opacity: 1; transform: none; }
@@ -134,6 +144,51 @@ body {
 .glass-panel:hover::before {
   opacity: 1;
   animation: shimmer-sweep 1.8s ease-in-out infinite;
+}
+
+/* ─── Section label ─── */
+.section-label {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--color-accent);
+  opacity: 0.75;
+}
+
+/* ─── Big editorial number ─── */
+.section-number {
+  font-size: clamp(4rem, 8vw, 8rem);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 0.85;
+  color: rgba(255, 255, 255, 0.07);
+  position: absolute;
+  top: -0.15em;
+  left: -0.05em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ─── CTA block (solid, like reference) ─── */
+.cta-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 2.5rem;
+  background: var(--color-accent);
+  color: var(--color-void);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+}
+.cta-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 182, 122, 0.3);
 }
 
 /* ─── Mobile perf ─── */
