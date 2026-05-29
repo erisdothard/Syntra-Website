@@ -178,7 +178,7 @@ function PortfolioView() {
       </div>
 
       {/* Project grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 36 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 12, marginBottom: 36 }}>
         {projects.map((proj) => (
           <button
             key={proj.title}

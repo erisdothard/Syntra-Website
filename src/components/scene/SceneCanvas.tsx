@@ -7,14 +7,17 @@ import { CrystalCore } from '../CrystalCore'
 import { CameraRig } from './CameraRig'
 import { PostFX } from './PostFX'
 import { scrollState } from '../../lib/scrollState'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 export const SceneCanvas = memo(function SceneCanvas() {
+  const isMobile = useIsMobile()
+
   return (
     <div id="scene-canvas" className="fixed inset-0 z-0 pointer-events-none will-change-transform">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 40 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: true }}
+        dpr={isMobile ? [1, 1.2] : [1, 1.5]}
+        gl={{ antialias: !isMobile, alpha: true }}
         style={{ pointerEvents: 'none' }}
       >
         <CameraRig />
@@ -37,7 +40,7 @@ export const SceneCanvas = memo(function SceneCanvas() {
             position={[0, 0, 0]} scale={16} />
         </Environment>
         <fog attach="fog" args={['#0D0E12', 12, 35]} />
-        <ParticleField scrollProgress={scrollState} />
+        <ParticleField scrollProgress={scrollState} count={isMobile ? 200 : 500} />
         <Suspense fallback={null}>
           <SyntraEmblem3D scrollProgress={scrollState} />
           <group position={[0, -12, 0]}>
