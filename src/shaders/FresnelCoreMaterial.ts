@@ -76,6 +76,7 @@ export function useFresnelCoreMaterial() {
       `,
       transparent: false,
       side: THREE.FrontSide,
+      toneMapped: false,
     })
   }, [])
 }

@@ -104,6 +104,7 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
       clearcoat: 1.0,
       clearcoatRoughness: 0.0,
       transparent: true,
+      toneMapped: false,
     })
 
     const dotWhite = new THREE.MeshPhysicalMaterial({
@@ -119,6 +120,7 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
       clearcoat: 1.0,
       clearcoatRoughness: 0.0,
       transparent: true,
+      toneMapped: false,
     })
 
     return { dotGreen, dotWhite }
@@ -218,18 +220,18 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
       <mesh ref={ringRefs.RingDark}  geometry={nodes.RingDark.geometry}  material={ringMaterials.darkRing} />
 
       {/* Core — high-res sphere with custom Fresnel shader */}
-      <mesh ref={coreRef} material={fresnelMat} toneMapped={false}>
+      <mesh ref={coreRef} material={fresnelMat}>
         <sphereGeometry args={[0.7, 128, 64]} />
       </mesh>
 
       {/* Orbiting dots — glass orbs */}
-      <mesh ref={dotRefs[0]} material={dotMaterials.dotGreen} toneMapped={false}>
+      <mesh ref={dotRefs[0]} material={dotMaterials.dotGreen}>
         <sphereGeometry args={[0.075, 32, 16]} />
       </mesh>
-      <mesh ref={dotRefs[1]} material={dotMaterials.dotGreen} toneMapped={false}>
+      <mesh ref={dotRefs[1]} material={dotMaterials.dotGreen}>
         <sphereGeometry args={[0.075, 32, 16]} />
       </mesh>
-      <mesh ref={dotRefs[2]} material={dotMaterials.dotWhite} toneMapped={false}>
+      <mesh ref={dotRefs[2]} material={dotMaterials.dotWhite}>
         <sphereGeometry args={[0.06, 32, 16]} />
       </mesh>
     </group>

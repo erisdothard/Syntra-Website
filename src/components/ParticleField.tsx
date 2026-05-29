@@ -121,8 +121,8 @@ export function ParticleField({ scrollProgress, count = 500 }: Props) {
   return (
     <points ref={pointsRef} material={shaderMat} renderOrder={-1}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" array={positions} count={count} itemSize={3} />
-        <bufferAttribute attach="attributes-aSize" array={sizes} count={count} itemSize={1} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-aSize" args={[sizes, 1]} />
       </bufferGeometry>
     </points>
   )
