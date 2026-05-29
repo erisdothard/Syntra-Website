@@ -1,31 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
-
-/* ── data ── */
-
-const projects = [
-  { title: 'FreightX', tag: 'AI Freight Marketplace', stack: 'React · Python · Supabase', featured: true },
-  { title: 'Syntra AI', tag: 'Agentic OS for SMBs', stack: 'FastAPI · Claude API · LangGraph', featured: true },
-  { title: 'BridgeLink', tag: 'HL7/FHIR Interop', stack: 'Mirth Connect · PostgreSQL', featured: false },
-  { title: 'CPI Card Group', tag: 'CJIS Fintech Pipelines', stack: 'OAuth 2.0 · ETL · SFTP', featured: false },
-]
-
-const experience = [
-  { role: 'Founder', org: 'Syntra', date: '2025 –' },
-  { role: 'Integration Engineer', org: 'CPI Card Group', date: '2021 – 26' },
-  { role: 'Technical Support', org: 'Google Fiber', date: '2019 – 21' },
-]
-
-const services = [
-  { title: 'AI Workflow Automation', desc: 'Agents and pipelines that replace manual ops end-to-end.' },
-  { title: 'Custom Software', desc: 'AI-embedded apps and tools built to your exact workflow.' },
-  { title: 'Ongoing Retainer', desc: 'Maintenance, monitoring, and iteration on shipped systems.' },
-]
+import { projects, experience, services, skills } from '../data/portfolio'
+import type { Project } from '../data/portfolio'
 
 /* ── component ── */
 
 interface TabOverlayProps {
-  activeTab: 'portfolio' | 'services' | null
+  activeTab: 'portfolio' | 'services' | 'resume' | null
   onClose: () => void
 }
 
@@ -109,10 +90,10 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center"
+      className="fixed inset-0 z-[60] flex items-center justify-center"
       style={{
         background: visible
-          ? 'radial-gradient(ellipse at 50% 30%, rgba(0,255,204,0.02) 0%, rgba(8,10,13,0.98) 50%)'
+          ? 'radial-gradient(ellipse at 50% 30%, rgba(0,255,204,0.03) 0%, transparent 50%), rgba(8,10,13,1)'
           : 'rgba(8,10,13,0)',
         transition: 'background 0.5s cubic-bezier(0.16,1,0.3,1)',
       }}
@@ -136,21 +117,48 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
         &times;
       </button>
 
-      {/* Content — vertically centered, single viewport */}
+      {/* Content — vertically centered, scrollable */}
       <div
         ref={contentRef}
-        className="relative z-10 w-full px-6 md:px-12"
+        className="relative z-10 w-full px-6 md:px-12 max-h-[85vh] overflow-y-auto"
         style={{ maxWidth: 960 }}
       >
-        {activeTab === 'portfolio' ? <PortfolioView /> : <ServicesView />}
+        {activeTab === 'portfolio' && <PortfolioView />}
+        {activeTab === 'services' && <ServicesView />}
+        {activeTab === 'resume' && <ResumeView />}
       </div>
     </div>
+  )
+}
+
+/* ── Shared card border component ── */
+
+function AnimatedBorder() {
+  return (
+    <div
+      data-animate="border"
+      style={{
+        position: 'absolute', inset: 0, borderRadius: 'inherit', padding: 1, pointerEvents: 'none',
+        background: 'linear-gradient(90deg, transparent 0%, rgba(0,255,204,0) 30%, rgba(0,255,204,0.3) 50%, rgba(0,255,204,0) 70%, transparent 100%)',
+        backgroundSize: '200% 100%',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        opacity: 0.6,
+      }}
+    />
   )
 }
 
 /* ═══════════════ PORTFOLIO ═══════════════ */
 
 function PortfolioView() {
+  const [selected, setSelected] = useState<Project | null>(null)
+
+  if (selected) {
+    return <ProjectDetail project={selected} onBack={() => setSelected(null)} />
+  }
+
   return (
     <>
       {/* Header */}
@@ -163,28 +171,17 @@ function PortfolioView() {
         </h2>
       </div>
 
-      {/* 2×2 bento grid */}
+      {/* Project grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 12, marginBottom: 36 }}>
         {projects.map((proj) => (
-          <div
+          <button
             key={proj.title}
             data-animate="card"
             className="tab-card"
-            style={{ position: 'relative', padding: '24px 24px 20px', overflow: 'hidden' }}
+            style={{ position: 'relative', padding: '24px 24px 20px', overflow: 'hidden', textAlign: 'left', cursor: 'pointer' }}
+            onClick={() => setSelected(proj)}
           >
-            {/* Animated border sweep */}
-            <div
-              data-animate="border"
-              style={{
-                position: 'absolute', inset: 0, borderRadius: 'inherit', padding: 1, pointerEvents: 'none',
-                background: 'linear-gradient(90deg, transparent 0%, rgba(0,255,204,0) 30%, rgba(0,255,204,0.3) 50%, rgba(0,255,204,0) 70%, transparent 100%)',
-                backgroundSize: '200% 100%',
-                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                WebkitMaskComposite: 'xor',
-                maskComposite: 'exclude',
-                opacity: 0.6,
-              }}
-            />
+            <AnimatedBorder />
 
             {proj.featured && (
               <span className="font-mono" style={{ fontSize: 8, color: '#00FFCC', letterSpacing: '0.15em', display: 'block', marginBottom: 8 }}>
@@ -200,19 +197,98 @@ function PortfolioView() {
             <p className="font-mono" style={{ fontSize: 9, color: 'rgba(0,255,204,0.4)', letterSpacing: '0.06em' }}>
               {proj.stack}
             </p>
-          </div>
+          </button>
         ))}
       </div>
 
       {/* Experience — compact horizontal row */}
       <div data-animate="item" style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
         {experience.map((item, i) => (
-          <div key={item.date} data-animate="item" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div key={item.org} data-animate="item" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: i === 0 ? '#00FFCC' : 'rgba(255,255,255,0.15)', boxShadow: i === 0 ? '0 0 8px rgba(0,255,204,0.3)' : 'none', flexShrink: 0 }} />
             <span className="font-heading" style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.role}</span>
             <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{item.org} · {item.date}</span>
           </div>
         ))}
+      </div>
+    </>
+  )
+}
+
+/* ── Project detail sub-view ── */
+
+function ProjectDetail({ project, onBack }: { project: Project; onBack: () => void }) {
+  return (
+    <>
+      <div data-animate="header" style={{ marginBottom: 32 }}>
+        <button
+          onClick={onBack}
+          className="font-mono"
+          style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.2em', opacity: 0.7, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer' }}
+        >
+          &larr; Back to Portfolio
+        </button>
+        {project.featured && (
+          <span className="font-mono" style={{ fontSize: 8, color: '#00FFCC', letterSpacing: '0.15em', display: 'block', marginBottom: 8 }}>
+            FEATURED
+          </span>
+        )}
+        <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
+          {project.title}<span style={{ color: '#00FFCC' }}>.</span>
+        </h2>
+        <p className="font-mono" style={{ fontSize: 11, color: 'rgba(0,255,204,0.5)', letterSpacing: '0.08em', marginTop: 8 }}>
+          {project.tag}
+        </p>
+      </div>
+
+      <div data-animate="card" className="tab-card" style={{ position: 'relative', padding: '32px 28px', overflow: 'hidden', marginBottom: 20 }}>
+        <AnimatedBorder />
+        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: 20 }}>
+          {project.description}
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {project.stack.split(' · ').map((tech) => (
+            <span
+              key={tech}
+              className="font-mono"
+              style={{
+                fontSize: 10,
+                color: '#00FFCC',
+                letterSpacing: '0.05em',
+                padding: '4px 10px',
+                borderRadius: 4,
+                border: '1px solid rgba(0,255,204,0.15)',
+                background: 'rgba(0,255,204,0.04)',
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Action links */}
+      <div data-animate="item" style={{ display: 'flex', gap: 12 }}>
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-initialize"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          >
+            View on GitHub <span style={{ fontSize: 16 }}>&rarr;</span>
+          </a>
+        )}
+        {!project.github && (
+          <a
+            href="mailto:eris@syntra.ai?subject=FreightX Demo Request"
+            className="cta-initialize"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          >
+            Request a Demo <span style={{ fontSize: 16 }}>&rarr;</span>
+          </a>
+        )}
       </div>
     </>
   )
@@ -242,19 +318,7 @@ function ServicesView() {
             className="tab-card"
             style={{ position: 'relative', padding: '28px 24px 24px', overflow: 'hidden' }}
           >
-            {/* Animated border sweep */}
-            <div
-              data-animate="border"
-              style={{
-                position: 'absolute', inset: 0, borderRadius: 'inherit', padding: 1, pointerEvents: 'none',
-                background: 'linear-gradient(90deg, transparent 0%, rgba(0,255,204,0) 30%, rgba(0,255,204,0.3) 50%, rgba(0,255,204,0) 70%, transparent 100%)',
-                backgroundSize: '200% 100%',
-                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                WebkitMaskComposite: 'xor',
-                maskComposite: 'exclude',
-                opacity: 0.6,
-              }}
-            />
+            <AnimatedBorder />
 
             <span className="font-mono" style={{ fontSize: 28, fontWeight: 700, color: 'rgba(255,255,255,0.04)', position: 'absolute', top: 16, right: 20, lineHeight: 1, pointerEvents: 'none' }}>
               {String(i + 1).padStart(2, '0')}
@@ -277,6 +341,125 @@ function ServicesView() {
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
           Start a Project <span style={{ fontSize: 16 }}>&rarr;</span>
+        </a>
+      </div>
+    </>
+  )
+}
+
+/* ═══════════════ RESUME ═══════════════ */
+
+function ResumeView() {
+  const [expanded, setExpanded] = useState<string | null>(null)
+
+  return (
+    <>
+      {/* Header */}
+      <div data-animate="header" style={{ marginBottom: 40 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
+          Background
+        </p>
+        <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
+          Resume<span style={{ color: '#00FFCC' }}>.</span>
+        </h2>
+      </div>
+
+      {/* Experience */}
+      <div style={{ marginBottom: 36 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
+          Experience
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {experience.map((item) => {
+            const isExpanded = expanded === item.org
+            const hasBullets = item.bullets && item.bullets.length > 0
+            return (
+              <div key={item.org} data-animate="card" className="tab-card" style={{ position: 'relative', overflow: 'hidden' }}>
+                <AnimatedBorder />
+                <button
+                  onClick={() => hasBullets && setExpanded(isExpanded ? null : item.org)}
+                  style={{
+                    width: '100%', textAlign: 'left', padding: '20px 24px',
+                    background: 'none', border: 'none', cursor: hasBullets ? 'pointer' : 'default',
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  }}
+                >
+                  <div>
+                    <h3 className="font-heading" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+                      {item.role}
+                    </h3>
+                    <p style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      {item.org} · {item.date}
+                    </p>
+                  </div>
+                  {hasBullets && (
+                    <span className="font-mono" style={{ fontSize: 14, color: '#00FFCC', opacity: 0.5, transition: 'transform 0.3s ease', transform: isExpanded ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                      +
+                    </span>
+                  )}
+                </button>
+                {isExpanded && item.bullets && (
+                  <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0 0' }}>
+                      {item.bullets.map((bullet) => (
+                        <li key={bullet} style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.7, paddingLeft: 14, position: 'relative', marginBottom: 6 }}>
+                          <span style={{ position: 'absolute', left: 0, color: 'rgba(0,255,204,0.3)' }}>›</span>
+                          {bullet}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Skills */}
+      <div style={{ marginBottom: 36 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
+          Skills
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 12 }}>
+          {skills.map((group) => (
+            <div key={group.category} data-animate="card" className="tab-card" style={{ position: 'relative', padding: '20px 20px 16px', overflow: 'hidden' }}>
+              <AnimatedBorder />
+              <h4 className="font-heading" style={{ fontSize: 11, fontWeight: 700, color: '#fff', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {group.category}
+              </h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {group.items.map((skill) => (
+                  <span
+                    key={skill}
+                    className="font-mono"
+                    style={{
+                      fontSize: 9,
+                      color: 'rgba(0,255,204,0.6)',
+                      letterSpacing: '0.04em',
+                      padding: '3px 8px',
+                      borderRadius: 3,
+                      border: '1px solid rgba(0,255,204,0.1)',
+                      background: 'rgba(0,255,204,0.03)',
+                    }}
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div data-animate="item">
+        <a
+          href="mailto:eris@syntra.ai"
+          className="cta-initialize"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+        >
+          Get in Touch <span style={{ fontSize: 16 }}>&rarr;</span>
         </a>
       </div>
     </>

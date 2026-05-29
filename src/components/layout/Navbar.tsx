@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 
 interface NavbarProps {
-  onTabOpen: (tab: 'portfolio' | 'services') => void
+  onTabOpen: (tab: 'portfolio' | 'services' | 'resume') => void
 }
 
 export function Navbar({ onTabOpen }: NavbarProps) {
@@ -32,7 +32,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
       }`}
       style={{ WebkitBackdropFilter: scrolled ? 'blur(24px) saturate(1.4)' : undefined }}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 md:px-10 lg:px-12 py-3">
         {/* Logo */}
         <a
           href="#"
@@ -43,7 +43,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
           className="font-heading text-sm font-semibold tracking-widest text-text uppercase select-none transition-colors duration-300 hover:text-accent"
           style={{ fontVariant: 'all-small-caps', letterSpacing: '0.18em' }}
         >
-          Eris Dothard
+          Eris Dothard &mdash; Syntra
         </a>
 
         {/* Center nav links */}
@@ -65,6 +65,14 @@ export function Navbar({ onTabOpen }: NavbarProps) {
             </button>
           </li>
           <li>
+            <button
+              onClick={() => onTabOpen('resume')}
+              className="font-mono text-[11px] uppercase tracking-[0.15em] text-text-secondary transition-colors duration-300 hover:text-accent"
+            >
+              Resume
+            </button>
+          </li>
+          <li>
             <a
               href="#section-5"
               onClick={(e) => handleAnchorClick(e, '#section-5')}
@@ -75,14 +83,8 @@ export function Navbar({ onTabOpen }: NavbarProps) {
           </li>
         </ul>
 
-        {/* Resume button */}
-        <a
-          href="/resume.pdf"
-          download
-          className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent border border-accent/30 rounded-full px-4 py-1.5 transition-all duration-300 hover:bg-accent/10 hover:border-accent/50 hover:shadow-[0_0_16px_rgba(0,182,122,0.15)]"
-        >
-          Resume
-        </a>
+        {/* Spacer for layout balance */}
+        <div className="w-20" />
       </div>
     </nav>
   )

@@ -26,14 +26,14 @@ export function useScrollAnimations() {
         onUpdate: (self) => {
           const p = self.progress
 
-          // One continuous 360° rotation — smoothstep eased for gentle start/end
-          const rotEase = smoothstep(0, 1, p)
+          // Rotation front-loaded — most happens in first half, slows through bottom sections
+          const rotEase = smoothstep(0, 0.65, p)
           scrollState.rotationY = rotEase * Math.PI * 2
 
-          // Explode: smooth ramp up (0–0.25), smooth ramp down (0.35–0.85)
-          const explodeUp = smoothstep(0.05, 0.25, p)
-          const explodeDown = 1 - smoothstep(0.35, 0.85, p)
-          scrollState.explode = Math.min(explodeUp, explodeDown)
+          // Explode: full decon through text sections, reconstruct near end
+          const explodeIn = smoothstep(0.03, 0.18, p)
+          const explodeOut = 1 - smoothstep(0.65, 0.88, p)
+          scrollState.explode = Math.min(explodeIn, explodeOut)
 
           // Scale: gentle arc — peaks mid-page
           const scaleArc = Math.sin(smoothstep(0, 1, p) * Math.PI)
@@ -53,7 +53,7 @@ export function useScrollAnimations() {
         trigger: '#section-3',
         start: 'top bottom',
         end: 'bottom top',
-        scrub: 2,
+        scrub: 0.8,
         onUpdate: (self) => {
           const t = smoothstep(0, 0.6, self.progress)
           scrollState.cameraX = t * -3.5
@@ -71,9 +71,40 @@ export function useScrollAnimations() {
           ease: 'none',
           scrollTrigger: {
             trigger: '#section-3',
-            start: 'top 90%',
-            end: 'top 50%',
-            scrub: 0.4,
+            start: 'top 95%',
+            end: 'top 40%',
+            scrub: 1,
+          },
+        },
+      )
+
+      // ─── Camera swings RIGHT during section-3b (mirror of section-3) ───
+      ScrollTrigger.create({
+        trigger: '#section-3b',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 0.8,
+        onUpdate: (self) => {
+          const t = smoothstep(0, 0.6, self.progress)
+          // Swing from -3.5 (left) to +3.5 (right)
+          scrollState.cameraX = -3.5 + t * 7
+          scrollState.lookAtX = -1.5 + t * 3
+        },
+      })
+
+      // ─── Services text column fade in ───
+      gsap.fromTo(
+        '#services-text',
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '#section-3b',
+            start: 'top 95%',
+            end: 'top 40%',
+            scrub: 1,
           },
         },
       )
@@ -86,8 +117,8 @@ export function useScrollAnimations() {
         scrub: 2,
         onUpdate: (self) => {
           const t = smoothstep(0, 1, self.progress)
-          scrollState.cameraX = -3.5 * (1 - t)
-          scrollState.lookAtX = -1.5 * (1 - t)
+          scrollState.cameraX = 3.5 * (1 - t)
+          scrollState.lookAtX = 1.5 * (1 - t)
         },
       })
 

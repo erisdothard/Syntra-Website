@@ -1,20 +1,21 @@
 export function CoreSection() {
   return (
     <section id="section-3" className="relative" style={{ minHeight: '130vh' }}>
-      <div className="sticky top-0 h-screen flex items-center px-6 md:px-12 lg:px-16">
+      <div className="sticky top-0 h-screen flex items-center pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12" style={{ willChange: 'transform' }}>
         {/* Left-aligned heavy typography column — canvas slides right via GSAP */}
-        <div id="agentic-text" className="max-w-xl">
+        <div id="agentic-text" className="relative max-w-xl">
           <span className="section-number">01</span>
           <p className="section-label mb-4">What We Build</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight font-heading">
-            Build your
+            Enterprise AI
             <br />
-            Agentic OS.
+            Infrastructure.
           </h2>
           <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed max-w-md">
-            Zero overhead. Infinite capacity. Custom-built AI pipelines,
-            deep-tier integrations, and autonomous workforces engineered to
-            replace manual friction entirely.
+            Syntra engineers custom AI pipelines, voice agents, and workflow
+            automation for operations-heavy industries &mdash; logistics,
+            fintech, and enterprise ops. We replace manual friction with
+            autonomous systems that scale without headcount.
           </p>
           <a href="#section-5" className="cta-initialize mt-10 inline-flex items-center gap-2">
             Initialize System <span className="text-lg">&rarr;</span>

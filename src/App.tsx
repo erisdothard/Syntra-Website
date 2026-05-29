@@ -9,6 +9,7 @@ import { HeroSection } from './components/sections/HeroSection'
 import { DeconstructSection } from './components/sections/DeconstructSection'
 import { CoreSection } from './components/sections/CoreSection'
 import { CrystalSection } from './components/sections/CrystalSection'
+import { ServicesSection } from './components/sections/ServicesSection'
 import { ReconstructSection } from './components/sections/ReconstructSection'
 
 export default function App() {
@@ -16,7 +17,7 @@ export default function App() {
   useScrollAnimations()
   useTextReveals()
 
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'services' | null>(null)
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'services' | 'resume' | null>(null)
 
   return (
     <>
@@ -28,6 +29,7 @@ export default function App() {
         <HeroSection />
         <DeconstructSection />
         <CoreSection />
+        <ServicesSection />
         <CrystalSection />
         <ReconstructSection />
       </div>

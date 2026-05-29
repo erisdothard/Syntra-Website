@@ -1,8 +1,8 @@
 export function HeroSection() {
   return (
-    <section id="section-1" className="h-screen relative px-6 md:px-12 lg:px-16">
+    <section id="section-1" className="h-screen relative px-8 md:px-16 lg:px-18">
       {/* Top-left quadrant: subtitle + dominant name */}
-      <div className="absolute top-28 md:top-32 left-6 md:left-12 lg:left-16">
+      <div className="absolute top-28 md:top-32 left-8 md:left-16 lg:left-18">
         <p className="reveal section-label text-[#00FFCC] tracking-widest text-[11px] font-mono uppercase mb-3 opacity-90">
           Founder &amp; Integrations Engineer
         </p>
@@ -13,25 +13,10 @@ export function HeroSection() {
         </h1>
       </div>
 
-      {/* Bottom-right: tagline + grouped CTAs */}
-      <div className="absolute bottom-24 md:bottom-32 right-6 md:right-12 lg:right-16 text-right max-w-md">
-        <p className="reveal text-sm md:text-base text-text-secondary leading-relaxed mb-8 font-body">
-          <span className="text-white font-semibold font-heading">Syntra AI</span>{' '}
-          &mdash; Architecting autonomous operations for enterprise&nbsp;scaling.
-        </p>
-        <div className="flex flex-col gap-3 items-end">
-          <a
-            href="#section-4"
-            className="reveal reveal-delay-2 cta-primary inline-flex items-center gap-2 px-8 py-3.5 bg-accent text-void font-semibold text-sm rounded-full"
-          >
-            See Our Work &rarr;
-          </a>
-          <a
-            href="#section-5"
-            className="reveal reveal-delay-3 inline-flex items-center gap-2 px-8 py-3.5 border border-white/10 text-text-secondary font-medium text-xs rounded-full hover:border-[#00FFCC]/50 hover:text-[#00FFCC] transition-colors duration-300"
-          >
-            Get Started
-          </a>
+      {/* Bottom-center: scroll indicator */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
+        <div className="reveal reveal-delay-2 flex flex-col items-center gap-3 opacity-25 hover:opacity-40 transition-opacity duration-500">
+          <div className="w-px h-12 bg-gradient-to-b from-transparent via-text-muted/50 to-transparent animate-pulse" />
         </div>
       </div>
     </section>
