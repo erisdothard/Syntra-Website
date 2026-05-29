@@ -488,7 +488,7 @@ function ResumeView() {
                   {cert.name}
                 </h4>
                 <p className="font-mono" style={{ fontSize: 9, color: 'rgba(0,255,204,0.5)', letterSpacing: '0.06em' }}>
-                  {cert.issuer} · {cert.date}
+                  {cert.issuer}{cert.date ? ` · ${cert.date}` : ''}
                 </p>
               </div>
             </div>
@@ -496,8 +496,16 @@ function ResumeView() {
         </div>
       </div>
 
-      {/* CTA */}
-      <div data-animate="item">
+      {/* CTAs */}
+      <div data-animate="item" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <a
+          href="/resume.html"
+          download="Eris_Dothard_Resume.html"
+          className="cta-initialize"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+        >
+          Download Resume <span style={{ fontSize: 16 }}>&darr;</span>
+        </a>
         <a
           href="mailto:erisdothard1@gmail.com"
           className="cta-initialize"

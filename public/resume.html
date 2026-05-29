@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eris Dothard — Resume</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.45;
+      color: #1a1a1a;
+      max-width: 8.5in;
+      margin: 0 auto;
+      padding: 0.45in 0.55in;
+      background: #fff;
+    }
+
+    a { color: #1a1a1a; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Header ── */
+    .header { text-align: center; margin-bottom: 14pt; }
+    .header h1 { font-size: 22pt; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4pt; }
+    .header .contact { font-size: 9.5pt; color: #444; }
+    .header .contact a { color: #444; }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 12pt; }
+    .section-title {
+      font-size: 10pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1.5pt solid #1a1a1a;
+      padding-bottom: 2pt;
+      margin-bottom: 7pt;
+    }
+
+    /* ── Summary ── */
+    .summary { font-size: 10pt; line-height: 1.5; color: #2a2a2a; }
+
+    /* ── Skills ── */
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 2pt 0; }
+    .skill-row { width: 100%; display: flex; gap: 6pt; margin-bottom: 2pt; }
+    .skill-label { font-weight: 700; min-width: 130pt; font-size: 9.5pt; flex-shrink: 0; }
+    .skill-items { font-size: 9.5pt; color: #333; }
+
+    /* ── Experience ── */
+    .job { margin-bottom: 10pt; }
+    .job-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1pt; }
+    .job-title { font-weight: 700; font-size: 10.5pt; }
+    .job-date { font-size: 9.5pt; color: #555; white-space: nowrap; }
+    .job-subtitle { font-size: 9.5pt; color: #555; font-style: italic; margin-bottom: 5pt; }
+    .job-sub-label { font-weight: 700; font-size: 9.5pt; margin-top: 6pt; margin-bottom: 3pt; }
+
+    ul { padding-left: 14pt; }
+    li { margin-bottom: 2.5pt; font-size: 10pt; }
+
+    /* ── Projects ── */
+    .project { margin-bottom: 8pt; }
+    .project-title { font-weight: 700; font-size: 10.5pt; }
+    .project-meta { font-size: 9pt; color: #555; font-style: italic; margin-bottom: 3pt; }
+    .project-stack { font-size: 8.5pt; color: #555; margin-top: 3pt; }
+
+    /* ── Certs ── */
+    .cert-line { font-size: 9.5pt; margin-bottom: 2pt; }
+    .cert-label { font-weight: 700; }
+
+    /* ── Print ── */
+    @media print {
+      body { padding: 0.4in 0.5in; font-size: 10pt; }
+      a { color: #1a1a1a !important; }
+      .section { break-inside: avoid; }
+      .job { break-inside: avoid; }
+      @page { margin: 0; size: letter; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>ERIS DOTHARD</h1>
+    <div class="contact">
+      Nashville, TN &nbsp;|&nbsp; <a href="mailto:erisdothard1@gmail.com">erisdothard1@gmail.com</a>
+      &nbsp;|&nbsp; 615-243-9891
+      &nbsp;|&nbsp; <a href="https://linkedin.com/in/eris-dothard-710622227">LinkedIn</a>
+      &nbsp;|&nbsp; <a href="https://github.com/erisdothard">GitHub</a>
+      &nbsp;|&nbsp; <a href="https://syntraai.tech">syntraai.tech</a>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="section">
+    <div class="section-title">Professional Summary</div>
+    <p class="summary">
+      Integration engineer and autonomous-infrastructure builder with seven years of IT experience.
+      Five years at CPI Card Group writing production-scale SQL across 50+ bank client databases, designing
+      source-to-target file mappings, and translating business requirements into functional specs in a
+      regulated, change-managed production environment. Now engineering custom integration logic and agentic
+      workflows that replace manual enterprise overhead &mdash; shipping full-stack platforms, cross-stack
+      data pipelines, voice-AI engines, and healthcare interoperability systems. Published HL7 v2.5 / FHIR R4
+      integration on Mirth Connect and BridgeLink. Methodology: requirements-to-implementation ownership with
+      change-management discipline and SLA-driven production recovery.
+    </p>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">Core Skills</div>
+    <div class="skills-grid">
+      <div class="skill-row">
+        <span class="skill-label">Frontend:</span>
+        <span class="skill-items">React, Next.js, TypeScript, Three.js, GSAP, Ionic, HTML, CSS</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Backend:</span>
+        <span class="skill-items">Python, Node.js, FastAPI, Express, Java, PostgreSQL, SQL Server, Supabase</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">AI &amp; Automation:</span>
+        <span class="skill-items">Anthropic API, LangChain, LangGraph, MCP, Voice AI (ElevenLabs), Claude Code, Agentic Pipelines</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Data &amp; SQL:</span>
+        <span class="skill-items">SQL, Data Modeling, Source-to-Target Mapping, Data Profiling, ETL, Large-Volume Reprocessing, Data Validation</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Integration &amp; APIs:</span>
+        <span class="skill-items">REST APIs, SFTP, HL7 v2.5, FHIR R4, Mirth Connect, OAuth 2.0, Postman, JSON, XML, YAML</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Healthcare:</span>
+        <span class="skill-items">HL7 (MSH, PID, PV1, OBR, OBX, EVN), FHIR R4 (Observation, Patient, Bundle), LOINC, HL7-to-FHIR Mapping, BridgeLink</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Infrastructure:</span>
+        <span class="skill-items">Docker, Kubernetes, AWS, GCP, GitHub Actions, Stripe, Upstash Redis, Networking</span>
+      </div>
+      <div class="skill-row">
+        <span class="skill-label">Process:</span>
+        <span class="skill-items">Requirements Gathering, FRS, Stakeholder Management, Change Management, SLA Recovery, Jira, Confluence, Git, Agile</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <div class="section">
+    <div class="section-title">Professional Experience</div>
+
+    <!-- Syntra -->
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title">Founder &amp; Technical Lead, Syntra AI</span>
+        <span class="job-date">2025 &ndash; Present</span>
+      </div>
+      <div class="job-subtitle">Autonomous infrastructure company &mdash; integration, automation, and application delivery</div>
+
+      <div class="job-sub-label">Capabilities &amp; Execution</div>
+      <ul>
+        <li>Engineering custom integration logic and agentic workflows that eliminate operational friction &mdash; replacing manual enterprise overhead with resilient, production-ready system architecture.</li>
+        <li>Cross-stack interoperability specialist: data pipelines connecting legacy system backbones to autonomous AI engines at production scale.</li>
+        <li>Full-lifecycle API and MCP orchestration with third-party pipeline implementation from scoping through production handoff.</li>
+        <li>Direct client communication for requirements, technical translation, and integration design &mdash; same methodology pattern carried forward from regulated banking work.</li>
+      </ul>
+
+      <div class="job-sub-label">Shipped Infrastructure</div>
+      <ul>
+        <li><strong>FreightX</strong> &mdash; multi-role logistics marketplace built across 20+ phases with autonomous load management, live GPS tracking, real-time bidding, billing automation, and carrier verification. React 19, TypeScript, Supabase, Stripe, Anthropic Claude, Upstash Redis.</li>
+        <li><strong>3 Aces Trucking Inc.</strong> &mdash; full application and web development for a commercial trucking carrier; voice AI integration, autonomous load and document automation, and client-facing site built end-to-end.</li>
+        <li><strong>BridgeLink Core</strong> &mdash; HL7/FHIR R4 data integration engine orchestrating four automated channels: ORU lab routing, ADT processing, and secure healthcare API infrastructure. Mirth Connect, PostgreSQL.</li>
+        <li><strong>DispatchRelay</strong> &mdash; voice-AI engine for small-tier trucking fleets with automated dispatch handling and background workflow automation. ElevenLabs, Python, TypeScript.</li>
+      </ul>
+    </div>
+
+    <!-- CPI -->
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title">Integration &amp; Production Support Engineer, CPI Card Group</span>
+        <span class="job-date">2021 &ndash; Feb 2026</span>
+      </div>
+      <div class="job-subtitle">Regulated banking production environment &mdash; financial institution clients &nbsp;|&nbsp; CJIS-certified</div>
+
+      <div class="job-sub-label">Daily Programming: SQL, XML &amp; Python</div>
+      <ul>
+        <li>Wrote and maintained SQL, XML, HTML, and Python in a regulated production environment with formal change control, delivered through a ticket-based workflow against bank-client requirements.</li>
+        <li>Ran production-scale SQL across 50+ bank client databases &mdash; investigation, validation, profiling, and large-volume data extracts with QA gates before every push.</li>
+        <li>Built reusable Python and SQL automation adopted into CPI's central library and used across the integration team.</li>
+        <li>Managed 30+ concurrent bank implementation tickets; presented changes in dev review meetings and coordinated production pushes with DevOps.</li>
+      </ul>
+
+      <div class="job-sub-label">File Format Design &amp; Source-to-Target Mapping</div>
+      <ul>
+        <li>Designed XML and flat-file formats for 50+ bank clients &mdash; field-level gap analysis, custom mapping logic, and source-to-target mapping from requirements through production deployment.</li>
+        <li>Built parse-and-transform pipelines and configured SFTP integrations per client, working directly with client IT to resolve technical decisions.</li>
+      </ul>
+
+      <div class="job-sub-label">Client Onboarding &amp; Production Recovery</div>
+      <ul>
+        <li>Onboarded enterprise financial institution clients end-to-end across 50+ bank implementations &mdash; from programming-implementation setup through live production.</li>
+        <li>Owned SLA-driven production recovery &mdash; diagnostic SQL to isolate failures, grouped by error type, reprocessed up to 10,000+ files per incident.</li>
+        <li>Provided product-tech support across the full card-issuance pipeline including remote troubleshooting at application, OS, and network layers.</li>
+      </ul>
+    </div>
+
+    <!-- Google Fiber -->
+    <div class="job">
+      <div class="job-header">
+        <span class="job-title">Tier 2 Technical Support Specialist, Google Fiber</span>
+        <span class="job-date">2019 &ndash; 2021</span>
+      </div>
+      <ul>
+        <li>Diagnosed network and configuration issues across 20+ daily live chat and phone interactions while maintaining 100% customer satisfaction; managed cases through Salesforce CRM.</li>
+        <li>Reproduced and reported bugs to engineering with detailed issue reports that drove systemic platform fixes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- HEALTHCARE PROJECTS -->
+  <div class="section">
+    <div class="section-title">Healthcare Integration Projects</div>
+    <div class="project">
+      <div class="project-title">BridgeLink HL7 / FHIR Healthcare Integration System</div>
+      <div class="project-meta">Solo build &nbsp;|&nbsp; <a href="https://github.com/erisdothard/healthcare-integration-portfolio">github.com/erisdothard</a></div>
+      <p>End-to-end healthcare integration on BridgeLink 4.6.1 (Innovar Healthcare fork of Mirth Connect) across four channels: ORU lab routing, ADT processing, and FHIR R4 Patient/Observation APIs.</p>
+      <ul>
+        <li>HL7 v2.5 parsing across MSH, PID, PV1, OBR, OBX, and EVN segments with try-catch error handling; ACK (MSH+MSA) response generation for every inbound message.</li>
+        <li><strong>ORU_Routing:</strong> parses PID/OBR/OBX; NPI provider enrichment via mid-flight reference table lookup against OBR-16; conditional routing of critical (HH/LL) vs normal results; multi-destination write to file and two PostgreSQL databases.</li>
+        <li><strong>ADT_Processing:</strong> handles A01 (admit), A03 (discharge), A08 (update) events with UPSERT logic for duplicate-admit resilience. Cross-channel data flow: ORU reads patient admission status from ADT-populated table for clinical-context enrichment.</li>
+        <li><strong>FHIR R4 APIs:</strong> separate endpoints returning Observation and Patient Bundles with searchset type, LOINC-coded lab results, unit coding via unitsofmeasure.org, interpretation flags via HL7 ObservationInterpretation CodeSystem.</li>
+      </ul>
+      <div class="project-stack">Stack: BridgeLink 4.6.1, Mirth Connect, PostgreSQL 14+, HL7 v2.5, FHIR R4, LOINC, JavaScript transformers.</div>
+    </div>
+  </div>
+
+  <!-- CERTS & EDU -->
+  <div class="section">
+    <div class="section-title">Certifications &amp; Education</div>
+    <div class="cert-line"><span class="cert-label">Anthropic:</span> Claude 101, Building with the Claude API, Introduction to Model Context Protocol, Model Context Protocol: Advanced Topics, Claude Code in Action</div>
+    <div class="cert-line"><span class="cert-label">Oracle:</span> Cloud Infrastructure AI Foundations (in progress)</div>
+    <div class="cert-line" style="margin-top: 6pt;"><span class="cert-label">Education:</span> Coursework in Computer Information Technology, Volunteer State Community College, Gallatin, TN</div>
+  </div>
+
+</body>
+</html>

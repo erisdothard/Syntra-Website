@@ -164,11 +164,11 @@ export interface Certification {
 }
 
 export const certifications: Certification[] = [
-  { name: 'Claude Code in Action', issuer: 'Anthropic', date: 'Mar 2026' },
-  { name: 'Model Context Protocol: Advanced Topics', issuer: 'Anthropic', date: 'Mar 2026' },
-  { name: 'Introduction to Model Context Protocol', issuer: 'Anthropic', date: 'Mar 2026' },
-  { name: 'Claude 101', issuer: 'Anthropic', date: 'Mar 2026' },
-  { name: 'Building with the Claude API', issuer: 'Anthropic', date: 'Mar 2026' },
+  { name: 'Claude Code in Action', issuer: 'Anthropic', date: '' },
+  { name: 'Model Context Protocol: Advanced Topics', issuer: 'Anthropic', date: '' },
+  { name: 'Introduction to Model Context Protocol', issuer: 'Anthropic', date: '' },
+  { name: 'Claude 101', issuer: 'Anthropic', date: '' },
+  { name: 'Building with the Claude API', issuer: 'Anthropic', date: '' },
 ]
 
 /* ── Skills (for resume view) ── */
