@@ -1,4 +1,8 @@
-export function CoreSection() {
+interface CoreSectionProps {
+  onTabOpen: (tab: 'portfolio' | 'services' | 'resume') => void
+}
+
+export function CoreSection({ onTabOpen }: CoreSectionProps) {
   return (
     <section id="section-3" className="relative" style={{ minHeight: '130vh' }}>
       <div className="sticky top-0 h-screen flex items-center pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12" style={{ willChange: 'transform' }}>
@@ -17,9 +21,9 @@ export function CoreSection() {
             wrappers &mdash; we build resilient, production-ready system
             architecture designed to replace manual enterprise overhead entirely.
           </p>
-          <a href="#section-5" className="cta-initialize mt-10 inline-flex items-center gap-2">
+          <button onClick={() => onTabOpen('services')} className="cta-initialize mt-10 inline-flex items-center gap-2">
             Initialize System <span className="text-lg">&rarr;</span>
-          </a>
+          </button>
         </div>
       </div>
     </section>

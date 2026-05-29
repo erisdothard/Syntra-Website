@@ -28,9 +28,9 @@ export default function App() {
       <div className="relative z-10 pointer-events-none [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
         <HeroSection />
         <DeconstructSection />
-        <CoreSection />
+        <CoreSection onTabOpen={setActiveTab} />
         <div style={{ height: '45vh' }} />
-        <ServicesSection />
+        <ServicesSection onTabOpen={setActiveTab} />
         <CrystalSection />
         <ReconstructSection />
       </div>
