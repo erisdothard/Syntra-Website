@@ -3,7 +3,7 @@ export function HeroSection() {
     <section id="section-1" className="h-screen relative px-8 md:px-16 lg:px-18">
       {/* Top-left quadrant: subtitle + dominant name */}
       <div className="absolute top-28 md:top-32 left-8 md:left-16 lg:left-18">
-        <p className="reveal section-label text-[#00FFCC] tracking-widest text-[11px] font-mono uppercase mb-5 opacity-90 leading-relaxed">
+        <p className="reveal section-label text-white/70 tracking-widest text-[11px] font-mono uppercase mb-5 leading-relaxed">
           Integration &amp; Production Support Engineer
           <br />
           Autonomous Systems Architect

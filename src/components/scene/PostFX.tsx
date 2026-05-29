@@ -36,7 +36,7 @@ export function PostFX() {
       <Bloom ref={bloomRef} luminanceThreshold={0.35} luminanceSmoothing={0.8} intensity={0.5} mipmapBlur />
       <Vignette ref={vignetteRef} offset={0.3} darkness={0.35} />
       <ChromaticAberration ref={chromaRef} blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.0008, 0.0008)} />
-      <Noise opacity={0.06} blendFunction={BlendFunction.SOFT_LIGHT} />
+      <Noise opacity={0.02} blendFunction={BlendFunction.SOFT_LIGHT} />
     </EffectComposer>
   )
 }

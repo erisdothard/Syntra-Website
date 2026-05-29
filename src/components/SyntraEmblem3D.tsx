@@ -80,7 +80,7 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
       color: new THREE.Color('#1a1a22'),
       roughness: 0.25,
       metalness: 0.8,
-      envMapIntensity: 0.9,
+      envMapIntensity: 0.5,
       clearcoat: 0.6,
       clearcoatRoughness: 0.1,
       reflectivity: 0.5,
