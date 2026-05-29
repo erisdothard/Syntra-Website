@@ -31,7 +31,7 @@ export function useScrollAnimations() {
           scrollState.rotationY = rotEase * Math.PI * 2
 
           // Explode: full decon through text sections, reconstruct near end
-          const explodeIn = smoothstep(0, 0.25, p)
+          const explodeIn = smoothstep(0, 0.40, p)
           const explodeOut = 1 - smoothstep(0.65, 0.88, p)
           scrollState.explode = explodeIn * explodeOut
 
