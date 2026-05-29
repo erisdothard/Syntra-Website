@@ -29,6 +29,7 @@ export default function App() {
         <HeroSection />
         <DeconstructSection />
         <CoreSection />
+        <div style={{ height: '45vh' }} />
         <ServicesSection />
         <CrystalSection />
         <ReconstructSection />
