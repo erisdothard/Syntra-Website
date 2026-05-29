@@ -7,15 +7,15 @@ export function CoreSection() {
           <span className="section-number">01</span>
           <p className="section-label mb-4">What We Build</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight font-heading">
-            Enterprise AI
+            Autonomous
             <br />
             Infrastructure.
           </h2>
           <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed max-w-md">
-            Syntra engineers custom AI pipelines, voice agents, and workflow
-            automation for operations-heavy industries &mdash; logistics,
-            fintech, and enterprise ops. We replace manual friction with
-            autonomous systems that scale without headcount.
+            Custom integration logic and agentic workflows that eliminate
+            operational friction. We don&apos;t build standard software
+            wrappers &mdash; we build resilient, production-ready system
+            architecture designed to replace manual enterprise overhead entirely.
           </p>
           <a href="#section-5" className="cta-initialize mt-10 inline-flex items-center gap-2">
             Initialize System <span className="text-lg">&rarr;</span>

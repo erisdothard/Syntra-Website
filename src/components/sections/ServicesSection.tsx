@@ -5,17 +5,17 @@ export function ServicesSection() {
         {/* Right-aligned text column — mirrors CoreSection but on opposite side */}
         <div id="services-text" className="relative max-w-xl text-right">
           <span className="section-number" style={{ left: 'auto', right: '-0.05em' }}>02</span>
-          <p className="section-label mb-4">How We Engineer</p>
+          <p className="section-label mb-4">The Operator</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight font-heading">
-            Complex systems.
+            Systemic integration.
             <br />
-            Proven builds.
+            Core of automation.
           </h2>
           <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed">
-            FreightX &mdash; a multi-role freight marketplace. CJIS-certified
-            banking pipelines with OAuth 2.0 data mapping. Logistics automation
-            that moves real cargo. We build where the integrations are hard
-            and the stakes are enterprise-grade.
+            Built on deep enterprise integration experience across regulated
+            banking, healthcare interoperability, and logistics infrastructure.
+            We specialize in cross-stack connectivity &mdash; bridging legacy
+            systems to autonomous AI engines at production scale.
           </p>
           <a href="#section-5" className="cta-initialize mt-10 inline-flex items-center gap-2">
             Start Building <span className="text-lg">&rarr;</span>

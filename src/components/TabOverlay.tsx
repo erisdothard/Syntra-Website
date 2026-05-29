@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
-import { projects, experience, services, skills } from '../data/portfolio'
+import { projects, experience, services, skills, certifications } from '../data/portfolio'
 import type { Project } from '../data/portfolio'
 
 /* ── component ── */
@@ -22,12 +22,15 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
     const canvas = document.getElementById('scene-canvas')
     document.body.style.overflow = 'hidden'
     if (canvas) {
-      canvas.style.transition = 'opacity 0.5s cubic-bezier(0.16,1,0.3,1)'
+      canvas.style.transition = 'opacity 0.3s ease-out'
       canvas.style.opacity = '0.08'
     }
     return () => {
       document.body.style.overflow = ''
-      if (canvas) canvas.style.opacity = '1'
+      if (canvas) {
+        canvas.style.transition = 'opacity 0.15s ease-out'
+        canvas.style.opacity = '1'
+      }
     }
   }, [activeTab])
 
@@ -86,7 +89,10 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
     return () => { tl.kill() }
   }, [visible, activeTab])
 
-  if (!activeTab) return null
+  if (!activeTab) {
+    tlRef.current?.kill()
+    return null
+  }
 
   return (
     <div
@@ -172,7 +178,7 @@ function PortfolioView() {
       </div>
 
       {/* Project grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 12, marginBottom: 36 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 36 }}>
         {projects.map((proj) => (
           <button
             key={proj.title}
@@ -194,7 +200,7 @@ function PortfolioView() {
             <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10, lineHeight: 1.5 }}>
               {proj.tag}
             </p>
-            <p className="font-mono" style={{ fontSize: 9, color: 'rgba(0,255,204,0.4)', letterSpacing: '0.06em' }}>
+            <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.55)', letterSpacing: '0.06em' }}>
               {proj.stack}
             </p>
           </button>
@@ -282,7 +288,7 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
         )}
         {!project.github && (
           <a
-            href="mailto:eris@syntra.ai?subject=FreightX Demo Request"
+            href="mailto:erisdothard1@gmail.com?subject=FreightX Demo Request"
             className="cta-initialize"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
@@ -302,33 +308,37 @@ function ServicesView() {
       {/* Header */}
       <div data-animate="header" style={{ marginBottom: 40 }}>
         <p className="font-mono" style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
-          What We Offer
+          What We Build
         </p>
         <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
           Services<span style={{ color: '#00FFCC' }}>.</span>
         </h2>
       </div>
 
-      {/* 3-column service cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: 12, marginBottom: 36 }}>
+      {/* Stacked service cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 36 }}>
         {services.map((svc, i) => (
           <div
             key={svc.title}
             data-animate="card"
             className="tab-card"
-            style={{ position: 'relative', padding: '28px 24px 24px', overflow: 'hidden' }}
+            style={{ position: 'relative', padding: '28px 28px 24px', overflow: 'hidden', display: 'flex', gap: 24, alignItems: 'flex-start' }}
           >
             <AnimatedBorder />
 
-            <span className="font-mono" style={{ fontSize: 28, fontWeight: 700, color: 'rgba(255,255,255,0.04)', position: 'absolute', top: 16, right: 20, lineHeight: 1, pointerEvents: 'none' }}>
+            {/* Editorial number */}
+            <span className="font-heading" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 700, color: 'rgba(255,255,255,0.05)', lineHeight: 1, flexShrink: 0, minWidth: 56 }}>
               {String(i + 1).padStart(2, '0')}
             </span>
-            <h3 className="font-heading" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 8 }}>
-              {svc.title}
-            </h3>
-            <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-              {svc.desc}
-            </p>
+
+            <div style={{ flex: 1 }}>
+              <h3 className="font-heading" style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', marginBottom: 10 }}>
+                {svc.title}
+              </h3>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.75 }}>
+                {svc.desc}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -336,7 +346,7 @@ function ServicesView() {
       {/* CTA */}
       <div data-animate="item">
         <a
-          href="mailto:eris@syntra.ai"
+          href="mailto:erisdothard1@gmail.com"
           className="cta-initialize"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
@@ -372,38 +382,49 @@ function ResumeView() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {experience.map((item) => {
             const isExpanded = expanded === item.org
-            const hasBullets = item.bullets && item.bullets.length > 0
+            const hasContent = (item.bullets && item.bullets.length > 0) || (item.sections && item.sections.length > 0)
             return (
-              <div key={item.org} data-animate="card" className="tab-card" style={{ position: 'relative', overflow: 'hidden' }}>
+              <div
+                key={item.org}
+                data-animate="card"
+                className="tab-card"
+                style={{ position: 'relative', overflow: 'hidden', cursor: hasContent ? 'pointer' : 'default' }}
+                onClick={() => hasContent && setExpanded(isExpanded ? null : item.org)}
+              >
                 <AnimatedBorder />
-                <button
-                  onClick={() => hasBullets && setExpanded(isExpanded ? null : item.org)}
-                  style={{
-                    width: '100%', textAlign: 'left', padding: '20px 24px',
-                    background: 'none', border: 'none', cursor: hasBullets ? 'pointer' : 'default',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  }}
-                >
-                  <div>
-                    <h3 className="font-heading" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>
-                      {item.role}
-                    </h3>
-                    <p style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      {item.org} · {item.date}
-                    </p>
+                <div style={{ padding: '20px 24px' }}>
+                  <h3 className="font-heading" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+                    {item.role}
+                  </h3>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
+                    {item.org} · {item.date}
+                  </p>
+                </div>
+                {isExpanded && item.sections && (
+                  <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    {item.sections.map((section) => (
+                      <div key={section.label} style={{ marginTop: 16 }}>
+                        <span className="font-mono" style={{ fontSize: 9, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.15em', display: 'block', marginBottom: 10 }}>
+                          {section.label}
+                        </span>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                          {section.bullets.map((bullet) => (
+                            <li key={bullet} style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, paddingLeft: 14, position: 'relative', marginBottom: 6 }}>
+                              <span style={{ position: 'absolute', left: 0, color: 'rgba(0,255,204,0.4)' }}>›</span>
+                              {bullet}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
-                  {hasBullets && (
-                    <span className="font-mono" style={{ fontSize: 14, color: '#00FFCC', opacity: 0.5, transition: 'transform 0.3s ease', transform: isExpanded ? 'rotate(45deg)' : 'rotate(0deg)' }}>
-                      +
-                    </span>
-                  )}
-                </button>
+                )}
                 {isExpanded && item.bullets && (
                   <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                     <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0 0' }}>
                       {item.bullets.map((bullet) => (
-                        <li key={bullet} style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.7, paddingLeft: 14, position: 'relative', marginBottom: 6 }}>
-                          <span style={{ position: 'absolute', left: 0, color: 'rgba(0,255,204,0.3)' }}>›</span>
+                        <li key={bullet} style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, paddingLeft: 14, position: 'relative', marginBottom: 6 }}>
+                          <span style={{ position: 'absolute', left: 0, color: 'rgba(0,255,204,0.4)' }}>›</span>
                           {bullet}
                         </li>
                       ))}
@@ -452,10 +473,33 @@ function ResumeView() {
         </div>
       </div>
 
+      {/* Certifications */}
+      <div style={{ marginBottom: 36 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
+          Certifications
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 12 }}>
+          {certifications.map((cert) => (
+            <div key={cert.name} data-animate="card" className="tab-card" style={{ position: 'relative', padding: '18px 20px', overflow: 'hidden', display: 'flex', gap: 14, alignItems: 'center' }}>
+              <AnimatedBorder />
+              <img src="/anthropic-icon.svg" alt="" style={{ width: 24, height: 24, opacity: 0.6, flexShrink: 0 }} />
+              <div>
+                <h4 className="font-heading" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 4, lineHeight: 1.3 }}>
+                  {cert.name}
+                </h4>
+                <p className="font-mono" style={{ fontSize: 9, color: 'rgba(0,255,204,0.5)', letterSpacing: '0.06em' }}>
+                  {cert.issuer} · {cert.date}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* CTA */}
       <div data-animate="item">
         <a
-          href="mailto:eris@syntra.ai"
+          href="mailto:erisdothard1@gmail.com"
           className="cta-initialize"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
