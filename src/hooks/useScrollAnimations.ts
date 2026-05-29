@@ -33,7 +33,7 @@ export function useScrollAnimations() {
           // Explode: full decon through text sections, reconstruct near end
           const explodeIn = smoothstep(0, 0.25, p)
           const explodeOut = 1 - smoothstep(0.65, 0.88, p)
-          scrollState.explode = Math.min(explodeIn, explodeOut)
+          scrollState.explode = explodeIn * explodeOut
 
           // Scale: gentle arc — peaks mid-page
           const scaleArc = Math.sin(smoothstep(0, 1, p) * Math.PI)
@@ -43,21 +43,16 @@ export function useScrollAnimations() {
           scrollState.cameraY = scaleArc * 0.3
           scrollState.lookAtY = -scaleArc * 0.15
 
+          // Camera X — single writer, no race conditions
+          const panLeft = smoothstep(0.20, 0.35, p)
+          const swingR  = smoothstep(0.35, 0.55, p)
+          const returnC = smoothstep(0.65, 0.85, p)
+          const camX = -3.5 * panLeft + 7.0 * swingR - 3.5 * returnC
+          scrollState.cameraX = camX
+          scrollState.lookAtX = camX * (1.5 / 3.5)
+
           // Env rotation — continuous, eased
           scrollState.envRotation = rotEase * Math.PI
-        },
-      })
-
-      // ─── Camera pans right during section-3 (GPU-native, no DOM jank) ───
-      ScrollTrigger.create({
-        trigger: '#section-3',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 0.8,
-        onUpdate: (self) => {
-          const t = smoothstep(0, 0.6, self.progress)
-          scrollState.cameraX = t * -3.5
-          scrollState.lookAtX = t * -1.5
         },
       })
 
@@ -78,20 +73,6 @@ export function useScrollAnimations() {
         },
       )
 
-      // ─── Camera swings RIGHT during section-3b (mirror of section-3) ───
-      ScrollTrigger.create({
-        trigger: '#section-3b',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 0.8,
-        onUpdate: (self) => {
-          const t = smoothstep(0, 0.6, self.progress)
-          // Swing from -3.5 (left) to +3.5 (right)
-          scrollState.cameraX = -3.5 + t * 7
-          scrollState.lookAtX = -1.5 + t * 3
-        },
-      })
-
       // ─── Services text column fade in ───
       gsap.fromTo(
         '#services-text',
@@ -108,19 +89,6 @@ export function useScrollAnimations() {
           },
         },
       )
-
-      // ─── Camera returns to center for footer ───
-      ScrollTrigger.create({
-        trigger: '#section-5',
-        start: 'top bottom',
-        end: 'top center',
-        scrub: 2,
-        onUpdate: (self) => {
-          const t = smoothstep(0, 1, self.progress)
-          scrollState.cameraX = 3.5 * (1 - t)
-          scrollState.lookAtX = 1.5 * (1 - t)
-        },
-      })
 
       // Section 4: CrystalCore reveal (separate 3D object)
       ScrollTrigger.create({
