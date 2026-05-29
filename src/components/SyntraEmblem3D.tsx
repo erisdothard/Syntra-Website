@@ -176,7 +176,7 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
       // Tilt only starts after ring has cleared the sphere (ease > 0.35 = past sphere radius)
       const tiltEase = Math.max(0, (ease - 0.35)) / 0.65 // 0 until 35% Z travel, then ramps to 1
 
-      ref.position.z = THREE.MathUtils.lerp(ref.position.z, ease * cfg.z, 0.07)
+      ref.position.z = THREE.MathUtils.lerp(ref.position.z, ease * cfg.z, 0.12)
       ref.rotation.x = THREE.MathUtils.lerp(ref.rotation.x, tiltEase * cfg.tiltX, 0.05)
       ref.rotation.y = THREE.MathUtils.lerp(ref.rotation.y, tiltEase * cfg.tiltY + t * cfg.spin * tiltEase, 0.05)
     }
