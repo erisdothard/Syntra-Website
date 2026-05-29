@@ -31,25 +31,67 @@ export function useScrollAnimations() {
           scrollState.rotationY = rotEase * Math.PI * 2
 
           // Explode: smooth ramp up (0–0.25), smooth ramp down (0.35–0.85)
-          // No hard corners — both edges are C1 continuous
           const explodeUp = smoothstep(0.05, 0.25, p)
           const explodeDown = 1 - smoothstep(0.35, 0.85, p)
           scrollState.explode = Math.min(explodeUp, explodeDown)
 
-          // Scale: smooth arc — peaks mid-page
+          // Scale: gentle arc — peaks mid-page
           const scaleArc = Math.sin(smoothstep(0, 1, p) * Math.PI)
-          scrollState.scale = 1 + scaleArc * 0.3
+          scrollState.scale = 1 + scaleArc * 0.12
 
-          // Camera drift — same smooth arc
-          scrollState.cameraY = scaleArc * 0.8
-          scrollState.lookAtY = -scaleArc * 0.4
+          // Camera drift — subtle
+          scrollState.cameraY = scaleArc * 0.3
+          scrollState.lookAtY = -scaleArc * 0.15
 
           // Env rotation — continuous, eased
           scrollState.envRotation = rotEase * Math.PI
         },
       })
 
-      // Section 5: CrystalCore reveal (separate 3D object)
+      // ─── Camera pans right during section-3 (GPU-native, no DOM jank) ───
+      ScrollTrigger.create({
+        trigger: '#section-3',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 2,
+        onUpdate: (self) => {
+          const t = smoothstep(0, 0.6, self.progress)
+          scrollState.cameraX = t * -3.5
+          scrollState.lookAtX = t * -1.5
+        },
+      })
+
+      // ─── Agentic text column fade in ───
+      gsap.fromTo(
+        '#agentic-text',
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '#section-3',
+            start: 'top 90%',
+            end: 'top 50%',
+            scrub: 0.4,
+          },
+        },
+      )
+
+      // ─── Camera returns to center for footer ───
+      ScrollTrigger.create({
+        trigger: '#section-5',
+        start: 'top bottom',
+        end: 'top center',
+        scrub: 2,
+        onUpdate: (self) => {
+          const t = smoothstep(0, 1, self.progress)
+          scrollState.cameraX = -3.5 * (1 - t)
+          scrollState.lookAtX = -1.5 * (1 - t)
+        },
+      })
+
+      // Section 4: CrystalCore reveal (separate 3D object)
       ScrollTrigger.create({
         trigger: '#section-4',
         start: 'top bottom',
@@ -64,8 +106,6 @@ export function useScrollAnimations() {
           scrollState.crystalScale = 1 + smoothstep(0, 0.5, t) * 0.2
         },
       })
-
-      // No canvas slide — 3D stays fullscreen, text overlays with glassmorphism
     })
 
     return () => {

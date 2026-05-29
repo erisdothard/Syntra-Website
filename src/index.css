@@ -170,6 +170,39 @@ body {
   user-select: none;
 }
 
+/* ─── Tab overlay cards ─── */
+.tab-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, transform 0.3s var(--ease-out-expo), box-shadow 0.3s ease;
+}
+.tab-card:hover {
+  border-color: rgba(0, 255, 204, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 255, 204, 0.06);
+}
+
+/* ─── Initialize System CTA (mint border glow) ─── */
+.cta-initialize {
+  padding: 0.875rem 2rem;
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  color: #00FFCC;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: all 300ms var(--ease-out-expo);
+}
+.cta-initialize:hover {
+  border-color: rgba(0, 255, 204, 0.6);
+  box-shadow: 0 0 24px rgba(0, 255, 204, 0.15), inset 0 0 24px rgba(0, 255, 204, 0.05);
+  color: #fff;
+}
+.cta-initialize:active { transform: scale(0.98); }
+.cta-initialize:focus-visible { outline: 2px solid #00FFCC; outline-offset: 3px; }
+
 /* ─── CTA block (solid, like reference) ─── */
 .cta-block {
   display: inline-flex;
