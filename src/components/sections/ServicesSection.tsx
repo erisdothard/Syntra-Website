@@ -4,8 +4,8 @@ interface ServicesSectionProps {
 
 export function ServicesSection({ onTabOpen }: ServicesSectionProps) {
   return (
-    <section id="section-3b" className="relative" style={{ minHeight: '130vh' }}>
-      <div className="sticky top-0 h-screen flex items-center justify-end pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12" style={{ willChange: 'transform' }}>
+    <section id="section-3b" className="relative py-40">
+      <div className="flex items-center justify-end pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12">
         {/* Right-aligned text column — mirrors CoreSection but on opposite side */}
         <div id="services-text" className="relative max-w-xl text-right">
           <span className="section-number" style={{ left: 'auto', right: '-0.05em' }}>02</span>

@@ -4,8 +4,8 @@ interface CoreSectionProps {
 
 export function CoreSection({ onTabOpen }: CoreSectionProps) {
   return (
-    <section id="section-3" className="relative" style={{ minHeight: '130vh' }}>
-      <div className="sticky top-0 h-screen flex items-center pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12" style={{ willChange: 'transform' }}>
+    <section id="section-3" className="relative py-40">
+      <div className="flex items-center pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12">
         {/* Left-aligned heavy typography column — canvas slides right via GSAP */}
         <div id="agentic-text" className="relative max-w-xl">
           <span className="section-number">01</span>
