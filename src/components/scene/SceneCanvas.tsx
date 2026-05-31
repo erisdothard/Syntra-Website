@@ -42,7 +42,7 @@ export const SceneCanvas = memo(function SceneCanvas() {
         <fog attach="fog" args={['#0D0E12', 12, 35]} />
         <ParticleField scrollProgress={scrollState} count={isMobile ? 200 : 500} />
         <Suspense fallback={null}>
-          <SyntraEmblem3D scrollProgress={scrollState} />
+          <SyntraEmblem3D scrollProgress={scrollState} isMobile={isMobile} />
           <group position={[0, -12, 0]}>
             <CrystalCore scrollProgress={{
               explode: scrollState.crystalExplode,

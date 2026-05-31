@@ -38,9 +38,14 @@ const RING_ANIM = {
 
 interface Props {
   scrollProgress: { explode: number; rotationY: number; scale: number; envRotation: number; mouseX: number; mouseY: number }
+  isMobile: boolean
 }
 
-export function SyntraEmblem3D({ scrollProgress }: Props) {
+/* ─── Intro animation config ─── */
+const INTRO_DELAY = 0.3    // seconds before animation starts
+const INTRO_DURATION = 2.0 // total ramp time (easeOutExpo reaches ~97% at 1.3s)
+
+export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
   const { nodes } = useGLTF('/syntra-emblem-3d.glb') as unknown as GLTFResult
   const groupRef = useRef<THREE.Group>(null)
   const coreRef = useRef<THREE.Mesh>(null)
@@ -51,6 +56,10 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
   }
   const dotRefs = [useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null)]
   const fresnelMat = useFresnelCoreMaterial()
+
+  /* ─── Intro animation state ─── */
+  const introStartTime = useRef<number | null>(null)
+  const introProgress = useRef(0)
 
   /* ─── MeshPhysicalMaterial with clearcoat — smooth reflections, no HDRI artifacts ─── */
   const ringMaterials = useMemo(() => {
@@ -141,14 +150,37 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
     const t = clock.elapsedTime
     const { explode, rotationY, scale, mouseX, mouseY } = scrollProgress
 
+    // ── Intro: easeOutExpo from 0→1 ──
+    if (introStartTime.current === null) introStartTime.current = t + INTRO_DELAY
+    let intro = introProgress.current
+    if (intro < 1) {
+      const elapsed = t - introStartTime.current
+      if (elapsed > 0) {
+        const raw = Math.min(1, elapsed / INTRO_DURATION)
+        intro = raw >= 1 ? 1 : 1 - Math.pow(2, -10 * raw)
+        introProgress.current = intro
+      }
+    }
+
+    // During intro, rings start separated and assemble inward
+    const introExplode = (1 - intro) * 0.6
+    const effectiveExplode = Math.max(explode, introExplode)
+
+    // Mobile: scale down to avoid covering title / improve quality ratio
+    const mobileScale = isMobile ? 0.65 : 1
+    const targetScale = scale * mobileScale * intro
+
     // ── Group: rotation + idle float ──
     if (groupRef.current) {
+      // Extra spin during intro that decelerates into idle
+      const introSpin = (1 - intro) * Math.PI * 1.5
+
       groupRef.current.rotation.z = THREE.MathUtils.lerp(
         groupRef.current.rotation.z,
-        t * 0.095 + rotationY * 0.76,
+        t * 0.095 + rotationY * 0.76 + introSpin,
         0.04
       )
-      const e3 = explode * explode * explode
+      const e3 = effectiveExplode * effectiveExplode * effectiveExplode
       groupRef.current.rotation.y = THREE.MathUtils.lerp(
         groupRef.current.rotation.y,
         e3 * 0.38 + Math.sin(t * 0.3) * e3 * 0.14 + mouseX * 0.095,
@@ -160,8 +192,10 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
         0.04
       )
       groupRef.current.position.y = Math.sin(t * 0.4) * 0.03
+      // Faster lerp during intro for snappy entrance
+      const scaleLerp = intro < 0.95 ? 0.12 : 0.05
       groupRef.current.scale.setScalar(
-        THREE.MathUtils.lerp(groupRef.current.scale.x, scale, 0.05)
+        THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, scaleLerp)
       )
     }
 
@@ -170,7 +204,7 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
       const ref = ringRefs[name as keyof typeof ringRefs].current
       if (!ref) continue
 
-      const staggered = Math.max(0, Math.min(1, (explode - cfg.delay) / (1 - cfg.delay)))
+      const staggered = Math.max(0, Math.min(1, (effectiveExplode - cfg.delay) / (1 - cfg.delay)))
       const ease = staggered * staggered * (3 - 2 * staggered) // smoothstep
 
       // Tilt only starts after ring has cleared the sphere (ease > 0.35 = past sphere radius)
@@ -184,31 +218,31 @@ export function SyntraEmblem3D({ scrollProgress }: Props) {
     // ── GreenRing: ramp emissive glow during explode ──
     const morphFactor = (Math.sin(t * 0.8) + 1) * 0.5
     ringMaterials.greenRing.emissive.lerpColors(GREEN_EMISSIVE_BASE, GREEN_EMISSIVE_LIGHT, morphFactor)
-    ringMaterials.greenRing.emissiveIntensity = 0.8 + morphFactor * 0.4 + explode * 0.6
+    ringMaterials.greenRing.emissiveIntensity = 0.8 + morphFactor * 0.4 + effectiveExplode * 0.6
 
     // ── Core: Fresnel pulse when exposed ──
     if (coreRef.current) {
       fresnelMat.uniforms.uTime.value = t
       fresnelMat.uniforms.uExplode.value = THREE.MathUtils.lerp(
         fresnelMat.uniforms.uExplode.value,
-        explode,
+        effectiveExplode,
         0.06
       )
       const pulse = 0.7 + Math.sin(t * 2.5) * 0.3
-      const cs = 1 + explode * 0.1 * pulse
+      const cs = 1 + effectiveExplode * 0.1 * pulse
       coreRef.current.scale.setScalar(THREE.MathUtils.lerp(coreRef.current.scale.x, cs, 0.05))
     }
 
     // ── Dots: orbit outside outer ring ──
-    const dotOrbitR = 2.35 + explode * 1.2
-    const dotSpeed = 0.3 + explode * 0.4
+    const dotOrbitR = 2.35 + effectiveExplode * 1.2
+    const dotSpeed = 0.3 + effectiveExplode * 0.4
 
     dotRefs.forEach((ref, i) => {
       if (!ref.current) return
       const angle = t * dotSpeed + (i * Math.PI * 2) / 3
       ref.current.position.x = Math.cos(angle) * dotOrbitR
       ref.current.position.y = Math.sin(angle) * dotOrbitR
-      ref.current.position.z = Math.sin(t * 0.6 + i * 2) * explode * 0.4
+      ref.current.position.z = Math.sin(t * 0.6 + i * 2) * effectiveExplode * 0.4
     })
   })
 
