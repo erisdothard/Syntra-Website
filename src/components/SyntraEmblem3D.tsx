@@ -57,6 +57,10 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
   const dotRefs = [useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null), useRef<THREE.Mesh>(null)]
   const fresnelMat = useFresnelCoreMaterial()
 
+  /* ─── Shared dot geometry (avoids 3 separate BufferGeometry instances) ─── */
+  const dotGeo = useMemo(() => new THREE.SphereGeometry(0.075, 16, 8), [])
+  const dotGeoSmall = useMemo(() => new THREE.SphereGeometry(0.06, 12, 6), [])
+
   /* ─── Intro animation state ─── */
   const introStartTime = useRef<number | null>(null)
   const introProgress = useRef(0)
@@ -80,7 +84,7 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       roughness: 0.25,
       metalness: 0.9,
       envMapIntensity: 1.2,
-      clearcoat: 1.0,
+      clearcoat: 0.5,
       clearcoatRoughness: 0.12,
       reflectivity: 0.9,
     })
@@ -90,45 +94,35 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       roughness: 0.25,
       metalness: 0.8,
       envMapIntensity: 0.5,
-      clearcoat: 0.6,
-      clearcoatRoughness: 0.1,
       reflectivity: 0.5,
     })
 
     return { greenRing, whiteRing, darkRing }
   }, [])
 
-  /* ─── Glass orb materials with transmission ─── */
+  /* ─── Emissive orb materials (no transmission — eliminates 3 extra scene passes) ─── */
   const dotMaterials = useMemo(() => {
-    const dotGreen = new THREE.MeshPhysicalMaterial({
+    const dotGreen = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#00b67a'),
-      roughness: 0.05,
+      roughness: 0.2,
       metalness: 0.0,
-      transmission: 0.85,
-      thickness: 0.5,
-      ior: 1.5,
-      envMapIntensity: 1.5,
-      emissive: new THREE.Color(0.0, 0.55, 0.42),
-      emissiveIntensity: 2.5,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.0,
+      envMapIntensity: 1.0,
+      emissive: new THREE.Color(0.0, 0.7, 0.5),
+      emissiveIntensity: 3.0,
       transparent: true,
+      opacity: 0.95,
       toneMapped: false,
     })
 
-    const dotWhite = new THREE.MeshPhysicalMaterial({
+    const dotWhite = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#ffffff'),
-      roughness: 0.05,
+      roughness: 0.2,
       metalness: 0.0,
-      transmission: 0.85,
-      thickness: 0.5,
-      ior: 1.5,
-      envMapIntensity: 1.5,
-      emissive: new THREE.Color('#aaddcc'),
-      emissiveIntensity: 1.8,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.0,
+      envMapIntensity: 1.0,
+      emissive: new THREE.Color('#bbeecc'),
+      emissiveIntensity: 2.5,
       transparent: true,
+      opacity: 0.95,
       toneMapped: false,
     })
 
@@ -143,8 +137,10 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       ringMaterials.darkRing.dispose()
       dotMaterials.dotGreen.dispose()
       dotMaterials.dotWhite.dispose()
+      dotGeo.dispose()
+      dotGeoSmall.dispose()
     }
-  }, [ringMaterials, dotMaterials])
+  }, [ringMaterials, dotMaterials, dotGeo, dotGeoSmall])
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime
@@ -253,21 +249,15 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       <mesh ref={ringRefs.RingWhite} geometry={nodes.RingWhite.geometry} material={ringMaterials.whiteRing} />
       <mesh ref={ringRefs.RingDark}  geometry={nodes.RingDark.geometry}  material={ringMaterials.darkRing} />
 
-      {/* Core — high-res sphere with custom Fresnel shader */}
+      {/* Core — reduced tessellation (64×32 vs 128×64, imperceptible at 0.7r) */}
       <mesh ref={coreRef} material={fresnelMat}>
-        <sphereGeometry args={[0.7, 128, 64]} />
+        <sphereGeometry args={[0.7, 64, 32]} />
       </mesh>
 
-      {/* Orbiting dots — glass orbs */}
-      <mesh ref={dotRefs[0]} material={dotMaterials.dotGreen}>
-        <sphereGeometry args={[0.075, 32, 16]} />
-      </mesh>
-      <mesh ref={dotRefs[1]} material={dotMaterials.dotGreen}>
-        <sphereGeometry args={[0.075, 32, 16]} />
-      </mesh>
-      <mesh ref={dotRefs[2]} material={dotMaterials.dotWhite}>
-        <sphereGeometry args={[0.06, 32, 16]} />
-      </mesh>
+      {/* Orbiting dots — shared geometry, emissive glow */}
+      <mesh ref={dotRefs[0]} material={dotMaterials.dotGreen} geometry={dotGeo} />
+      <mesh ref={dotRefs[1]} material={dotMaterials.dotGreen} geometry={dotGeo} />
+      <mesh ref={dotRefs[2]} material={dotMaterials.dotWhite} geometry={dotGeoSmall} />
     </group>
   )
 }

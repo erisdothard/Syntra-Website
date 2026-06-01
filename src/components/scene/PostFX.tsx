@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { EffectComposer, Bloom, Vignette, ChromaticAberration, Noise } from '@react-three/postprocessing'
+import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing'
 import { BlendFunction, BloomEffect, VignetteEffect, ChromaticAberrationEffect } from 'postprocessing'
 import * as THREE from 'three'
 import { scrollState } from '../../lib/scrollState'
@@ -26,7 +26,8 @@ export function PostFX() {
     }
 
     if (chromaRef.current && chromaRef.current.offset) {
-      const offset = 0.0008 + explode * 0.002
+      // Zero offset at rest (no-op), ramp during explode — no enabled toggling to avoid pipeline recompile
+      const offset = explode * 0.0025
       chromaRef.current.offset.set(offset, offset)
     }
   })
@@ -35,8 +36,7 @@ export function PostFX() {
     <EffectComposer>
       <Bloom ref={bloomRef} luminanceThreshold={0.35} luminanceSmoothing={0.8} intensity={0.5} mipmapBlur />
       <Vignette ref={vignetteRef} offset={0.3} darkness={0.35} />
-      <ChromaticAberration ref={chromaRef} blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0.0008, 0.0008)} />
-      <Noise opacity={0.02} blendFunction={BlendFunction.SOFT_LIGHT} />
+      <ChromaticAberration ref={chromaRef} blendFunction={BlendFunction.NORMAL} offset={new THREE.Vector2(0, 0)} />
     </EffectComposer>
   )
 }

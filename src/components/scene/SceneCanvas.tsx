@@ -16,8 +16,8 @@ export const SceneCanvas = memo(function SceneCanvas() {
     <div id="scene-canvas" className="fixed inset-0 z-0 pointer-events-none will-change-transform">
       <Canvas
         camera={{ position: [0, 0, 8], fov: 40 }}
-        dpr={isMobile ? [1, 1.2] : [1, 1.5]}
-        gl={{ antialias: !isMobile, alpha: true }}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true }}
         style={{ pointerEvents: 'none' }}
       >
         <CameraRig />
@@ -27,7 +27,7 @@ export const SceneCanvas = memo(function SceneCanvas() {
         <pointLight position={[3, 1, 4]} intensity={2} distance={15} color="#00b67a" />
         <pointLight position={[-3, -1, 3]} intensity={1.2} distance={12} color="#00d48a" />
         <pointLight position={[0, 3, -2]} intensity={1} distance={10} color="#00b67a" />
-        <Environment resolution={1024}>
+        <Environment resolution={512}>
           <Lightformer form="rect" intensity={2} color="#ffffff"
             position={[4, 5, -3]} rotation={[Math.PI / 4, Math.PI / 4, 0]} scale={[10, 4, 1]} />
           <Lightformer form="rect" intensity={0.8} color="#c0d0e0"
