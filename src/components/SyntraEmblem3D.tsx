@@ -25,10 +25,6 @@ type GLTFResult = {
   materials: Record<string, THREE.MeshStandardMaterial>
 }
 
-/* Emissive morph targets: current shade ↔ a hair lighter */
-const GREEN_EMISSIVE_BASE  = new THREE.Color(0.0, 0.25, 0.12)
-const GREEN_EMISSIVE_LIGHT = new THREE.Color(0.0, 0.38, 0.20)
-
 /* Ring animation config — big tilts + spins, tiltEase in useFrame prevents sphere clipping */
 const RING_ANIM = {
   RingGreen: { z: 3.3,  tiltX: 0.33,  tiltY: 0.28,  spin: 0.076, delay: 0 },
@@ -65,36 +61,29 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
   const introStartTime = useRef<number | null>(null)
   const introProgress = useRef(0)
 
-  /* ─── MeshPhysicalMaterial with clearcoat — smooth reflections, no HDRI artifacts ─── */
+  /* ─── MeshStandardMaterial — no clearcoat pass, much cheaper ─── */
   const ringMaterials = useMemo(() => {
-    const greenRing = new THREE.MeshPhysicalMaterial({
+    const greenRing = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#0a3d2a'),
-      roughness: 0.22,
+      roughness: 0.2,
       metalness: 0.9,
       envMapIntensity: 0.6,
       emissive: new THREE.Color(0.0, 0.25, 0.12),
       emissiveIntensity: 0.8,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.05,
-      reflectivity: 0.8,
     })
 
-    const whiteRing = new THREE.MeshPhysicalMaterial({
+    const whiteRing = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#e8e8e8'),
-      roughness: 0.25,
+      roughness: 0.22,
       metalness: 0.9,
       envMapIntensity: 1.2,
-      clearcoat: 0.5,
-      clearcoatRoughness: 0.12,
-      reflectivity: 0.9,
     })
 
-    const darkRing = new THREE.MeshPhysicalMaterial({
+    const darkRing = new THREE.MeshStandardMaterial({
       color: new THREE.Color('#1a1a22'),
       roughness: 0.25,
       metalness: 0.8,
       envMapIntensity: 0.5,
-      reflectivity: 0.5,
     })
 
     return { greenRing, whiteRing, darkRing }
@@ -108,7 +97,7 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       metalness: 0.0,
       envMapIntensity: 1.0,
       emissive: new THREE.Color(0.0, 0.7, 0.5),
-      emissiveIntensity: 3.0,
+      emissiveIntensity: 1.5,
       transparent: true,
       opacity: 0.95,
       toneMapped: false,
@@ -120,7 +109,7 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       metalness: 0.0,
       envMapIntensity: 1.0,
       emissive: new THREE.Color('#bbeecc'),
-      emissiveIntensity: 2.5,
+      emissiveIntensity: 1.2,
       transparent: true,
       opacity: 0.95,
       toneMapped: false,
@@ -174,18 +163,18 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       groupRef.current.rotation.z = THREE.MathUtils.lerp(
         groupRef.current.rotation.z,
         t * 0.095 + rotationY * 0.76 + introSpin,
-        0.04
+        0.08
       )
       const e3 = effectiveExplode * effectiveExplode * effectiveExplode
       groupRef.current.rotation.y = THREE.MathUtils.lerp(
         groupRef.current.rotation.y,
         e3 * 0.38 + Math.sin(t * 0.3) * e3 * 0.14 + mouseX * 0.095,
-        0.04
+        0.08
       )
       groupRef.current.rotation.x = THREE.MathUtils.lerp(
         groupRef.current.rotation.x,
         e3 * 0.24 + mouseY * -0.067,
-        0.04
+        0.08
       )
       groupRef.current.position.y = Math.sin(t * 0.4) * 0.03
       // Faster lerp during intro for snappy entrance
@@ -207,25 +196,21 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       const tiltEase = Math.max(0, (ease - 0.35)) / 0.65 // 0 until 35% Z travel, then ramps to 1
 
       ref.position.z = THREE.MathUtils.lerp(ref.position.z, ease * cfg.z, 0.12)
-      ref.rotation.x = THREE.MathUtils.lerp(ref.rotation.x, tiltEase * cfg.tiltX, 0.05)
-      ref.rotation.y = THREE.MathUtils.lerp(ref.rotation.y, tiltEase * cfg.tiltY + t * cfg.spin * tiltEase, 0.05)
+      ref.rotation.x = THREE.MathUtils.lerp(ref.rotation.x, tiltEase * cfg.tiltX, 0.10)
+      ref.rotation.y = THREE.MathUtils.lerp(ref.rotation.y, tiltEase * cfg.tiltY + t * cfg.spin * tiltEase, 0.10)
     }
 
     // ── GreenRing: ramp emissive glow during explode ──
-    const morphFactor = (Math.sin(t * 0.8) + 1) * 0.5
-    ringMaterials.greenRing.emissive.lerpColors(GREEN_EMISSIVE_BASE, GREEN_EMISSIVE_LIGHT, morphFactor)
-    ringMaterials.greenRing.emissiveIntensity = 0.8 + morphFactor * 0.4 + effectiveExplode * 0.6
+    ringMaterials.greenRing.emissiveIntensity = 0.8 + effectiveExplode * 0.6
 
     // ── Core: Fresnel pulse when exposed ──
     if (coreRef.current) {
-      fresnelMat.uniforms.uTime.value = t
       fresnelMat.uniforms.uExplode.value = THREE.MathUtils.lerp(
         fresnelMat.uniforms.uExplode.value,
         effectiveExplode,
         0.06
       )
-      const pulse = 0.7 + Math.sin(t * 2.5) * 0.3
-      const cs = 1 + effectiveExplode * 0.1 * pulse
+      const cs = 1 + effectiveExplode * 0.07
       coreRef.current.scale.setScalar(THREE.MathUtils.lerp(coreRef.current.scale.x, cs, 0.05))
     }
 
@@ -249,9 +234,9 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       <mesh ref={ringRefs.RingWhite} geometry={nodes.RingWhite.geometry} material={ringMaterials.whiteRing} />
       <mesh ref={ringRefs.RingDark}  geometry={nodes.RingDark.geometry}  material={ringMaterials.darkRing} />
 
-      {/* Core — reduced tessellation (64×32 vs 128×64, imperceptible at 0.7r) */}
+      {/* Core — low tessellation, small radius makes detail imperceptible */}
       <mesh ref={coreRef} material={fresnelMat}>
-        <sphereGeometry args={[0.7, 64, 32]} />
+        <sphereGeometry args={[0.7, 32, 16]} />
       </mesh>
 
       {/* Orbiting dots — shared geometry, emissive glow */}

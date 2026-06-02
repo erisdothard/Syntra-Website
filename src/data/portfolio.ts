@@ -68,6 +68,15 @@ export const projects: Project[] = [
     description:
       'Voice-AI engine for small-tier trucking fleets. Automated dispatch handling with background workflow automation and natural-language voice agents.',
   },
+  {
+    title: 'PropLogix Extraction Pipeline',
+    tag: 'AI-Powered Property Data Extraction',
+    stack: 'Python · FastAPI · Claude API · Playwright · Pydantic · MCP · Streamlit',
+    featured: true,
+    description:
+      'Agentic property data extraction system that scrapes county appraiser sites via Playwright, extracts structured records through Claude tool use with per-field confidence scoring, and routes results through auto-approve, human-review, or reject lanes. Three service surfaces — FastAPI gateway, MCP server for AI agents, and Streamlit monitoring dashboard.',
+    github: 'https://github.com/erisdothard/property-data-extraction-pipeline',
+  },
 ]
 
 /* ── Experience ── */

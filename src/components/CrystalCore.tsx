@@ -208,7 +208,7 @@ export function CrystalCore({ scrollProgress }: CrystalCoreProps) {
 
     // Update shader uniforms
     explodeMat.uniforms.uProgress.value = THREE.MathUtils.lerp(
-      explodeMat.uniforms.uProgress.value, explode, 0.08
+      explodeMat.uniforms.uProgress.value, explode, 0.12
     )
     explodeMat.uniforms.uTime.value = t
 
@@ -217,11 +217,11 @@ export function CrystalCore({ scrollProgress }: CrystalCoreProps) {
       groupRef.current.rotation.y = THREE.MathUtils.lerp(
         groupRef.current.rotation.y,
         rotationY + t * 0.1,
-        0.06
+        0.10
       )
       groupRef.current.position.y = Math.sin(t * 0.5) * 0.08
       groupRef.current.scale.setScalar(
-        THREE.MathUtils.lerp(groupRef.current.scale.x, scale, 0.06)
+        THREE.MathUtils.lerp(groupRef.current.scale.x, scale, 0.10)
       )
     }
 

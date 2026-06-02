@@ -1,18 +1,22 @@
 export function HeroSection() {
   return (
     <section id="section-1" className="h-screen relative px-8 md:px-16 lg:px-18">
-      {/* Top-left quadrant: subtitle + dominant name */}
-      <div className="absolute top-28 md:top-32 left-8 md:left-16 lg:left-18">
-        <p className="reveal section-label text-white/70 tracking-widest text-[11px] font-mono uppercase mb-5 leading-relaxed">
-          Integration &amp; Production Support Engineer
-          <br />
-          Autonomous Systems Architect
+      {/* Top-left quadrant: title + name + hook + CTA */}
+      <div className="absolute top-28 md:top-32 left-8 md:left-16 lg:left-18 max-w-md">
+        <p className="section-label text-white/70 tracking-widest text-[11px] font-mono uppercase mb-5 leading-relaxed">
+          Founder &amp; Integrations Engineer
         </p>
-        <h1 className="reveal reveal-delay-1 text-5xl md:text-6xl font-bold text-white leading-[0.9] tracking-tight font-heading">
+        <h1 className="text-5xl md:text-6xl font-bold text-white leading-[0.9] tracking-tight font-heading">
           Eris
           <br />
           Dothard
         </h1>
+        <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed">
+          we build automated infrastructure.
+        </p>
+        <a href="mailto:erisdothard1@gmail.com" className="cta-initialize mt-8 inline-flex items-center gap-2">
+          Start a Project <span className="text-lg">&rarr;</span>
+        </a>
       </div>
 
       {/* Bottom-center: scroll indicator */}

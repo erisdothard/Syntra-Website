@@ -5,7 +5,6 @@ export function useFresnelCoreMaterial() {
   return useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
-        uTime: { value: 0 },
         uExplode: { value: 0 },
       },
       vertexShader: /* glsl */ `
@@ -24,7 +23,6 @@ export function useFresnelCoreMaterial() {
         }
       `,
       fragmentShader: /* glsl */ `
-        uniform float uTime;
         uniform float uExplode;
 
         varying vec3 vNormal;
@@ -61,8 +59,7 @@ export function useFresnelCoreMaterial() {
 
           // Subtle teal-green rim, not saturated slime green
           vec3 rimColor = vec3(0.0, 0.55, 0.45);
-          float pulse = 1.0 + sin(uTime * 2.0) * 0.2;
-          float rimStrength = (0.4 + uExplode * 1.2) * pulse;
+          float rimStrength = 0.4 + uExplode * 1.2;
 
           // Blend rim onto lit sphere
           vec3 color = litColor + rimColor * fresnel * rimStrength;

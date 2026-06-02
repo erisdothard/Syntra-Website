@@ -48,7 +48,10 @@ export function Navbar({ onTabOpen }: NavbarProps) {
       }`}
       style={{ WebkitBackdropFilter: scrolled || menuOpen ? 'blur(24px) saturate(1.4)' : undefined }}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 md:px-10 lg:px-12 py-3">
+      <div
+        className="mx-auto max-w-7xl items-center px-5 md:px-10 lg:px-12 py-3"
+        style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr' }}
+      >
         {/* Logo */}
         <a
           href="#"
@@ -64,7 +67,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
         </a>
 
         {/* Desktop nav links */}
-        <ul className="hidden md:flex items-center gap-8">
+        <ul className="hidden md:flex items-center justify-center gap-8">
           <li>
             <button
               onClick={() => handleTabClick('portfolio')}
@@ -100,28 +103,27 @@ export function Navbar({ onTabOpen }: NavbarProps) {
           </li>
         </ul>
 
-        {/* Spacer for desktop layout balance */}
-        <div className="hidden md:block w-20" />
-
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-        >
-          <span
-            className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center"
-            style={menuOpen ? { transform: 'translateY(3.25px) rotate(45deg)' } : {}}
-          />
-          <span
-            className="block w-5 h-[1.5px] bg-white transition-all duration-300"
-            style={menuOpen ? { opacity: 0 } : {}}
-          />
-          <span
-            className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center"
-            style={menuOpen ? { transform: 'translateY(-3.25px) rotate(-45deg)' } : {}}
-          />
-        </button>
+        {/* Right cell — grid balance on desktop, hamburger on mobile */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            <span
+              className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center"
+              style={menuOpen ? { transform: 'translateY(3.25px) rotate(45deg)' } : {}}
+            />
+            <span
+              className="block w-5 h-[1.5px] bg-white transition-all duration-300"
+              style={menuOpen ? { opacity: 0 } : {}}
+            />
+            <span
+              className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center"
+              style={menuOpen ? { transform: 'translateY(-3.25px) rotate(-45deg)' } : {}}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown menu */}

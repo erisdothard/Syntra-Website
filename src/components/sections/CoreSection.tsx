@@ -9,17 +9,18 @@ export function CoreSection({ onTabOpen }: CoreSectionProps) {
         {/* Left-aligned heavy typography column — canvas slides right via GSAP */}
         <div id="agentic-text" className="relative max-w-xl">
           <span className="section-number">01</span>
-          <p className="section-label mb-4">What We Build</p>
+          <p className="section-label mb-4">The Operator</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] tracking-tight font-heading">
-            Autonomous
+            Systemic integration
             <br />
-            Infrastructure.
+            is the core of automation.
           </h2>
           <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed max-w-md">
-            Custom integration logic and agentic workflows that eliminate
-            operational friction. We don&apos;t build standard software
-            wrappers &mdash; we build resilient, production-ready system
-            architecture designed to replace manual enterprise overhead entirely.
+            Engineered by technical operators with a deep background in
+            high-stakes logistics and enterprise data infrastructure. We
+            specialize in cross-stack interoperability, building resilient data
+            highways that connect legacy backbones directly to autonomous AI
+            engines.
           </p>
           <button onClick={() => onTabOpen('services')} className="cta-initialize mt-10 inline-flex items-center gap-2">
             Initialize System <span className="text-lg">&rarr;</span>

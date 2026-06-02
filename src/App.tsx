@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { SceneCanvas } from './components/scene/SceneCanvas'
+import { useState, lazy, Suspense } from 'react'
 import { useMouseTracking } from './hooks/useMouseTracking'
+
+const SceneCanvas = lazy(() => import('./components/scene/SceneCanvas').then(m => ({ default: m.SceneCanvas })))
 import { useScrollAnimations } from './hooks/useScrollAnimations'
 import { useTextReveals } from './hooks/useTextReveals'
 import { Navbar } from './components/layout/Navbar'
@@ -21,7 +22,9 @@ export default function App() {
 
   return (
     <>
-      <SceneCanvas />
+      <Suspense fallback={null}>
+        <SceneCanvas />
+      </Suspense>
       <div className="emblem-glow" />
       <Navbar onTabOpen={setActiveTab} />
       <TabOverlay activeTab={activeTab} onClose={() => setActiveTab(null)} />
@@ -29,9 +32,11 @@ export default function App() {
         <HeroSection />
         <DeconstructSection />
         <CoreSection onTabOpen={setActiveTab} />
-        <div style={{ height: '45vh' }} />
+        <div style={{ height: '80vh' }} />
         <ServicesSection onTabOpen={setActiveTab} />
+        <div style={{ height: '105vh' }} />
         <CrystalSection />
+        <div style={{ height: '75vh' }} />
         <ReconstructSection />
       </div>
     </>
