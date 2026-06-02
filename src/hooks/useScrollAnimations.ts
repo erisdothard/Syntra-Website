@@ -16,6 +16,11 @@ export function useScrollAnimations() {
   useEffect(() => {
     const timer = setTimeout(() => ScrollTrigger.refresh(), 100)
 
+    // Snapshot viewport width once — avoids layout-triggering read on every scroll event
+    let narrow = window.innerWidth <= 768
+    const onResize = () => { narrow = window.innerWidth <= 768 }
+    window.addEventListener('resize', onResize)
+
     const ctx = gsap.context(() => {
       // ONE global trigger — entire page drives one continuous motion
       ScrollTrigger.create({
@@ -27,9 +32,11 @@ export function useScrollAnimations() {
         onUpdate: (self) => {
           const p = self.progress
 
-          // ─── Rotation — continuous, extends through section-4 ───
+          // ─── Rotation — base + accent flips at text-box transitions ───
           const rotEase = smoothstep(0, 0.78, p)
-          scrollState.rotationY = rotEase * Math.PI * 2
+          const accent2 = smoothstep(0.24, 0.38, p)   // speed-up during swing to text box 2
+          const accent3 = smoothstep(0.65, 0.78, p)   // speed-up during pan to text box 3
+          scrollState.rotationY = rotEase * Math.PI * 2 + (accent2 + accent3) * Math.PI * 0.5
 
           // ─── Explode: decon through all text sections, reconstruct in final spacer ───
           const explodeIn  = smoothstep(0, 0.20, p)
@@ -59,17 +66,16 @@ export function useScrollAnimations() {
           //
           // Phase 0  Hero        (p 0.00–0.13) nudge right, model clears top-left name
           // Phase 1  Section 3   (p 0.15–0.28) pan LEFT  → model RIGHT (text left)
-          // Phase 2  pre-3b      (p 0.26–0.38) swing RIGHT → model LEFT (text right)
+          // Phase 2  pre-3b      (p 0.22–0.34) swing RIGHT → model LEFT (text right)
           // Phase 3  Section 4   (p 0.65–0.78) pan LEFT  → model RIGHT (text left)
           // Phase 4  Section 5   (p 0.88–0.96) return CENTER (CTA centered)
           //
           // Cumulative: -3.5 → +3.5 → -2.0 → 0
-          const narrow = window.innerWidth <= 768
           const m = narrow ? 1.4 : 1.0
 
           const heroNudge = (1 - smoothstep(0, 0.13, p)) * (narrow ? -1.2 : -0.4)
           const panL1     = smoothstep(0.15, 0.28, p)   // → -3.5
-          const swingR    = smoothstep(0.26, 0.38, p)   // → +3.5  (net +3.5) — completes well before 3b at ~0.44
+          const swingR    = smoothstep(0.22, 0.34, p)   // → +3.5  (net +3.5) — shifted 4pts earlier for text box 2 clearance
           const panL2     = smoothstep(0.65, 0.78, p)   // → -2.0  (net -2.0) — completes as section-4 arrives at ~0.77
           const toCenter  = smoothstep(0.88, 0.96, p)   // → 0     (net 0) — centers for CTA
 
@@ -135,6 +141,7 @@ export function useScrollAnimations() {
 
     return () => {
       clearTimeout(timer)
+      window.removeEventListener('resize', onResize)
       ctx.revert()
     }
   }, [])

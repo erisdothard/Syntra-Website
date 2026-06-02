@@ -5,7 +5,7 @@ export function ReconstructSection() {
       <h2 className="reveal reveal-delay-1 text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight font-heading">
         Build your <span className="text-accent">Agentic&nbsp;OS.</span>
       </h2>
-      <a href="mailto:erisdothard1@gmail.com" className="reveal reveal-delay-2 cta-initialize mt-10 inline-flex items-center gap-2">
+      <a href="mailto:agent@syntraai.tech" className="reveal reveal-delay-2 cta-initialize mt-10 inline-flex items-center gap-2">
         Deploy With Us <span className="text-lg">&rarr;</span>
       </a>
     </section>

@@ -288,7 +288,7 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
         )}
         {!project.github && (
           <a
-            href="mailto:erisdothard1@gmail.com?subject=FreightX Demo Request"
+            href="mailto:agent@syntraai.tech?subject=FreightX Demo Request"
             className="cta-initialize"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
@@ -346,7 +346,7 @@ function ServicesView() {
       {/* CTA */}
       <div data-animate="item">
         <a
-          href="mailto:erisdothard1@gmail.com"
+          href="mailto:agent@syntraai.tech"
           className="cta-initialize"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >

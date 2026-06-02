@@ -33,6 +33,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
   overflow-x: hidden;
+  touch-action: pan-y;
 }
 
 #root { min-height: 100vh; }

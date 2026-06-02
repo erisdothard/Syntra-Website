@@ -14,7 +14,7 @@ export function HeroSection() {
         <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed">
           we build automated infrastructure.
         </p>
-        <a href="mailto:erisdothard1@gmail.com" className="cta-initialize mt-8 inline-flex items-center gap-2">
+        <a href="mailto:agent@syntraai.tech" className="cta-initialize mt-8 inline-flex items-center gap-2">
           Start a Project <span className="text-lg">&rarr;</span>
         </a>
       </div>
