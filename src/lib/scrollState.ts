@@ -5,6 +5,7 @@ export const scrollState = {
   scale: 1,
   cameraX: 0,
   cameraY: 0,
+  cameraZ: 0,
   lookAtX: 0,
   lookAtY: 0,
   envRotation: 0,

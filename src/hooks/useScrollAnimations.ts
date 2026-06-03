@@ -12,6 +12,11 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t)
 }
 
+/** Fast burst that decelerates — used for explode outward */
+function easeOutExpo(t: number): number {
+  return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t)
+}
+
 export function useScrollAnimations() {
   useEffect(() => {
     const timer = setTimeout(() => ScrollTrigger.refresh(), 100)
@@ -38,30 +43,40 @@ export function useScrollAnimations() {
           const accent3 = smoothstep(0.65, 0.78, p)   // speed-up during pan to text box 3
           scrollState.rotationY = rotEase * Math.PI * 2 + (accent2 + accent3) * Math.PI * 0.5
 
-          // ─── Explode: decon through all text sections, reconstruct in final spacer ───
-          const explodeIn  = smoothstep(0, 0.20, p)
-          const explodeOut = 1 - smoothstep(0.82, 0.95, p)
+          // ─── Explode: asymmetric easing ───
+          // Out = exponential burst (fast separation, slow settle)
+          // In  = double-smoothstep (controlled, deliberate reassembly)
+          const explodeIn  = easeOutExpo(smoothstep(0, 0.20, p))
+          const implodeT   = smoothstep(0.82, 0.95, p)
+          const explodeOut = 1 - implodeT * implodeT * (3 - 2 * implodeT)
           scrollState.explode = explodeIn * explodeOut
 
           // ─── Scale: gentle arc — peaks mid-page ───
           const scaleArc = Math.sin(smoothstep(0, 1, p) * Math.PI)
           scrollState.scale = 1 + scaleArc * 0.12
 
-          // ─── Camera Y — subtle vertical drift ───
-          scrollState.cameraY = scaleArc * 0.3
-          scrollState.lookAtY = -scaleArc * 0.15
+          // ─── Camera Y — vertical drift (increased amplitude) ───
+          scrollState.cameraY = scaleArc * 0.5
+          scrollState.lookAtY = -scaleArc * 0.25
+
+          // ─── Camera Z — depth movement ───
+          // Push in during explode (immersive), drift back for text, return for CTA
+          const zPush   = easeOutExpo(smoothstep(0.05, 0.22, p))
+          const zPull   = smoothstep(0.35, 0.55, p)
+          const zReturn = smoothstep(0.88, 0.96, p)
+          scrollState.cameraZ = -zPush * 0.8 + zPull * 0.5 + zReturn * 0.3
 
           // ─── Camera X — 5-phase choreography ───
           //
-          // Progress map (with 80/105/75vh spacers, 140vh section-3b):
+          // Progress map (with 55/80/75vh spacers, 140vh section-3b):
           //   section-1  hero        p ≈ 0.00
           //   section-2  decon       p ≈ 0.13
           //   section-3  core        p ≈ 0.20
-          //   spacer 80vh            p ≈ 0.33–0.44
-          //   section-3b services    p ≈ 0.44–0.63
-          //   spacer 105vh           p ≈ 0.63–0.77
-          //   section-4  crystal     p ≈ 0.77–0.90
-          //   spacer 75vh            p ≈ 0.90–1.00
+          //   spacer 55vh            p ≈ 0.33–0.42
+          //   section-3b services    p ≈ 0.42–0.62
+          //   spacer 80vh            p ≈ 0.62–0.76
+          //   section-4  crystal     p ≈ 0.76–0.89
+          //   spacer 75vh            p ≈ 0.89–1.00
           //   section-5  reconstruct p ≈ 1.00
           //
           // Phase 0  Hero        (p 0.00–0.13) nudge right, model clears top-left name
@@ -76,7 +91,7 @@ export function useScrollAnimations() {
           const heroNudge = (1 - smoothstep(0, 0.13, p)) * (narrow ? -1.2 : -0.4)
           const panL1     = smoothstep(0.15, 0.28, p)   // → -3.5
           const swingR    = smoothstep(0.22, 0.34, p)   // → +3.5  (net +3.5) — shifted 4pts earlier for text box 2 clearance
-          const panL2     = smoothstep(0.65, 0.78, p)   // → -2.0  (net -2.0) — completes as section-4 arrives at ~0.77
+          const panL2     = smoothstep(0.58, 0.72, p)   // → -2.0  (net -2.0) — completes before section-4 arrives at ~0.76
           const toCenter  = smoothstep(0.88, 0.96, p)   // → 0     (net 0) — centers for CTA
 
           const camX = heroNudge + (-3.5 * panL1 + 7.0 * swingR - 5.5 * panL2 + 2.0 * toCenter) * m

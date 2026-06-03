@@ -32,9 +32,9 @@ export default function App() {
         <HeroSection />
         <DeconstructSection />
         <CoreSection onTabOpen={setActiveTab} />
-        <div style={{ height: '80vh' }} />
+        <div style={{ height: '40vh' }} />
         <ServicesSection onTabOpen={setActiveTab} />
-        <div style={{ height: '105vh' }} />
+        <div style={{ height: '55vh' }} />
         <CrystalSection />
         <div style={{ height: '75vh' }} />
         <ReconstructSection />

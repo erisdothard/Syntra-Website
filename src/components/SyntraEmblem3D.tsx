@@ -25,11 +25,11 @@ type GLTFResult = {
   materials: Record<string, THREE.MeshStandardMaterial>
 }
 
-/* Ring animation config — big tilts + spins, tiltEase in useFrame prevents sphere clipping */
+/* Ring animation config — wider stagger for visible cascade effect */
 const RING_ANIM = {
   RingGreen: { z: 3.3,  tiltX: 0.33,  tiltY: 0.28,  spin: 0.076, delay: 0 },
-  RingWhite: { z: 1.9,  tiltX: -0.24, tiltY: -0.19,  spin: 0.048, delay: 0.08 },
-  RingDark:  { z: -2.4, tiltX: 0.19,  tiltY: 0.14,   spin: -0.057, delay: 0.15 },
+  RingWhite: { z: 1.9,  tiltX: -0.24, tiltY: -0.19,  spin: 0.048, delay: 0.15 },
+  RingDark:  { z: -2.4, tiltX: 0.19,  tiltY: 0.14,   spin: -0.057, delay: 0.30 },
 } as const
 
 interface Props {
@@ -38,8 +38,8 @@ interface Props {
 }
 
 /* ─── Intro animation config ─── */
-const INTRO_DELAY = 0.3    // seconds before animation starts
-const INTRO_DURATION = 2.0 // total ramp time (easeOutExpo reaches ~97% at 1.3s)
+const INTRO_DELAY = 0.2    // seconds before animation starts
+const INTRO_DURATION = 1.6 // rotation reveal (easeOutExpo reaches ~97% at 1.0s)
 
 export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
   const { nodes } = useGLTF('/syntra-emblem-3d.glb') as unknown as GLTFResult
@@ -147,18 +147,21 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       }
     }
 
-    // During intro, rings start separated and assemble inward
-    const introExplode = (1 - intro) * 0.6
-    const effectiveExplode = Math.max(explode, introExplode)
+    // Rotation reveal — rings stay assembled, model flips from edge-on to face-on
+    const effectiveExplode = explode
+
+    // Intro rotation: edge-on (PI/2) → face camera (0)
+    const introRotX = (1 - intro) * Math.PI * 0.5
 
     // Mobile: scale down to avoid covering title / improve quality ratio
     const mobileScale = isMobile ? 0.65 : 1
-    const targetScale = scale * mobileScale * intro
+    const introScale = 0.92 + intro * 0.08  // subtle 92%→100% growth during flip
+    const targetScale = scale * mobileScale * introScale
 
     // ── Group: rotation + idle float ──
     if (groupRef.current) {
-      // Extra spin during intro that decelerates into idle
-      const introSpin = (1 - intro) * Math.PI * 1.5
+      // Subtle Z spin during reveal that settles into idle
+      const introSpin = (1 - intro) * Math.PI * 0.4
 
       groupRef.current.rotation.z = THREE.MathUtils.lerp(
         groupRef.current.rotation.z,
@@ -173,11 +176,10 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       )
       groupRef.current.rotation.x = THREE.MathUtils.lerp(
         groupRef.current.rotation.x,
-        e3 * 0.24 + mouseY * -0.067,
-        0.08
+        e3 * 0.24 + mouseY * -0.067 + introRotX,
+        0.10
       )
       groupRef.current.position.y = Math.sin(t * 0.4) * 0.03
-      // Faster lerp during intro for snappy entrance
       const scaleLerp = intro < 0.95 ? 0.12 : 0.05
       groupRef.current.scale.setScalar(
         THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, scaleLerp)
@@ -198,6 +200,14 @@ export function SyntraEmblem3D({ scrollProgress, isMobile }: Props) {
       ref.position.z = THREE.MathUtils.lerp(ref.position.z, ease * cfg.z, 0.12)
       ref.rotation.x = THREE.MathUtils.lerp(ref.rotation.x, tiltEase * cfg.tiltX, 0.10)
       ref.rotation.y = THREE.MathUtils.lerp(ref.rotation.y, tiltEase * cfg.tiltY + t * cfg.spin * tiltEase, 0.10)
+
+      // Secondary: rotational wobble during explode (follow-through)
+      const wobble = Math.sin(t * 3 + cfg.delay * 20) * ease * 0.04
+      ref.rotation.z = THREE.MathUtils.lerp(ref.rotation.z, wobble, 0.08)
+
+      // Secondary: scale breathing at peak explode
+      const breathe = 1 + Math.sin(t * 2 + cfg.delay * 15) * ease * 0.012
+      ref.scale.setScalar(THREE.MathUtils.lerp(ref.scale.x, breathe, 0.08))
     }
 
     // ── GreenRing: ramp emissive glow during explode ──

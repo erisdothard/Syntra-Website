@@ -4,7 +4,7 @@ interface ServicesSectionProps {
 
 export function ServicesSection({ onTabOpen }: ServicesSectionProps) {
   return (
-    <section id="section-3b" className="relative min-h-[140vh] py-48">
+    <section id="section-3b" className="relative min-h-[140vh] py-32">
       <div className="flex items-center justify-end pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12">
         <div id="services-text" className="relative max-w-xl">
           <span className="section-number" style={{ left: 'auto', right: '-0.05em' }}>02</span>

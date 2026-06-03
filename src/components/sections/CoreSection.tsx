@@ -4,7 +4,7 @@ interface CoreSectionProps {
 
 export function CoreSection({ onTabOpen }: CoreSectionProps) {
   return (
-    <section id="section-3" className="relative min-h-screen py-40">
+    <section id="section-3" className="relative min-h-screen py-32">
       <div className="flex items-center pl-5 pr-5 md:pl-10 md:pr-10 lg:pl-12 lg:pr-12">
         {/* Left-aligned heavy typography column — canvas slides right via GSAP */}
         <div id="agentic-text" className="relative max-w-xl">
