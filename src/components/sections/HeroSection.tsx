@@ -20,9 +20,12 @@ export function HeroSection() {
       </div>
 
       {/* Bottom-center: scroll indicator */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
-        <div className="reveal reveal-delay-2 flex flex-col items-center gap-3 opacity-25 hover:opacity-40 transition-opacity duration-500">
-          <div className="w-px h-12 bg-gradient-to-b from-transparent via-text-muted/50 to-transparent animate-pulse" />
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <div className="reveal reveal-delay-3 flex flex-col items-center gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent/50">Scroll</span>
+          <svg className="scroll-chevron-svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
+            <path d="M1 1L7 7L13 1" stroke="rgba(0,182,122,0.5)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
       </div>
     </section>

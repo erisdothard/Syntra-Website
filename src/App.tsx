@@ -34,7 +34,7 @@ export default function App() {
         <CoreSection onTabOpen={setActiveTab} />
         <div style={{ height: '40vh' }} />
         <ServicesSection onTabOpen={setActiveTab} />
-        <div style={{ height: '55vh' }} />
+        <div style={{ height: '23vh' }} />
         <CrystalSection />
         <div style={{ height: '75vh' }} />
         <ReconstructSection />

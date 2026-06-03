@@ -49,8 +49,8 @@ export function Navbar({ onTabOpen }: NavbarProps) {
       style={{ WebkitBackdropFilter: scrolled || menuOpen ? 'blur(24px) saturate(1.4)' : undefined }}
     >
       <div
-        className="mx-auto max-w-7xl items-center px-5 md:px-10 lg:px-12 py-3"
-        style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr' }}
+        className="mx-auto max-w-7xl flex items-center justify-between px-5 md:px-10 lg:px-12 py-3 md:grid"
+        style={{ gridTemplateColumns: '1fr auto 1fr' } as React.CSSProperties}
       >
         {/* Logo */}
         <a

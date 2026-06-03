@@ -1,6 +1,6 @@
 export function CrystalSection() {
   return (
-    <section id="section-4" className="h-screen relative flex items-center px-6 md:px-12 lg:px-16">
+    <section id="section-4" className="h-screen relative flex items-start pt-32 px-6 md:px-12 lg:px-16">
       <div className="max-w-lg">
         <p className="section-label mb-4">Buy the Blueprint. Skip the Engineering Cycle.</p>
         <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight font-heading mb-8">

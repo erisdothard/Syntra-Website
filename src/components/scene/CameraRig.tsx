@@ -12,14 +12,14 @@ export function CameraRig() {
   useFrame(() => {
     if (baseZ.current === null) baseZ.current = camera.position.z
 
-    // Camera position — slower lerp (0.05) for cinematic weight
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, scrollState.cameraX, 0.05)
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, scrollState.cameraY, 0.05)
-    camera.position.z = THREE.MathUtils.lerp(camera.position.z, baseZ.current + scrollState.cameraZ, 0.05)
+    // Camera position — 0.09 lerp for responsive tracking without jitter
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, scrollState.cameraX, 0.09)
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, scrollState.cameraY, 0.09)
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, baseZ.current + scrollState.cameraZ, 0.09)
 
-    // LookAt target — faster lerp (0.08) creates natural "following" drift
-    target.x = THREE.MathUtils.lerp(target.x, scrollState.lookAtX, 0.08)
-    target.y = THREE.MathUtils.lerp(target.y, scrollState.lookAtY, 0.08)
+    // LookAt target — slightly faster for natural "following" drift
+    target.x = THREE.MathUtils.lerp(target.x, scrollState.lookAtX, 0.12)
+    target.y = THREE.MathUtils.lerp(target.y, scrollState.lookAtY, 0.12)
     camera.lookAt(target)
   })
 

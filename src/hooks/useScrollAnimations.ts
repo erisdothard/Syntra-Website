@@ -88,11 +88,11 @@ export function useScrollAnimations() {
           // Cumulative: -3.5 → +3.5 → -2.0 → 0
           const m = narrow ? 1.4 : 1.0
 
-          const heroNudge = (1 - smoothstep(0, 0.13, p)) * (narrow ? -1.2 : -0.4)
+          const heroNudge = narrow ? 0 : (1 - smoothstep(0, 0.13, p)) * -0.4
           const panL1     = smoothstep(0.15, 0.28, p)   // → -3.5
           const swingR    = smoothstep(0.22, 0.34, p)   // → +3.5  (net +3.5) — shifted 4pts earlier for text box 2 clearance
-          const panL2     = smoothstep(0.58, 0.72, p)   // → -2.0  (net -2.0) — completes before section-4 arrives at ~0.76
-          const toCenter  = smoothstep(0.88, 0.96, p)   // → 0     (net 0) — centers for CTA
+          const panL2     = smoothstep(0.45, 0.56, p)   // → -2.0  (net -2.0) — completes before section-4 enters viewport
+          const toCenter  = smoothstep(0.82, 0.94, p)   // → 0     (net 0) — syncs with implode start
 
           const camX = heroNudge + (-3.5 * panL1 + 7.0 * swingR - 5.5 * panL2 + 2.0 * toCenter) * m
           scrollState.cameraX = camX

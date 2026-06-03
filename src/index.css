@@ -94,6 +94,13 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(0, 182, 122, 0.15); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0, 182, 122, 0.35); }
 
+/* ─── Scroll chevron ─── */
+@keyframes scroll-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50%      { transform: translateY(4px); opacity: 0.7; }
+}
+.scroll-chevron-svg { animation: scroll-bob 2s ease-in-out infinite; }
+
 /* ─── Tab overlay animations ─── */
 @keyframes overlay-fade-in {
   from { opacity: 0; }
