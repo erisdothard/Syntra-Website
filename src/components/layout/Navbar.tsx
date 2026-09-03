@@ -60,9 +60,13 @@ export function Navbar({ onTabOpen }: NavbarProps) {
             setMenuOpen(false)
             window.scrollTo({ top: 0, behavior: 'smooth' })
           }}
-          className="font-heading text-sm font-semibold tracking-widest text-text uppercase select-none transition-colors duration-300 hover:text-accent"
+          className="flex items-center gap-2.5 font-heading text-sm font-semibold tracking-widest text-text uppercase select-none transition-colors duration-300 hover:text-accent"
           style={{ fontVariant: 'all-small-caps', letterSpacing: '0.18em' }}
         >
+          {/* Same file as the favicon and the TikTok app icon — one mark, three
+              surfaces. TikTok app review rejects a submission whose icon does not
+              match the one shown on the site. */}
+          <img src="/favicon.svg" alt="" width={24} height={24} className="h-6 w-6 shrink-0" />
           Eris Dothard &mdash; Syntra
         </a>
 
