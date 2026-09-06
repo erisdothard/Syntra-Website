@@ -186,7 +186,7 @@ export const skills: SkillGroup[] = [
   { category: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Ionic', 'Three.js', 'GSAP'] },
   { category: 'Backend', items: ['Python', 'Java', 'Node.js', 'FastAPI', 'Express', 'PostgreSQL', 'SQL Server'] },
   { category: 'AI & Automation', items: ['Anthropic API', 'LangChain', 'LangGraph', 'MCP', 'Voice AI', 'Test Automation'] },
-  { category: 'Integration & APIs', items: ['REST APIs', 'SFTP', 'HL7', 'FHIR', 'Mirth Connect', 'Postman', 'OAuth 2.0'] },
-  { category: 'Data', items: ['SQL', 'XML', 'JSON', 'CSV', 'Data Modeling', 'Data Validation', 'Data Engineering', 'ETL Pipelines'] },
+  { category: 'Integration & APIs', items: ['REST APIs', 'CRM Automation', 'SFTP', 'HL7', 'FHIR', 'Mirth Connect', 'OAuth 2.0'] },
+  { category: 'Data', items: ['SQL', 'Snowflake', 'Dataiku', 'Power BI', 'Data Modeling', 'Data Validation', 'Data Engineering', 'ETL / ELT Pipelines'] },
   { category: 'Infrastructure', items: ['Docker', 'Kubernetes', 'AWS', 'GCP', 'Supabase', 'GitHub Actions', 'Networking'] },
 ]

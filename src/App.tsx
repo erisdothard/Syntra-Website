@@ -1,44 +1,45 @@
 import { useState, lazy, Suspense } from 'react'
 import { useMouseTracking } from './hooks/useMouseTracking'
-
-const SceneCanvas = lazy(() => import('./components/scene/SceneCanvas').then(m => ({ default: m.SceneCanvas })))
-import { useScrollAnimations } from './hooks/useScrollAnimations'
-import { useTextReveals } from './hooks/useTextReveals'
+import { useLaunchScroll } from './hooks/useLaunchScroll'
 import { Navbar } from './components/layout/Navbar'
 import { TabOverlay } from './components/TabOverlay'
-import { HeroSection } from './components/sections/HeroSection'
-import { DeconstructSection } from './components/sections/DeconstructSection'
-import { CoreSection } from './components/sections/CoreSection'
-import { CrystalSection } from './components/sections/CrystalSection'
-import { ServicesSection } from './components/sections/ServicesSection'
-import { ReconstructSection } from './components/sections/ReconstructSection'
+import { Hero } from './components/sections/Hero'
+import { ActPanel } from './components/sections/ActPanel'
+import { Telemetry } from './components/sections/Telemetry'
+import { Outro } from './components/sections/Outro'
+import { acts } from './data/acts'
+
+const LaunchCanvas = lazy(() =>
+  import('./components/scene/LaunchCanvas').then((m) => ({ default: m.LaunchCanvas })),
+)
+
+type Tab = 'portfolio' | 'services' | 'resume' | null
 
 export default function App() {
   useMouseTracking()
-  useScrollAnimations()
-  useTextReveals()
-
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'services' | 'resume' | null>(null)
+  useLaunchScroll()
+  const [activeTab, setActiveTab] = useState<Tab>(null)
 
   return (
     <>
+      <div className="poster" aria-hidden />
       <Suspense fallback={null}>
-        <SceneCanvas />
+        <LaunchCanvas />
       </Suspense>
-      <div className="emblem-glow" />
+      <Telemetry />
       <Navbar onTabOpen={setActiveTab} />
       <TabOverlay activeTab={activeTab} onClose={() => setActiveTab(null)} />
-      <div className="relative z-10 pointer-events-none [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
-        <HeroSection />
-        <DeconstructSection />
-        <CoreSection onTabOpen={setActiveTab} />
-        <div style={{ height: '40vh' }} />
-        <ServicesSection onTabOpen={setActiveTab} />
-        <div style={{ height: '23vh' }} />
-        <CrystalSection />
-        <div style={{ height: '75vh' }} />
-        <ReconstructSection />
-      </div>
+
+      <main className="relative z-10">
+        {/* One tall scroll track. Every act boundary lives in launchTimeline.PHASES. */}
+        <section id="launch" style={{ height: '640vh' }} className="relative">
+          <Hero />
+          {acts.map((a) => (
+            <ActPanel key={a.n} act={a} />
+          ))}
+        </section>
+        <Outro onTabOpen={setActiveTab} />
+      </main>
     </>
   )
 }

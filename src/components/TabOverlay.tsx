@@ -16,7 +16,7 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
   const tlRef = useRef<gsap.core.Timeline | null>(null)
 
   useEffect(() => {
-    if (!activeTab) { setVisible(false); return }
+    if (!activeTab) { requestAnimationFrame(() => setVisible(false)); return }
     requestAnimationFrame(() => setVisible(true))
 
     const canvas = document.getElementById('scene-canvas')
@@ -86,20 +86,17 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
     })
 
     tlRef.current = tl
-    return () => { tl.kill() }
+    return () => { tl.kill(); tlRef.current = null }
   }, [visible, activeTab])
 
-  if (!activeTab) {
-    tlRef.current?.kill()
-    return null
-  }
+  if (!activeTab) return null
 
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center"
       style={{
         background: visible
-          ? 'radial-gradient(ellipse at 50% 30%, rgba(0,255,204,0.03) 0%, transparent 50%), rgba(8,10,13,1)'
+          ? 'radial-gradient(ellipse at 50% 30%, rgba(255,106,26,0.03) 0%, transparent 50%), rgba(7,8,12,0.97)'
           : 'rgba(8,10,13,0)',
         transition: 'background 0.5s cubic-bezier(0.16,1,0.3,1)',
       }}
@@ -117,7 +114,7 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
       {/* Close */}
       <button
         onClick={onClose}
-        className="fixed top-5 right-8 md:right-12 w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-text-muted hover:text-white hover:border-[#00FFCC]/40 transition-all duration-300 text-lg z-50"
+        className="fixed top-5 right-8 md:right-12 w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-text-muted hover:text-white hover:border-accent/40 transition-all duration-300 text-lg z-50"
         aria-label="Close"
       >
         &times;
@@ -145,7 +142,7 @@ function AnimatedBorder() {
       data-animate="border"
       style={{
         position: 'absolute', inset: 0, borderRadius: 'inherit', padding: 1, pointerEvents: 'none',
-        background: 'linear-gradient(90deg, transparent 0%, rgba(0,255,204,0) 30%, rgba(0,255,204,0.3) 50%, rgba(0,255,204,0) 70%, transparent 100%)',
+        background: 'linear-gradient(90deg, transparent 0%, rgba(255,106,26,0) 30%, rgba(255,106,26,0.3) 50%, rgba(255,106,26,0) 70%, transparent 100%)',
         backgroundSize: '200% 100%',
         WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
         WebkitMaskComposite: 'xor',
@@ -169,11 +166,11 @@ function PortfolioView() {
     <>
       {/* Header */}
       <div data-animate="header" style={{ marginBottom: 40 }}>
-        <p className="font-mono" style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
           Selected Work
         </p>
-        <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
-          Portfolio<span style={{ color: '#00FFCC' }}>.</span>
+        <h2 className="font-display" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
+          Portfolio<span style={{ color: 'var(--color-accent)' }}>.</span>
         </h2>
       </div>
 
@@ -183,24 +180,24 @@ function PortfolioView() {
           <button
             key={proj.title}
             data-animate="card"
-            className="tab-card"
+            className="overlay-panel"
             style={{ position: 'relative', padding: '24px 24px 20px', overflow: 'hidden', textAlign: 'left', cursor: 'pointer' }}
             onClick={() => setSelected(proj)}
           >
             <AnimatedBorder />
 
             {proj.featured && (
-              <span className="font-mono" style={{ fontSize: 8, color: '#00FFCC', letterSpacing: '0.15em', display: 'block', marginBottom: 8 }}>
+              <span className="font-mono" style={{ fontSize: 8, color: 'var(--color-accent)', letterSpacing: '0.15em', display: 'block', marginBottom: 8 }}>
                 FEATURED
               </span>
             )}
-            <h3 className="font-heading" style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+            <h3 className="font-display" style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', marginBottom: 4 }}>
               {proj.title}
             </h3>
             <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10, lineHeight: 1.5 }}>
               {proj.tag}
             </p>
-            <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.55)', letterSpacing: '0.06em' }}>
+            <p className="font-mono" style={{ fontSize: 10, color: 'rgba(255,106,26,0.55)', letterSpacing: '0.06em' }}>
               {proj.stack}
             </p>
           </button>
@@ -211,8 +208,8 @@ function PortfolioView() {
       <div data-animate="item" style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
         {experience.map((item, i) => (
           <div key={item.org} data-animate="item" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: i === 0 ? '#00FFCC' : 'rgba(255,255,255,0.15)', boxShadow: i === 0 ? '0 0 8px rgba(0,255,204,0.3)' : 'none', flexShrink: 0 }} />
-            <span className="font-heading" style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.role}</span>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: i === 0 ? 'var(--color-accent)' : 'rgba(255,255,255,0.15)', boxShadow: i === 0 ? '0 0 8px rgba(255,106,26,0.3)' : 'none', flexShrink: 0 }} />
+            <span className="font-display" style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.role}</span>
             <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{item.org} · {item.date}</span>
           </div>
         ))}
@@ -230,24 +227,24 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
         <button
           onClick={onBack}
           className="font-mono"
-          style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.2em', opacity: 0.7, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer' }}
+          style={{ fontSize: 10, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.2em', opacity: 0.7, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer' }}
         >
           &larr; Back to Portfolio
         </button>
         {project.featured && (
-          <span className="font-mono" style={{ fontSize: 8, color: '#00FFCC', letterSpacing: '0.15em', display: 'block', marginBottom: 8 }}>
+          <span className="font-mono" style={{ fontSize: 8, color: 'var(--color-accent)', letterSpacing: '0.15em', display: 'block', marginBottom: 8 }}>
             FEATURED
           </span>
         )}
-        <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
-          {project.title}<span style={{ color: '#00FFCC' }}>.</span>
+        <h2 className="font-display" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
+          {project.title}<span style={{ color: 'var(--color-accent)' }}>.</span>
         </h2>
-        <p className="font-mono" style={{ fontSize: 11, color: 'rgba(0,255,204,0.5)', letterSpacing: '0.08em', marginTop: 8 }}>
+        <p className="font-mono" style={{ fontSize: 11, color: 'rgba(255,106,26,0.5)', letterSpacing: '0.08em', marginTop: 8 }}>
           {project.tag}
         </p>
       </div>
 
-      <div data-animate="card" className="tab-card" style={{ position: 'relative', padding: '32px 28px', overflow: 'hidden', marginBottom: 20 }}>
+      <div data-animate="card" className="overlay-panel" style={{ position: 'relative', padding: '32px 28px', overflow: 'hidden', marginBottom: 20 }}>
         <AnimatedBorder />
         <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.7, marginBottom: 20 }}>
           {project.description}
@@ -259,12 +256,12 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
               className="font-mono"
               style={{
                 fontSize: 10,
-                color: '#00FFCC',
+                color: 'var(--color-accent)',
                 letterSpacing: '0.05em',
                 padding: '4px 10px',
                 borderRadius: 4,
-                border: '1px solid rgba(0,255,204,0.15)',
-                background: 'rgba(0,255,204,0.04)',
+                border: '1px solid rgba(255,106,26,0.15)',
+                background: 'rgba(255,106,26,0.04)',
               }}
             >
               {tech}
@@ -280,7 +277,7 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="cta-initialize"
+            className="btn-ghost"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
             View on GitHub <span style={{ fontSize: 16 }}>&rarr;</span>
@@ -289,7 +286,7 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
         {!project.github && (
           <a
             href="mailto:agent@syntraai.tech?subject=FreightX Demo Request"
-            className="cta-initialize"
+            className="btn-ghost"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
             Request a Demo <span style={{ fontSize: 16 }}>&rarr;</span>
@@ -307,11 +304,11 @@ function ServicesView() {
     <>
       {/* Header */}
       <div data-animate="header" style={{ marginBottom: 40 }}>
-        <p className="font-mono" style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
           What We Build
         </p>
-        <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
-          Services<span style={{ color: '#00FFCC' }}>.</span>
+        <h2 className="font-display" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
+          Services<span style={{ color: 'var(--color-accent)' }}>.</span>
         </h2>
       </div>
 
@@ -321,18 +318,18 @@ function ServicesView() {
           <div
             key={svc.title}
             data-animate="card"
-            className="tab-card"
+            className="overlay-panel"
             style={{ position: 'relative', padding: '28px 28px 24px', overflow: 'hidden', display: 'flex', gap: 24, alignItems: 'flex-start' }}
           >
             <AnimatedBorder />
 
             {/* Editorial number */}
-            <span className="font-heading" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 700, color: 'rgba(255,255,255,0.05)', lineHeight: 1, flexShrink: 0, minWidth: 56 }}>
+            <span className="font-display" style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 700, color: 'rgba(255,255,255,0.05)', lineHeight: 1, flexShrink: 0, minWidth: 56 }}>
               {String(i + 1).padStart(2, '0')}
             </span>
 
             <div style={{ flex: 1 }}>
-              <h3 className="font-heading" style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', marginBottom: 10 }}>
+              <h3 className="font-display" style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', marginBottom: 10 }}>
                 {svc.title}
               </h3>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.75 }}>
@@ -347,7 +344,7 @@ function ServicesView() {
       <div data-animate="item">
         <a
           href="mailto:agent@syntraai.tech"
-          className="cta-initialize"
+          className="btn-ghost"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
           Start a Project <span style={{ fontSize: 16 }}>&rarr;</span>
@@ -366,17 +363,17 @@ function ResumeView() {
     <>
       {/* Header */}
       <div data-animate="header" style={{ marginBottom: 40 }}>
-        <p className="font-mono" style={{ fontSize: 10, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
           Background
         </p>
-        <h2 className="font-heading" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
-          Resume<span style={{ color: '#00FFCC' }}>.</span>
+        <h2 className="font-display" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
+          Resume<span style={{ color: 'var(--color-accent)' }}>.</span>
         </h2>
       </div>
 
       {/* Experience */}
       <div style={{ marginBottom: 36 }}>
-        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(255,106,26,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
           Experience
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -387,13 +384,13 @@ function ResumeView() {
               <div
                 key={item.org}
                 data-animate="card"
-                className="tab-card"
+                className="overlay-panel"
                 style={{ position: 'relative', overflow: 'hidden', cursor: hasContent ? 'pointer' : 'default' }}
                 onClick={() => hasContent && setExpanded(isExpanded ? null : item.org)}
               >
                 <AnimatedBorder />
                 <div style={{ padding: '20px 24px' }}>
-                  <h3 className="font-heading" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+                  <h3 className="font-display" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>
                     {item.role}
                   </h3>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
@@ -404,13 +401,13 @@ function ResumeView() {
                   <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                     {item.sections.map((section) => (
                       <div key={section.label} style={{ marginTop: 16 }}>
-                        <span className="font-mono" style={{ fontSize: 9, color: '#00FFCC', textTransform: 'uppercase', letterSpacing: '0.15em', display: 'block', marginBottom: 10 }}>
+                        <span className="font-mono" style={{ fontSize: 9, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.15em', display: 'block', marginBottom: 10 }}>
                           {section.label}
                         </span>
                         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                           {section.bullets.map((bullet) => (
                             <li key={bullet} style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, paddingLeft: 14, position: 'relative', marginBottom: 6 }}>
-                              <span style={{ position: 'absolute', left: 0, color: 'rgba(0,255,204,0.4)' }}>›</span>
+                              <span style={{ position: 'absolute', left: 0, color: 'rgba(255,106,26,0.4)' }}>›</span>
                               {bullet}
                             </li>
                           ))}
@@ -424,7 +421,7 @@ function ResumeView() {
                     <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0 0' }}>
                       {item.bullets.map((bullet) => (
                         <li key={bullet} style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, paddingLeft: 14, position: 'relative', marginBottom: 6 }}>
-                          <span style={{ position: 'absolute', left: 0, color: 'rgba(0,255,204,0.4)' }}>›</span>
+                          <span style={{ position: 'absolute', left: 0, color: 'rgba(255,106,26,0.4)' }}>›</span>
                           {bullet}
                         </li>
                       ))}
@@ -439,14 +436,14 @@ function ResumeView() {
 
       {/* Skills */}
       <div style={{ marginBottom: 36 }}>
-        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(255,106,26,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
           Skills
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 170px), 1fr))', gap: 12 }}>
           {skills.map((group) => (
-            <div key={group.category} data-animate="card" className="tab-card" style={{ position: 'relative', padding: '20px 20px 16px', overflow: 'hidden' }}>
+            <div key={group.category} data-animate="card" className="overlay-panel" style={{ position: 'relative', padding: '20px 20px 16px', overflow: 'hidden' }}>
               <AnimatedBorder />
-              <h4 className="font-heading" style={{ fontSize: 11, fontWeight: 700, color: '#fff', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <h4 className="font-display" style={{ fontSize: 11, fontWeight: 700, color: '#fff', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 {group.category}
               </h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -456,12 +453,12 @@ function ResumeView() {
                     className="font-mono"
                     style={{
                       fontSize: 9,
-                      color: 'rgba(0,255,204,0.6)',
+                      color: 'rgba(255,106,26,0.6)',
                       letterSpacing: '0.04em',
                       padding: '3px 8px',
                       borderRadius: 3,
-                      border: '1px solid rgba(0,255,204,0.1)',
-                      background: 'rgba(0,255,204,0.03)',
+                      border: '1px solid rgba(255,106,26,0.1)',
+                      background: 'rgba(255,106,26,0.03)',
                     }}
                   >
                     {skill}
@@ -475,19 +472,19 @@ function ResumeView() {
 
       {/* Certifications */}
       <div style={{ marginBottom: 36 }}>
-        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(0,255,204,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
+        <p className="font-mono" style={{ fontSize: 10, color: 'rgba(255,106,26,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
           Certifications
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 12 }}>
           {certifications.map((cert) => (
-            <div key={cert.name} data-animate="card" className="tab-card" style={{ position: 'relative', padding: '18px 20px', overflow: 'hidden', display: 'flex', gap: 14, alignItems: 'center' }}>
+            <div key={cert.name} data-animate="card" className="overlay-panel" style={{ position: 'relative', padding: '18px 20px', overflow: 'hidden', display: 'flex', gap: 14, alignItems: 'center' }}>
               <AnimatedBorder />
               <img src="/anthropic-icon.svg" alt="" style={{ width: 24, height: 24, opacity: 0.6, flexShrink: 0 }} />
               <div>
-                <h4 className="font-heading" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 4, lineHeight: 1.3 }}>
+                <h4 className="font-display" style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 4, lineHeight: 1.3 }}>
                   {cert.name}
                 </h4>
-                <p className="font-mono" style={{ fontSize: 9, color: 'rgba(0,255,204,0.5)', letterSpacing: '0.06em' }}>
+                <p className="font-mono" style={{ fontSize: 9, color: 'rgba(255,106,26,0.5)', letterSpacing: '0.06em' }}>
                   {cert.issuer}{cert.date ? ` · ${cert.date}` : ''}
                 </p>
               </div>
@@ -501,14 +498,14 @@ function ResumeView() {
         <a
           href="/resume.html"
           download="Eris_Dothard_Resume.html"
-          className="cta-initialize"
+          className="btn-ghost"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
           Download Resume <span style={{ fontSize: 16 }}>&darr;</span>
         </a>
         <a
           href="mailto:erisdothard1@gmail.com"
-          className="cta-initialize"
+          className="btn-ghost"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
           Get in Touch <span style={{ fontSize: 16 }}>&rarr;</span>
