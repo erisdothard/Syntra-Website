@@ -1,38 +1,51 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { scrollState } from '../../../lib/scrollState'
+import { upgradeRocketMaterials } from '../../../lib/rocketMaterials'
 import { Exhaust } from './Exhaust'
 
-export const ROCKET_R = 1.7
-export const BODY_H = 19
+/** Saturn V: NASA model is ~13 units tall with the axis at (−0.01, y, 0.74). */
+const MODEL_SCALE = 1.85
+const AXIS = new THREE.Vector3(-0.01, -0.14, 0.74) // subtract to put engine plane at y=0 on the axis
+
+export const ROCKET_R = 0.65 * MODEL_SCALE
+export const ROCKET_H = 13 * MODEL_SCALE
 export const LIFT_UNITS = 95
-/** Height of the engine plane above the pad — the vehicle sits on a launch mount. */
-export const ROCKET_BASE_Y = 3.4
+/** Engine plane height: the vehicle stands on the Mobile Launcher deck. */
+export const ROCKET_BASE_Y = 2.9
+
+const MODEL_URL = '/models/saturn-v.glb'
+const DRACO = '/draco/'
 
 /**
  * Foreground layer. The vehicle group translates on lift; Exhaust is a child
- * so the flame stays glued to the engines during ascent.
+ * so the plumes stay glued to the F-1 cluster during ascent.
  */
 export function Rocket() {
   const group = useRef<THREE.Group>(null)
+  const gltf = useGLTF(MODEL_URL, DRACO)
 
-  const skin = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#D8DAE0', roughness: 0.42, metalness: 0.25 }),
-    [],
-  )
-  const band = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#15171E', roughness: 0.55, metalness: 0.5 }),
-    [],
-  )
-  const accent = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#FF6A1A', roughness: 0.5, metalness: 0.2, emissive: '#FF6A1A', emissiveIntensity: 0.15 }),
-    [],
-  )
-  const engine = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#2B2E38', roughness: 0.35, metalness: 0.9 }),
-    [],
-  )
+  // Clone once so material replacement never touches the cached asset.
+  const { scene, mats, engines } = useMemo(() => {
+    const scene = gltf.scene.clone(true)
+    const mats = upgradeRocketMaterials(scene)
+    // F-1 engine bell positions in rocket-local space (after axis shift + scale)
+    const engines: THREE.Vector3[] = []
+    const box = new THREE.Box3()
+    scene.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh && /^polySurfa/.test(o.name)) {
+        box.setFromObject(o)
+        const c = box.getCenter(new THREE.Vector3()).sub(AXIS).multiplyScalar(MODEL_SCALE)
+        engines.push(new THREE.Vector3(c.x, 0.15, c.z))
+      }
+    })
+    if (engines.length === 0) engines.push(new THREE.Vector3(0, 0.15, 0))
+    return { scene, mats, engines }
+  }, [gltf])
+
+  useEffect(() => () => mats.all.forEach((m) => m.dispose()), [mats])
 
   useFrame((state) => {
     const s = scrollState
@@ -44,60 +57,25 @@ export function Rocket() {
     g.position.x = Math.sin(t * 43.0) * rumble + Math.sin(t * 61.0) * rumble * 0.5
     g.position.z = Math.sin(t * 37.0 + 1.0) * rumble
     g.position.y = ROCKET_BASE_Y + s.lift * LIFT_UNITS
-    // Gentle pitch program as it climbs
     g.rotation.z = -s.lift * 0.09
     g.rotation.x = Math.sin(t * 0.7) * s.lift * 0.01
-  })
 
-  const fins = [0, 1, 2, 3].map((i) => (i * Math.PI) / 2)
+    // Surface state: frost builds with venting, boils off at ignition
+    mats.uniforms.uFrost.value = Math.max(0, s.vent * 0.9 + s.pressure * 0.35 - s.ignition * 1.4)
+    mats.uniforms.uTime.value = t
+    // Engine bells glow with ignition
+    const heat = s.ignition * 2.4 * (1 + Math.sin(t * 23) * 0.08)
+    for (const m of mats.hot) m.emissiveIntensity = heat
+  })
 
   return (
     <group ref={group} position={[0, ROCKET_BASE_Y, 0]}>
-      {/* Engine bells */}
-      {[[0, 0], [ROCKET_R * 0.55, 0], [-ROCKET_R * 0.55, 0], [0, ROCKET_R * 0.55], [0, -ROCKET_R * 0.55]].map(([x, z], i) => (
-        <mesh key={i} position={[x * 0.9, 0.85, z * 0.9]} material={engine}>
-          <cylinderGeometry args={[0.32, 0.62, 1.5, 20, 1, true]} />
-        </mesh>
-      ))}
-      {/* Thrust structure */}
-      <mesh position={[0, 1.75, 0]} material={band}>
-        <cylinderGeometry args={[ROCKET_R * 0.96, ROCKET_R * 0.8, 0.9, 40]} />
-      </mesh>
-      {/* Main body */}
-      <mesh position={[0, 2.2 + BODY_H / 2, 0]} material={skin}>
-        <cylinderGeometry args={[ROCKET_R, ROCKET_R, BODY_H, 48, 1]} />
-      </mesh>
-      {/* Bands */}
-      <mesh position={[0, 2.2 + BODY_H * 0.18, 0]} material={band}>
-        <cylinderGeometry args={[ROCKET_R + 0.02, ROCKET_R + 0.02, 0.6, 48]} />
-      </mesh>
-      <mesh position={[0, 2.2 + BODY_H * 0.62, 0]} material={band}>
-        <cylinderGeometry args={[ROCKET_R + 0.02, ROCKET_R + 0.02, 1.4, 48]} />
-      </mesh>
-      <mesh position={[0, 2.2 + BODY_H * 0.72, 0]} material={accent}>
-        <cylinderGeometry args={[ROCKET_R + 0.025, ROCKET_R + 0.025, 0.22, 48]} />
-      </mesh>
-      {/* Interstage + nose */}
-      <mesh position={[0, 2.2 + BODY_H + 0.6, 0]} material={band}>
-        <cylinderGeometry args={[ROCKET_R * 0.92, ROCKET_R, 1.2, 48]} />
-      </mesh>
-      <mesh position={[0, 2.2 + BODY_H + 1.2 + 2.9, 0]} material={skin}>
-        <coneGeometry args={[ROCKET_R * 0.92, 5.8, 48]} />
-      </mesh>
-      {/* Fins */}
-      {fins.map((a, i) => (
-        <group key={i} rotation={[0, a, 0]}>
-          <mesh position={[ROCKET_R + 0.9, 3.4, 0]} rotation={[0, 0, 0.32]} material={band}>
-            <boxGeometry args={[2.2, 3.2, 0.14]} />
-          </mesh>
-        </group>
-      ))}
-      {/* Cable raceway */}
-      <mesh position={[ROCKET_R + 0.12, 2.2 + BODY_H / 2, 0]} material={band}>
-        <boxGeometry args={[0.24, BODY_H - 1, 0.5]} />
-      </mesh>
-
-      <Exhaust />
+      <group scale={MODEL_SCALE} position={[-AXIS.x * MODEL_SCALE, -AXIS.y * MODEL_SCALE, -AXIS.z * MODEL_SCALE]}>
+        <primitive object={scene} />
+      </group>
+      <Exhaust engines={engines} />
     </group>
   )
 }
+
+useGLTF.preload(MODEL_URL, DRACO)

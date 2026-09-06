@@ -53,7 +53,7 @@ void main() {
 
   // Length falloff — plume thins and breaks up toward the tail
   float body = pow(v, 0.9 + n * 0.8);
-  float alpha = body * edge * (0.65 + n * 0.5) * uPower;
+  float alpha = body * edge * (0.9 + n * 0.5) * uPower;
   alpha += diamonds * edge * 0.6 * uPower;
   alpha *= smoothstep(uFloorY, uFloorY + 3.5, vWorldY);
   alpha = clamp(alpha, 0.0, 1.0);
@@ -66,7 +66,8 @@ void main() {
   vec3 col = mix(ember, hot, smoothstep(0.1, 0.7, coreness + n2 * 0.15));
   col = mix(col, core, smoothstep(0.55, 1.0, coreness + diamonds * 0.8));
 
-  col = min(col * uHeat, vec3(4.0));
+  // Premultiplied output, bounded so the buffer can never run away
+  col = min(col * uHeat, vec3(1.9));
   gl_FragColor = vec4(col * alpha, alpha);
 }
 `
@@ -92,19 +93,25 @@ function glowTexture() {
  * core cone and a billboard glow at the nozzle. Values are pushed above 1.0
  * so bloom treats them as HDR.
  */
-export function Exhaust() {
-  const outer = useRef<THREE.Mesh>(null)
-  const inner = useRef<THREE.Mesh>(null)
+interface ExhaustProps {
+  /** Engine bell positions in the parent (vehicle) space. */
+  engines: THREE.Vector3[]
+}
+
+export function Exhaust({ engines }: ExhaustProps) {
+  const cluster = useRef<THREE.Group>(null)
   const outerMat = useRef<THREE.ShaderMaterial>(null)
   const innerMat = useRef<THREE.ShaderMaterial>(null)
+  // per-engine plume scale: five F-1s share the total plume footprint
+  const per = Math.max(0.68, 1 / Math.sqrt(engines.length))
   const glow = useRef<THREE.Sprite>(null)
   const light = useRef<THREE.PointLight>(null)
   const uniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uHeat: { value: 2.6 }, uFloorY: { value: -7.4 } }),
+    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uHeat: { value: 1.5 }, uFloorY: { value: -7.4 } }),
     [],
   )
   const uniformsInner = useMemo(
-    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uHeat: { value: 3.2 }, uFloorY: { value: -7.4 } }),
+    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uHeat: { value: 1.9 }, uFloorY: { value: -7.4 } }),
     [],
   )
   const tex = useMemo(glowTexture, [])
@@ -115,7 +122,7 @@ export function Exhaust() {
     const power = Math.max(s.ignition, 0)
     const flicker = 1 + Math.sin(t * 57) * 0.05 + Math.sin(t * 91) * 0.03
     const len = (0.6 + power * 15 + s.thrust * 11) * flicker
-    const wid = 0.55 + power * 1.9 + s.thrust * 0.7
+    const wid = (0.55 + power * 1.9 + s.thrust * 0.7) * per
 
     // R3F copies the uniforms object on assignment — always write through the material.
     if (outerMat.current) {
@@ -131,15 +138,16 @@ export function Exhaust() {
       u.uThrust.value = s.thrust
     }
 
-    if (outer.current) {
-      outer.current.visible = power > 0.001
-      outer.current.scale.set(wid, len, wid)
-      outer.current.position.y = 0.3 - len / 2
-    }
-    if (inner.current) {
-      inner.current.visible = power > 0.001
-      inner.current.scale.set(wid * 0.45, len * 0.62, wid * 0.45)
-      inner.current.position.y = 0.3 - (len * 0.62) / 2
+    if (cluster.current) {
+      cluster.current.visible = power > 0.001
+      for (const eng of cluster.current.children) {
+        const [outer, inner] = eng.children as THREE.Mesh[]
+        const j = 1 + Math.sin(t * 47 + eng.position.x * 9) * 0.04
+        outer.scale.set(wid * j, len, wid * j)
+        outer.position.y = 0.3 - len / 2
+        inner.scale.set(wid * 0.45, len * 0.62, wid * 0.45)
+        inner.position.y = 0.3 - (len * 0.62) / 2
+      }
     }
     if (glow.current) {
       const g = (power * 6.5 + s.vent * 0.6) * flicker
@@ -153,34 +161,30 @@ export function Exhaust() {
     }
   })
 
+  const outerMaterial = useMemo(
+    () => new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms, transparent: true, depthWrite: false, blending: THREE.NormalBlending, premultipliedAlpha: true, side: THREE.DoubleSide }),
+    [uniforms],
+  )
+  const innerMaterial = useMemo(
+    () => new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: frag, uniforms: uniformsInner, transparent: true, depthWrite: false, blending: THREE.NormalBlending, premultipliedAlpha: true, side: THREE.DoubleSide }),
+    [uniformsInner],
+  )
+  const outerGeo = useMemo(() => new THREE.CylinderGeometry(0.12, 1, 1, 40, 24, true), [])
+  const innerGeo = useMemo(() => new THREE.CylinderGeometry(0.08, 1, 1, 32, 16, true), [])
+  // materials are shared across engines; the refs feed the per-frame uniform writes
+  outerMat.current = outerMaterial
+  innerMat.current = innerMaterial
+
   return (
     <group>
-      <mesh ref={outer} position={[0, 0, 0]} frustumCulled={false}>
-        <cylinderGeometry args={[0.12, 1, 1, 40, 24, true]} />
-        <shaderMaterial
-          ref={outerMat}
-          vertexShader={vert}
-          fragmentShader={frag}
-          uniforms={uniforms}
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      <mesh ref={inner} frustumCulled={false}>
-        <cylinderGeometry args={[0.08, 1, 1, 32, 16, true]} />
-        <shaderMaterial
-          ref={innerMat}
-          vertexShader={vert}
-          fragmentShader={frag}
-          uniforms={uniformsInner}
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
+      <group ref={cluster} visible={false}>
+        {engines.map((e, i) => (
+          <group key={i} position={[e.x, e.y, e.z]}>
+            <mesh geometry={outerGeo} material={outerMaterial} frustumCulled={false} />
+            <mesh geometry={innerGeo} material={innerMaterial} frustumCulled={false} />
+          </group>
+        ))}
+      </group>
       <sprite ref={glow} position={[0, 0.4, 0]}>
         <spriteMaterial map={tex} transparent depthWrite={false} blending={THREE.AdditiveBlending} opacity={0} toneMapped={false} />
       </sprite>

@@ -90,16 +90,16 @@ export function mapProgress(p: number, out: ScrollState, narrow = false): void {
   const spike = ig * (1 - smoothstep(PHASES.ignitionFull, PHASES.shockEnd, p))
   out.exposure = 1 + spike * 0.9 + ig * 0.15
 
-  /* ── Camera path (world units; rocket base sits at y=0, nozzle at ~y=1, nose at ~y=22) ── */
+  /* ── Camera path (world units; engines at y≈1.6 on the ML deck, nose at ≈25.5) ── */
   const m = narrow ? 1.35 : 1 // pull back further on narrow viewports
   // Hero: wide establishing shot of the pad
-  const cHero = { x: 0, y: 9, z: 34 * m, look: 9 }
+  const cHero = { x: -7, y: 11, z: 46 * m, look: 12.5 }
   // Act 1: low, tight on the engine bells, slightly off-axis
-  const cAct1 = { x: 5.5, y: 4.8, z: 15 * m, look: 6 }
+  const cAct1 = { x: -6.5, y: 3.4, z: 12.5 * m, look: 3.6 }
   // Act 2: pulled back and low, watching the fireball swallow the pad
-  const cAct2 = { x: -10, y: 9.5, z: 31 * m, look: 9 }
+  const cAct2 = { x: -12, y: 9.5, z: 33 * m, look: 10 }
   // Act 3: far, tilting upward to track the ascent
-  const cAct3 = { x: 4, y: 14, z: 40 * m, look: 22 }
+  const cAct3 = { x: 6, y: 15, z: 42 * m, look: 23 }
 
   const t1 = smoothstep(0, PHASES.act1Start + 0.1, p)
   const t2 = smoothstep(PHASES.act1End - 0.04, PHASES.ignitionFull + 0.04, p)
