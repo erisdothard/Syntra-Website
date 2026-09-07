@@ -16,6 +16,8 @@ import {
 import { N8AOPostPass } from 'n8ao'
 import * as THREE from 'three'
 import { scrollState } from '../../lib/scrollState'
+import { HeatHazeEffect } from './effects/HeatHaze'
+import { LIFT_UNITS, ROCKET_BASE_Y } from './layers/Rocket'
 import { dbg } from '../../lib/dbg'
 
 /**
@@ -24,6 +26,10 @@ import { dbg } from '../../lib/dbg'
  * re-render, and under React 19 `ref` is a prop — once it holds an effect
  * instance that walks into the scene graph and throws on circular refs.
  */
+const NOZZLE = new THREE.Vector3()
+const EDGE = new THREE.Vector3()
+const PLUME_UV = new THREE.Vector2()
+
 export function PostFX({ mobile }: { mobile: boolean }) {
   const { scene, camera, size } = useThree()
 
@@ -67,7 +73,8 @@ export function PostFX({ mobile }: { mobile: boolean }) {
     const toneMapping = new ToneMappingEffect({
       mode: dbg('aces') ? ToneMappingMode.ACES_FILMIC : ToneMappingMode.NEUTRAL,
     })
-    return { ao, bloom, toneMapping, ca, vignette, noise, smaa }
+    const haze = dbg('nohaze') ? null : new HeatHazeEffect()
+    return { ao, bloom, toneMapping, haze, ca, vignette, noise, smaa }
     // scene/camera identity is stable for the canvas lifetime
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mobile])
@@ -83,21 +90,35 @@ export function PostFX({ mobile }: { mobile: boolean }) {
       effects.ca.dispose()
       effects.vignette.dispose()
       effects.noise.dispose()
+      effects.haze?.dispose()
       effects.toneMapping.dispose()
       effects.smaa?.dispose()
     }
   }, [effects])
 
-  useFrame(() => {
+  useFrame((state) => {
     const s = scrollState
     effects.bloom.intensity = 0.4 + s.ignition * 0.85 * (1 - s.altitude * 0.45) + s.vent * 0.12
     const a = s.shock * (1 - s.shock) * 4 * 0.0018 + s.shake * 0.0008
     effects.ca.offset.set(a, a * 0.6)
+
+    if (effects.haze) {
+      // Track the engine plane in screen space. Refraction needs air, so the
+      // whole effect fades out as the vehicle leaves the atmosphere.
+      const y = ROCKET_BASE_Y + s.lift * LIFT_UNITS
+      NOZZLE.set(0, y, 0).project(camera)
+      EDGE.set(14, y, 0).project(camera)
+      const heat = NOZZLE.z < 1 ? s.ignition * (1 - s.altitude * 0.85) : 0
+      PLUME_UV.set(NOZZLE.x * 0.5 + 0.5, NOZZLE.y * 0.5 + 0.5)
+      const radius = Math.min(0.9, Math.abs(EDGE.x - NOZZLE.x) * 0.5)
+      effects.haze.set(PLUME_UV, Math.max(radius, 0.05), heat, state.clock.elapsedTime, size.width / size.height)
+    }
   })
 
   return (
     <EffectComposer multisampling={0} enableNormalPass={false}>
       {effects.ao ? <primitive object={effects.ao} /> : <></>}
+      {effects.haze ? <primitive object={effects.haze} /> : <></>}
       <primitive object={effects.bloom} />
       <primitive object={effects.toneMapping} />
       <primitive object={effects.ca} />
