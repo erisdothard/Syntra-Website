@@ -57,6 +57,8 @@ uniform float uThrust;    // 0..1
 uniform float uAltitude;  // 0..1 — kills the shock structure as ambient pressure drops
 uniform float uHeat;      // brightness multiplier for HDR
 uniform float uSoot;      // how dirty this shell runs (0 for the core)
+uniform float uOpacity;   // outer sheath stays translucent so the core reads through it
+uniform float uCeil;      // HDR ceiling for this shell
 ${NOISE_GLSL}
 
 void main() {
@@ -94,7 +96,7 @@ void main() {
   // it tears into dark filaments downstream and feeds the black column.
   float soot = uSoot * smoothstep(0.06, 0.42, along) * smoothstep(0.30, 0.62, n) * (1.0 - uAltitude * 0.35);
 
-  float alpha = density * thickness * uPower;
+  float alpha = density * thickness * uPower * uOpacity;
   alpha += diamonds * 0.75 * uPower;
   alpha *= smoothstep(uFloorY, uFloorY + 3.5, vWorldY);
   alpha = clamp(alpha, 0.0, 1.0);
@@ -104,15 +106,23 @@ void main() {
   vec3 core  = vec3(1.00, 0.96, 0.84);
   vec3 hot   = vec3(1.00, 0.56, 0.17);
   vec3 flame = vec3(1.00, 0.26, 0.05);
-  vec3 sooty = vec3(0.16, 0.08, 0.05);
-  float coreness = pow(v, 2.0) * (0.45 + 0.55 * rim);
-  vec3 col = mix(flame, hot, smoothstep(0.14, 0.72, coreness + n2 * 0.30));
-  col = mix(col, core, smoothstep(0.52, 1.0, coreness + diamonds * 0.9));
+  vec3 sooty  = vec3(0.16, 0.08, 0.05);
+  vec3 edge_c = vec3(0.85, 0.11, 0.02);   // cool red shear layer at the boundary
+  // rim is 1 on the axis and 0 at the silhouette, so it is the radial coordinate.
+  float radial = rim * (0.55 + 0.45 * v);
+  vec3 col = mix(edge_c, flame, smoothstep(0.05, 0.50, radial + n2 * 0.22));
+  col = mix(col, hot, smoothstep(0.58, 0.90, radial + n2 * 0.26));
+  col = mix(col, core, smoothstep(0.90, 1.02, radial + diamonds * 1.1));
   col = mix(col, sooty, soot * 0.95);
 
-  // Premultiplied output, bounded so the buffer can never run away. The ceiling
-  // sits well above the 0.86 bloom threshold so the core actually blooms.
-  col = min(col * uHeat, vec3(3.4));
+  // Premultiplied output, bounded so the buffer can never run away.
+  //
+  // ACES filmic desaturates and hue-shifts anything much past 1.0 toward
+  // yellow-white, and bloom above the 0.86 threshold finishes the job. So a
+  // saturated red sheath only survives if it stays in SDR: the outer shell is
+  // held near 1.0 to keep its colour, and only the narrow inner core is pushed
+  // into HDR where it is *meant* to blow out and bloom.
+  col = min(col * uHeat, vec3(uCeil));
   gl_FragColor = vec4(col * alpha, alpha);
 }
 `
@@ -182,11 +192,11 @@ export function Exhaust({ engines, liftUnits, baseY }: ExhaustProps) {
   const midLight = useRef<THREE.PointLight>(null)
   const bounce = useRef<THREE.PointLight>(null)
   const uniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uAltitude: { value: 0 }, uExpand: { value: 0 }, uHeat: { value: 1.5 }, uSoot: { value: 1 }, uFloorY: { value: -7.4 } }),
+    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uAltitude: { value: 0 }, uExpand: { value: 0 }, uHeat: { value: 0.72 }, uSoot: { value: 1 }, uOpacity: { value: 0.70 }, uCeil: { value: 1.05 }, uFloorY: { value: -7.4 } }),
     [],
   )
   const uniformsInner = useMemo(
-    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uAltitude: { value: 0 }, uExpand: { value: 0 }, uHeat: { value: 2.2 }, uSoot: { value: 0.15 }, uFloorY: { value: -7.4 } }),
+    () => ({ uTime: { value: 0 }, uPower: { value: 0 }, uThrust: { value: 0 }, uAltitude: { value: 0 }, uExpand: { value: 0 }, uHeat: { value: 3.2 }, uSoot: { value: 0.10 }, uOpacity: { value: 1.0 }, uCeil: { value: 3.6 }, uFloorY: { value: -7.4 } }),
     [],
   )
   const tex = useMemo(glowTexture, [])
@@ -224,8 +234,8 @@ export function Exhaust({ engines, liftUnits, baseY }: ExhaustProps) {
         const j = 1 + (flickerNoise(t * 9 + eng.position.x * 4) - 0.5) * 0.14
         outer.scale.set(wid * j, len, wid * j)
         outer.position.y = 0.3 - len / 2
-        inner.scale.set(wid * 0.45, len * 0.62, wid * 0.45)
-        inner.position.y = 0.3 - (len * 0.62) / 2
+        inner.scale.set(wid * 0.30, len * 0.70, wid * 0.30)
+        inner.position.y = 0.3 - (len * 0.70) / 2
       }
     }
     if (glow.current) {
