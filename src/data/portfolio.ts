@@ -36,6 +36,15 @@ export interface SkillGroup {
 
 export const projects: Project[] = [
   {
+    title: 'Hyper Racer USA',
+    tag: 'Distributor Platform & Agentic CRM',
+    stack: 'Next.js 16 · React 19 · TypeScript · Supabase · Anthropic Claude · Sanity · Mapbox · Resend · Vercel',
+    featured: true,
+    description:
+      'US distributor platform for the Australian-built Hyper Racer X1, plus the lead-intelligence layer behind it. Public site covers the build configurator, inventory, dealer and event maps, media gallery, owner garage, and a kiosk mode for trackside events. The CRM inverts the usual model — agents do the writing, the human does the approving: a triage pipeline (junk filter, enrichment, classification) scores every inbound lead, a deterministic cadence engine schedules follow-up by priority and channel, and a morning briefing ranks the day. Anything customer-facing routes through an approval queue, every mutation lands in an append-only event history, and an eval harness scores the classifier against a fenced human-labeled corpus before it is trusted.',
+    github: 'https://github.com/erisdothard/Hyper-Racer',
+  },
+  {
     title: 'FreightX',
     tag: 'Full-Stack Freight Marketplace',
     stack: 'React 19 · TypeScript · Vite · Supabase · Stripe · Anthropic Claude · Upstash Redis',
@@ -82,6 +91,16 @@ export const projects: Project[] = [
 /* ── Experience ── */
 
 export const experience: Experience[] = [
+  {
+    role: 'Data Scientist II / AI Engineer',
+    org: 'Caterpillar Inc.',
+    date: 'Aug 2026 –',
+    bullets: [
+      'Financial Management — building and maintaining data and machine-learning pipelines that support financial analytics',
+      'Developing AI-assisted tooling and models that turn financial and operational data into decision-ready reporting',
+      'Partnering with business stakeholders to translate financial questions into data products, carried through validation and documentation to production',
+    ],
+  },
   {
     role: 'Founder',
     org: 'Syntra AI',
@@ -140,11 +159,6 @@ export const experience: Experience[] = [
       },
     ],
   },
-  {
-    role: 'Technical Support',
-    org: 'Google Fiber',
-    date: '2019 – 2021',
-  },
 ]
 
 /* ── Services ── */
@@ -185,8 +199,8 @@ export const certifications: Certification[] = [
 export const skills: SkillGroup[] = [
   { category: 'Frontend', items: ['React', 'Next.js', 'TypeScript', 'Ionic', 'Three.js', 'GSAP'] },
   { category: 'Backend', items: ['Python', 'Java', 'Node.js', 'FastAPI', 'Express', 'PostgreSQL', 'SQL Server'] },
-  { category: 'AI & Automation', items: ['Anthropic API', 'LangChain', 'LangGraph', 'MCP', 'Voice AI', 'Test Automation'] },
+  { category: 'AI & Automation', items: ['Anthropic API', 'LangChain', 'LangGraph', 'MCP', 'Voice AI', 'Agent Evals', 'Test Automation'] },
   { category: 'Integration & APIs', items: ['REST APIs', 'CRM Automation', 'SFTP', 'HL7', 'FHIR', 'Mirth Connect', 'OAuth 2.0'] },
   { category: 'Data', items: ['SQL', 'Snowflake', 'Dataiku', 'Power BI', 'Data Modeling', 'Data Validation', 'Data Engineering', 'ETL / ELT Pipelines'] },
-  { category: 'Infrastructure', items: ['Docker', 'Kubernetes', 'AWS', 'GCP', 'Supabase', 'GitHub Actions', 'Networking'] },
+  { category: 'Infrastructure', items: ['Docker', 'Kubernetes', 'AWS', 'GCP', 'Supabase', 'Vercel', 'GitHub Actions', 'Networking'] },
 ]
