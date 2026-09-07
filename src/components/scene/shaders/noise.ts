@@ -87,3 +87,18 @@ vec3 curl3(vec3 p) {
   return c / (2.0 * e);
 }
 `
+
+/** Ridged noise. abs() folds the field at zero crossings, giving the sharp
+ *  filament structure of combustion rather than the smooth lumps of cloud fbm. */
+export const RIDGED_GLSL = /* glsl */ `
+float ridged3(vec3 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 4; i++) {
+    v += a * abs(vnoise3(p) * 2.0 - 1.0);
+    p = p * 2.11 + vec3(23.7, 11.3, 5.9);
+    a *= 0.5;
+  }
+  return v;
+}
+`

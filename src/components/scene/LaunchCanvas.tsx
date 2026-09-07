@@ -135,7 +135,9 @@ export const LaunchCanvas = memo(function LaunchCanvas() {
       gl={{
         antialias: false,
         powerPreference: 'high-performance',
-        toneMapping: THREE.ACESFilmicToneMapping,
+        // Overridden to NoToneMapping by <EffectComposer> for as long as it is
+        // mounted; the real curve is a ToneMappingEffect pass in PostFX.
+        toneMapping: THREE.NoToneMapping,
         toneMappingExposure: 1,
         stencil: false,
         depth: true,

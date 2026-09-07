@@ -9,6 +9,8 @@ import {
   NoiseEffect,
   SMAAEffect,
   SMAAPreset,
+  ToneMappingEffect,
+  ToneMappingMode,
   VignetteEffect,
 } from 'postprocessing'
 import { N8AOPostPass } from 'n8ao'
@@ -54,7 +56,18 @@ export function PostFX({ mobile }: { mobile: boolean }) {
     const noise = new NoiseEffect({ premultiply: true, blendFunction: BlendFunction.SOFT_LIGHT })
     noise.blendMode.opacity.value = mobile ? 0.05 : 0.08
     const smaa = dbg('nosmaa') ? null : new SMAAEffect({ preset: mobile ? SMAAPreset.LOW : SMAAPreset.HIGH })
-    return { ao, bloom, ca, vignette, noise, smaa }
+    // @react-three/postprocessing forces renderer.toneMapping = NoToneMapping
+    // while the composer is mounted, so the ACESFilmicToneMapping set on the
+    // Canvas never ran — the scene was reaching the screen with values above 1.0
+    // simply clipped per channel. Channel clipping is what turned every hot
+    // colour the same yellow-white: red and green pin at 1.0, blue does not.
+    // Tone map as a pass instead, after bloom so the halo is still saturated
+    // when the curve rolls the core off, and before the display-referred
+    // effects (aberration, vignette, grain) which expect 0-1 input.
+    const toneMapping = new ToneMappingEffect({
+      mode: dbg('aces') ? ToneMappingMode.ACES_FILMIC : ToneMappingMode.NEUTRAL,
+    })
+    return { ao, bloom, toneMapping, ca, vignette, noise, smaa }
     // scene/camera identity is stable for the canvas lifetime
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mobile])
@@ -70,6 +83,7 @@ export function PostFX({ mobile }: { mobile: boolean }) {
       effects.ca.dispose()
       effects.vignette.dispose()
       effects.noise.dispose()
+      effects.toneMapping.dispose()
       effects.smaa?.dispose()
     }
   }, [effects])
@@ -85,6 +99,7 @@ export function PostFX({ mobile }: { mobile: boolean }) {
     <EffectComposer multisampling={0} enableNormalPass={false}>
       {effects.ao ? <primitive object={effects.ao} /> : <></>}
       <primitive object={effects.bloom} />
+      <primitive object={effects.toneMapping} />
       <primitive object={effects.ca} />
       <primitive object={effects.vignette} />
       <primitive object={effects.noise} />
