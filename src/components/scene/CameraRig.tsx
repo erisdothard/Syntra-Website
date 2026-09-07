@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { scrollState } from '../../lib/scrollState'
@@ -10,10 +10,37 @@ const look = new THREE.Vector3()
  * Lerps the camera toward the scroll-driven path, layers in pointer parallax,
  * procedural shake, a subtle dutch roll, and drives tone-mapping exposure.
  */
+/**
+ * Vertical FOV that keeps the HORIZONTAL field roughly constant across aspect
+ * ratios, clamped so portrait does not go fisheye.
+ *
+ * three's `fov` is vertical, so a 36 deg camera shows ~54 deg horizontally on a
+ * 16:10 desktop but only ~17 deg on a phone in portrait — everything ends up
+ * three times over-zoomed, and the plume swallows the screen. Solving for the
+ * vertical fov that preserves horizontal coverage gives ~95 deg on a phone,
+ * which is unusably wide, so this recovers most of the framing rather than all
+ * of it and accepts a tighter horizontal field on narrow screens.
+ */
+const BASE_H_FOV = (54 * Math.PI) / 180
+const MIN_V_FOV = 36
+const MAX_V_FOV = 58
+
+function fovForAspect(aspect: number): number {
+  const want = (2 * Math.atan(Math.tan(BASE_H_FOV / 2) / aspect) * 180) / Math.PI
+  return Math.min(MAX_V_FOV, Math.max(MIN_V_FOV, want))
+}
+
 export function CameraRig() {
-  const { camera, gl } = useThree()
+  const { camera, gl, size } = useThree()
   const lookRef = useRef(new THREE.Vector3(0, 8, 0))
   const expRef = useRef(1)
+
+  useEffect(() => {
+    const cam = camera as THREE.PerspectiveCamera
+    if (!cam.isPerspectiveCamera) return
+    cam.fov = fovForAspect(size.width / size.height)
+    cam.updateProjectionMatrix()
+  }, [camera, size])
 
   useFrame((state, dt) => {
     const s = scrollState
