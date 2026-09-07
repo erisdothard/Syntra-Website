@@ -73,7 +73,7 @@ export function Rocket() {
       <group scale={MODEL_SCALE} position={[-AXIS.x * MODEL_SCALE, -AXIS.y * MODEL_SCALE, -AXIS.z * MODEL_SCALE]}>
         <primitive object={scene} />
       </group>
-      <Exhaust engines={engines} />
+      <Exhaust engines={engines} liftUnits={LIFT_UNITS} baseY={ROCKET_BASE_Y} />
     </group>
   )
 }
