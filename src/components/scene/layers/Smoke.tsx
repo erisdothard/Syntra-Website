@@ -48,7 +48,7 @@ void main() {
 
   if (kind < 0.22) {
     // Venting: small puffs escaping the body sides, drifting outward + up
-    float speed = 0.28 + rnd * 0.2;
+    float speed = 0.13 + rnd * 0.09;
     ph = fract(aSeed.x + uTime * speed);
     float side = (aSeed.x > 0.5) ? 1.0 : -1.0;
     float h = uBaseY + 6.0 + rnd * 12.0;
@@ -64,7 +64,7 @@ void main() {
     // how each one is shaded. Emitting in waves gives the cloud fronts and gaps,
     // which is what actually reads as volume.
     float wave = floor(aSeed.x * 6.0);
-    float speed = 0.085 + fract(wave * 0.37) * 0.055;
+    float speed = 0.038 + fract(wave * 0.37) * 0.025;
     ph = fract(wave * 0.1667 + rnd * 0.14 + uTime * speed);
     // Lobed front. A real pad cloud pushes further along some bearings than
     // others; a uniform radius is the single loudest "expanding disc" tell.
@@ -92,7 +92,7 @@ void main() {
   } else {
     // Column: trails below the engines as the vehicle climbs
     float wave = floor(aSeed.x * 5.0);
-    float speed = 0.34 + fract(wave * 0.53) * 0.3;
+    float speed = 0.15 + fract(wave * 0.53) * 0.14;
     ph = fract(wave * 0.2 + rnd * 0.16 + uTime * speed);
     float nozzle = uBaseY + uLift * uLiftUnits;
     float drop = ph * (14.0 + uThrust * 36.0);
@@ -110,7 +110,7 @@ void main() {
   // so neighbours sitting close together get near-identical velocities and the
   // cloud folds as a sheet. That spatial coherence — not the per-particle
   // randomness — is what separates fluid from jitter.
-  vec3 fp = c * 0.055 - vec3(0.0, uTime * 0.30, 0.0);
+  vec3 fp = c * 0.055 - vec3(0.0, uTime * 0.13, 0.0);
   vec3 flow = curl3(fp) + curl3(fp * 2.9 + 11.0) * 0.42;
   // Bound the field to roughly unit length so turb reads as literal world units.
   // Raw curl magnitude here runs 2-3x and sprays the cloud into flat haze.
@@ -153,7 +153,7 @@ void main() {
   if (a <= 0.0025) discard;
   float depth = t.g;   // baked distance into the puff: 0 at the wisp, 1 at the core
 
-  vec3 grey  = vec3(0.46, 0.48, 0.55);
+  vec3 grey  = vec3(0.72, 0.64, 0.53);
   vec3 steam = vec3(0.82, 0.86, 0.94);
   vec3 ember = vec3(1.00, 0.42, 0.13);
   vec3 base = vKind < 0.22 ? steam : grey;
