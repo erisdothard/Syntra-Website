@@ -28,7 +28,7 @@ export function Hero() {
       <div className="relative w-full px-6 md:px-12 lg:px-16 pointer-events-none">
         <div className="max-w-[1400px] mx-auto">
           <p className="mono-label fade-up mb-6" style={{ '--d': '80ms' } as React.CSSProperties}>
-            Syntra AI · Integration · Data · Automation
+            Syntra AI · Web · Applications · AI Automation
           </p>
           <h1 className="display text-text" style={{ fontSize: 'clamp(3.4rem, 11.5vw, 11rem)' }}>
             <SplitWord text="FROM" offset={0} />{' '}
@@ -40,8 +40,8 @@ export function Hero() {
             </span>
           </h1>
           <p className="fade-up mt-8 md:mt-10 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed" style={{ '--d': '600ms' } as React.CSSProperties}>
-            We engineer the pipelines, automations, and integrations that take enterprise operations
-            from manual friction to full thrust. Scroll to ignite.
+            We build the websites, applications, and AI automations that take a business from
+            manual work to full thrust. Scroll to ignite.
           </p>
           <div className="fade-up mt-8 flex items-center gap-4" style={{ '--d': '760ms' } as React.CSSProperties}>
             <span className="block w-px h-10 bg-white/40 scroll-hint-line" />

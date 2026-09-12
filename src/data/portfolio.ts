@@ -109,6 +109,28 @@ export const experience: Experience[] = [
     ],
   },
   {
+    role: 'Data Scientist',
+    org: 'Caterpillar',
+    date: '2026 \u2013',
+    sections: [
+      {
+        label: 'AI Engineering & Process Automation',
+        bullets: [
+          'AI engineering and automation of manual business processes \u2014 replacing human-in-the-loop steps with automated pipelines and agent-driven systems',
+          'Connecting AI agents into business systems and workflows so analysis, routing, and hand-offs run without manual intervention',
+        ],
+      },
+      {
+        label: 'Data Platform',
+        bullets: [
+          'Snowflake as the primary platform \u2014 modeling, querying, and building the warehouse layer that reporting and automation run on',
+          'Dataiku flows for automated ingestion, transformation, and validation',
+          'Power BI reporting built on top of the warehouse layer',
+        ],
+      },
+    ],
+  },
+  {
     role: 'Integration and Production Support Engineer',
     org: 'CPI Card Group',
     date: '2021 – 2026',
@@ -151,16 +173,16 @@ export const experience: Experience[] = [
 
 export const services: Service[] = [
   {
+    title: 'Web & Applications',
+    desc: 'Websites and applications built end to end \u2014 the marketing site, the product, the backend, and the database as one system. React and TypeScript front ends, Python and Node services, Postgres underneath. Scoped, designed, built, and deployed by the same people, with proven commercial platforms like FreightX behind it.',
+  },
+  {
+    title: 'AI Automation',
+    desc: 'AI agents wired into the systems your team already runs. Agentic CRMs that act on their own records, voice agents that handle inbound calls, and background workflows that execute overnight and hand you the result \u2014 built on the Claude API, MCP, and custom orchestration.',
+  },
+  {
     title: 'Integration',
-    desc: 'Cross-stack API orchestration and robust data pipelines built for zero operational friction. We lead complex integration projects from initial data discovery straight through production go-live, ensuring flawless interoperability between your core databases and third-party networks.',
-  },
-  {
-    title: 'Automation',
-    desc: 'Custom, resilient business logic engineered for your stack. We eliminate structural overhead by constructing secure background automation, multi-point workflows, intelligent AI routing, and specialized voice-AI communication agents.',
-  },
-  {
-    title: 'Applications',
-    desc: 'High-performance web and mobile applications built to serve as the interface for your automation suite. Backed by proven experience building commercial-grade platforms like FreightX — integrating live telemetry, automated billing, and compliance verification layers.',
+    desc: 'Cross-stack API orchestration and resilient data flow between the tools you already pay for. We lead integration projects from discovery through production go-live, so your core systems, third-party networks, and new automation layer all read from the same truth.',
   },
 ]
 

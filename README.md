@@ -5,9 +5,9 @@ The syntraai.tech site: a full-screen, scroll-scrubbed rocket launch that tells 
 | Scroll | Act | Story |
 | --- | --- | --- |
 | 0–6% | Hero | Wordmark over the pad at night |
-| 6–34% | 1 · Venting & pressure build-up | Heavy manual operational friction |
-| 34–66% | 2 · Core ignition & shockwaves | Automated ingestion and processing (Dataiku, Snowflake), structural transformation |
-| 66–100% | 3 · Final thrust & liftoff | Enterprise-scale delivery (Power BI, automated CRMs, custom app integration) |
+| 6–34% | 1 · Venting & pressure build-up | The software isn’t there — aging sites, disconnected tools, work done by hand |
+| 34–66% | 2 · Core ignition & shockwaves | Built end to end — web and application development, frontend through database |
+| 66–100% | 3 · Final thrust & liftoff | AI that runs it — agents, agentic CRMs, voice AI, workflow automation |
 
 After the launch track ends, a normal-scroll outro carries the contact CTA, service list, and footer. Portfolio, Services, and Resume open in the nav overlay.
 

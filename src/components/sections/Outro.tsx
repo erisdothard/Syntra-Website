@@ -2,8 +2,9 @@ import { MagneticButton } from '../ui/MagneticButton'
 import { services } from '../../data/portfolio'
 
 const marquee = [
-  'Dataiku', 'Snowflake', 'Power BI', 'Automated CRMs', 'HL7 / FHIR', 'Supabase',
-  'Claude API', 'MCP', 'FastAPI', 'React', 'Postgres', 'ETL / ELT', 'Voice AI', 'Playwright',
+  'Web Development', 'Application Development', 'AI Agents', 'Agentic CRMs', 'Voice AI',
+  'Workflow Automation', 'Claude API', 'MCP', 'React', 'TypeScript', 'FastAPI', 'Node',
+  'Postgres', 'Supabase', 'REST APIs', 'HL7 / FHIR', 'Playwright',
 ]
 
 interface Props {
@@ -75,7 +76,7 @@ export function Outro({ onTabOpen }: Props) {
           <div className="max-w-[1400px] mx-auto pt-8 flex flex-col md:flex-row gap-6 md:items-center justify-between">
             <div className="flex flex-col gap-1">
               <span className="display text-text text-sm tracking-wide">SYNTRA AI</span>
-              <span className="hud">Eris Dothard · Integration · Data · AI</span>
+              <span className="hud">Eris Dothard · Web · Applications · AI</span>
             </div>
             <div className="flex flex-wrap gap-6">
               <button className="btn-ghost" onClick={() => onTabOpen('portfolio')}>Portfolio</button>
