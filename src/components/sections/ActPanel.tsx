@@ -19,17 +19,9 @@ export function ActPanel({ act }: { act: Act }) {
           <h2 className="display text-text" style={{ fontSize: 'clamp(2.2rem, 5.6vw, 5rem)' }}>
             {act.headline}
           </h2>
-          <p className="mt-6 text-base md:text-lg text-text-secondary leading-relaxed">{act.body}</p>
-          {act.specs && (
-            <dl className={`spec-list tone-${act.tone} ${right ? 'is-right' : ''}`}>
-              {act.specs.map((spec) => (
-                <div key={spec.label} className="spec-row">
-                  <dt className="spec-label">{spec.label}</dt>
-                  <dd className="spec-value">{spec.values.join(' · ')}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
+          <p className={`act-body mt-6 max-w-md text-base md:text-lg leading-relaxed ${right ? 'md:ml-auto' : ''}`}>
+            {act.body}
+          </p>
         </div>
       </div>
     </div>

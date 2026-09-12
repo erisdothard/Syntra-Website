@@ -110,7 +110,13 @@ body {
 .act-panel.is-active .act-inner > *:nth-child(4) { transition-delay: 240ms; }
 .act-panel.is-active .act-inner > *:nth-child(5) { transition-delay: 320ms; }
 
-.act-panel .display, .act-panel p { text-shadow: 0 2px 28px rgba(7, 8, 12, 0.75), 0 0 2px rgba(7, 8, 12, 0.6); }
+/* Act copy sits on the lit 3D render, not on the void — mid-grey body text
+   disappears against the act-2 sky. Near-white plus a tight halo, so it stays
+   legible over both the dark starfield and the bright pad. */
+.act-panel .display, .act-panel p {
+  text-shadow: 0 1px 2px rgba(7, 8, 12, 0.95), 0 2px 16px rgba(7, 8, 12, 0.9), 0 0 40px rgba(7, 8, 12, 0.75);
+}
+.act-body { color: rgba(237, 237, 240, 0.94); }
 
 .act-number {
   font-family: var(--font-display);
@@ -125,45 +131,6 @@ body {
   pointer-events: none;
 }
 
-/* Instrumentation readout under an act. One row = one kind of value, named by
-   its label, so a stack line can never sit beside a claim. */
-.spec-list {
-  margin-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-}
-.spec-row {
-  display: flex;
-  align-items: baseline;
-  gap: 1.25rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-.spec-list.is-right .spec-row { flex-direction: row-reverse; }
-.spec-label {
-  flex: 0 0 auto;
-  min-width: 4.75rem;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(237, 237, 240, 0.42);
-}
-.spec-list.is-right .spec-label { min-width: 0; }
-.spec-value {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.05em;
-  line-height: 1.5;
-  color: var(--tone-color, var(--color-text));
-}
-.tone-ember { --tone-color: #FFB088; }
-.tone-data  { --tone-color: #9ADCFF; }
-.tone-hot   { --tone-color: #FFE7C4; }
-
-/* ─── HUD ─── */
 .hud {
   font-family: var(--font-mono);
   font-size: 10px;
