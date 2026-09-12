@@ -8,11 +8,7 @@ export interface Act {
    * container and clips off the edge.
    */
   headline: string
-  /**
-   * Two lines, ~25 words. The rocket is the hero; a panel tall enough to need
-   * a third line starts burying it. Detail belongs in Services and Portfolio,
-   * not stacked on top of the render.
-   */
+  /** Constrained to max-w-md so the prose column clears the rocket. */
   body: string
   /** Drives --tone-color for the eyebrow label. */
   tone: 'ember' | 'data' | 'hot'
@@ -22,31 +18,31 @@ export interface Act {
 export const acts: Act[] = [
   {
     n: 1,
-    label: 'T-minus · Venting & pressure build-up',
-    title: 'Pressure with nowhere to go',
-    headline: 'Human speed is your ceiling.',
+    label: 'Stage one · Off the ground',
+    title: 'First, we build it',
+    headline: 'First, we build it.',
     body:
-      'Every quote, every lead, every order waits for someone to get to it. Growth means more headcount, never more capacity.',
+      'Websites, customer portals, booking and ordering systems, marketplaces, internal tools. If your business needs it and nothing off the shelf does the job, we build it from scratch.',
     tone: 'ember',
     align: 'left',
   },
   {
     n: 2,
-    label: 'T-zero · Core ignition & shockwaves',
-    title: 'One team, one machine',
-    headline: 'You own what we build.',
+    label: 'Stage two · Full power',
+    title: 'Then we connect it',
+    headline: 'Then we connect it.',
     body:
-      'Hyper Racer USA runs their company on one of ours — site, configurator, dealer map, CRM. No seat licences, no roadmap to wait on.',
+      'Your tools start talking to each other. Orders, customers, payments, records. Information moves where it needs to go the moment it arrives, without anyone copying it over by hand.',
     tone: 'data',
     align: 'right',
   },
   {
     n: 3,
-    label: 'Liftoff · Final thrust',
-    title: 'Judgment at machine speed',
-    headline: 'It runs itself. And proves it.',
+    label: 'Stage three · It flies itself',
+    title: 'Then it runs without you',
+    headline: 'Then it runs without you.',
     body:
-      'Leads arrive scored and prioritised before anyone opens them — graded against a fixed eval set, every request reporting what it cost.',
+      'AI works inside your systems and handles the real tasks. Sorting requests, answering customers, moving work forward. Every step gets logged, so you can see exactly what it did.',
     tone: 'hot',
     align: 'left',
   },

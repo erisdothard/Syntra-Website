@@ -22,6 +22,19 @@ export function Outro({ onTabOpen }: Props) {
         style={{ background: 'linear-gradient(180deg, transparent, var(--color-void))' }}
       />
       <div style={{ background: 'var(--color-void)' }}>
+        {/* Ownership band — closes the launch sequence, directly under Act 03.
+            No bottom border: the marquee's border-y supplies the rule. */}
+        <div className="px-6 md:px-12 lg:px-16 pt-20 pb-16 md:pt-24 md:pb-20">
+          <div className="max-w-[1400px] mx-auto">
+            <p className="display text-text max-w-3xl" style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2.6rem)', lineHeight: 1.15 }}>
+              You own all of it. The code, the database, the accounts.
+            </p>
+            <p className="mt-6 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed">
+              No monthly license, no seats to pay for, no waiting on somebody else’s roadmap.
+            </p>
+          </div>
+        </div>
+
         {/* Marquee */}
         <div className="overflow-hidden border-y border-border py-4">
           <div className="marquee-track gap-10">
