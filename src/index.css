@@ -21,7 +21,11 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-*, *::before, *::after { margin: 0; box-sizing: border-box; }
+/* box-sizing ONLY. An unlayered `margin: 0` here outranks every Tailwind
+   utility in the cascade and silently kills mt-*, mb-* and mx-auto site-wide.
+   Tailwind v4's preflight already zeroes element margins inside @layer base,
+   where utilities can still override it. */
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
   scroll-behavior: auto;

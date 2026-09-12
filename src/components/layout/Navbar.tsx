@@ -36,32 +36,37 @@ export function Navbar({ onTabOpen }: NavbarProps) {
         scrolled || menuOpen ? 'bg-void/60 backdrop-blur-xl border-b border-border' : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="mx-auto max-w-[1400px] flex items-center justify-between px-6 md:px-12 lg:px-16 py-4">
-        <a
-          href="#"
-          onClick={(e) => { e.preventDefault(); setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-          className="display text-text text-[13px] tracking-[0.12em] select-none flex items-center gap-3"
-        >
-          <span className="inline-block w-2 h-2 rounded-full bg-accent shadow-[0_0_12px_rgba(255,106,26,0.8)]" />
-          SYNTRA AI
-        </a>
+      {/* Same container idiom as the sections: padding outside, max-width inside.
+          Putting the padding inside the max-width box insets the logo from the
+          content grid by (vw - 1400) / 2 on wide screens. */}
+      <div className="px-6 md:px-12 lg:px-16">
+        <div className="mx-auto max-w-[1400px] flex items-center justify-between py-4">
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); setMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            className="display text-text text-[13px] tracking-[0.12em] select-none flex items-center gap-3"
+          >
+            <span className="inline-block w-2 h-2 rounded-full bg-accent shadow-[0_0_12px_rgba(255,106,26,0.8)]" />
+            SYNTRA AI
+          </a>
 
-        <ul className="hidden md:flex items-center gap-9">
-          {TABS.map((t) => (
-            <li key={t}><button onClick={() => handleTab(t)} className={link}>{t}</button></li>
-          ))}
-          <li><a href="#outro" onClick={handleContact} className={`${link} text-accent hover:text-accent-hot`}>Contact</a></li>
-        </ul>
+          <ul className="hidden md:flex items-center gap-9">
+            {TABS.map((t) => (
+              <li key={t}><button onClick={() => handleTab(t)} className={link}>{t}</button></li>
+            ))}
+            <li><a href="#outro" onClick={handleContact} className={`${link} text-accent hover:text-accent-hot`}>Contact</a></li>
+          </ul>
 
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-        >
-          <span className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center" style={menuOpen ? { transform: 'translateY(3.25px) rotate(45deg)' } : {}} />
-          <span className="block w-5 h-[1.5px] bg-white transition-all duration-300" style={menuOpen ? { opacity: 0 } : {}} />
-          <span className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center" style={menuOpen ? { transform: 'translateY(-3.25px) rotate(-45deg)' } : {}} />
-        </button>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px]"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            <span className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center" style={menuOpen ? { transform: 'translateY(3.25px) rotate(45deg)' } : {}} />
+            <span className="block w-5 h-[1.5px] bg-white transition-all duration-300" style={menuOpen ? { opacity: 0 } : {}} />
+            <span className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center" style={menuOpen ? { transform: 'translateY(-3.25px) rotate(-45deg)' } : {}} />
+          </button>
+        </div>
       </div>
 
       <div
