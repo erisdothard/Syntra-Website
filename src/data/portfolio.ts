@@ -197,6 +197,39 @@ export const services: Service[] = [
   },
 ]
 
+/* ── Credentials (buyer-facing: claim first, employer as evidence) ── */
+
+export interface Credential {
+  claim: string
+  detail: string
+}
+
+/** Names only. Titles and dates belong on the resume, not on a sales page. */
+export const backgroundOrgs = ['Google', 'CPI Card Group', 'Caterpillar']
+
+export const credentials: Credential[] = [
+  {
+    claim: 'CJIS-certified',
+    detail:
+      'Five years shipping to production inside a regulated banking environment under formal change control \u2014 where a bad deploy is a compliance event, not a hotfix.',
+  },
+  {
+    claim: '50+ bank clients',
+    detail:
+      'Production SQL across their databases, source-to-target file mappings, and SLA-driven recovery reprocessing 10,000+ files per incident.',
+  },
+  {
+    claim: 'Enterprise AI, currently',
+    detail:
+      'Data and AI engineering at Caterpillar \u2014 Snowflake, automated pipelines, and agents wired into live business systems.',
+  },
+  {
+    claim: 'Published healthcare interop',
+    detail:
+      'HL7 v2.5 and FHIR R4 on Mirth Connect and BridgeLink \u2014 ORU lab routing, ADT processing, LOINC-coded FHIR bundles.',
+  },
+]
+
 /* ── Certifications ── */
 
 export interface Certification {

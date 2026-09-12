@@ -1,5 +1,5 @@
 import { MagneticButton } from '../ui/MagneticButton'
-import { services } from '../../data/portfolio'
+import { services, credentials, backgroundOrgs } from '../../data/portfolio'
 
 const marquee = [
   'Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Mapbox',
@@ -33,6 +33,33 @@ export function Outro({ onTabOpen }: Props) {
           </div>
         </div>
 
+        {/* Background — credentials as buyer proof, not a resume */}
+        <div className="px-6 md:px-12 lg:px-16 pt-24 md:pt-32">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="flex flex-col md:flex-row md:items-baseline gap-3 md:gap-10 pb-7 border-b border-border">
+              <p className="mono-label text-accent whitespace-nowrap">Background</p>
+              <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+                {backgroundOrgs.map((org, i) => (
+                  <span key={org} className="flex items-baseline gap-5">
+                    <span className="display text-text text-lg md:text-2xl">{org}</span>
+                    {i < backgroundOrgs.length - 1 && (
+                      <span className="text-accent/40" aria-hidden>/</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <dl className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-9 mt-11">
+              {credentials.map((c) => (
+                <div key={c.claim} className="border-t border-border pt-5">
+                  <dt className="display text-text text-base md:text-lg leading-tight mb-3 lg:min-h-[2.5em]">{c.claim}</dt>
+                  <dd className="text-sm text-text-secondary leading-relaxed">{c.detail}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+
         {/* CTA */}
         <div className="px-6 md:px-12 lg:px-16 py-28 md:py-40">
           <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-16 items-end">
@@ -42,8 +69,8 @@ export function Outro({ onTabOpen }: Props) {
                 Ready for<br />liftoff?
               </h2>
               <p className="mt-8 max-w-lg text-text-secondary text-base md:text-lg leading-relaxed">
-                Tell us what your team still does by hand. We scope it, build it, and hand back the
-                system — front end through database, agents included.
+                Tell us what you need built. We scope it, build it, and hand you the system —
+                front end through database, agents included. You own it outright.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <MagneticButton href="mailto:agent@syntraai.tech?subject=Launch%20request">

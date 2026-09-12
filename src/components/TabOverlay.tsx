@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
-import { projects, experience, services, skills, certifications } from '../data/portfolio'
+import { projects, experience, services, skills, certifications, backgroundOrgs } from '../data/portfolio'
 import type { Project } from '../data/portfolio'
 
 /* ── component ── */
@@ -204,13 +204,15 @@ function PortfolioView() {
         ))}
       </div>
 
-      {/* Experience — compact horizontal row */}
-      <div data-animate="item" style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-        {experience.map((item, i) => (
-          <div key={item.org} data-animate="item" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* Background — names carry, titles and dates do not */}
+      <div data-animate="item" style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+        <span className="font-mono" style={{ fontSize: 10, color: 'rgba(255,106,26,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+          Background
+        </span>
+        {backgroundOrgs.map((org, i) => (
+          <div key={org} data-animate="item" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 5, height: 5, borderRadius: '50%', background: i === 0 ? 'var(--color-accent)' : 'rgba(255,255,255,0.15)', boxShadow: i === 0 ? '0 0 8px rgba(255,106,26,0.3)' : 'none', flexShrink: 0 }} />
-            <span className="font-display" style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{item.role}</span>
-            <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>{item.org} · {item.date}</span>
+            <span className="font-display" style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{org}</span>
           </div>
         ))}
       </div>
