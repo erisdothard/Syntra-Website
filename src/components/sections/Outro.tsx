@@ -1,5 +1,5 @@
 import { MagneticButton } from '../ui/MagneticButton'
-import { services, credentials, backgroundOrgs, projects } from '../../data/portfolio'
+import { services, projects } from '../../data/portfolio'
 
 const marquee = [
   'Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Mapbox',
@@ -70,50 +70,6 @@ export function Outro({ onTabOpen }: Props) {
                 {m}<span className="text-accent">✦</span>
               </span>
             ))}
-          </div>
-        </div>
-
-        {/* Principal — for a one-person firm the founder IS the differentiator,
-            so this is a section, not a credentials footnote. */}
-        <div className="px-6 md:px-12 lg:px-16 pt-24 md:pt-32">
-          <div className="max-w-[1400px] mx-auto">
-            <div className="grid lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-20 items-start">
-              <div>
-                <p className="mono-label mb-6 text-accent">Who builds it</p>
-                <h2 className="display text-text" style={{ fontSize: 'clamp(2.2rem, 5vw, 4.25rem)' }}>
-                  You deal with<br />the person<br />who builds it.
-                </h2>
-              </div>
-              <div className="lg:pt-14">
-                <p className="text-base md:text-lg text-text leading-relaxed">
-                  No account manager. No handoff to a junior team once the contract is signed.
-                  The person who scopes your build is the person who writes it, and the person
-                  who answers when something breaks at 6pm on a Friday.
-                </p>
-                <p className="hud mt-9">Seven years in IT</p>
-                {/* No separator glyphs: a "/" between items dangles at the end of a
-                    line when the row wraps. Spacing separates them and cannot dangle. */}
-                <div className="mt-3 flex flex-wrap items-baseline gap-x-8 gap-y-2">
-                  {backgroundOrgs.map((org) => (
-                    <span key={org} className="display text-text text-lg md:text-xl whitespace-nowrap">
-                      {org}
-                    </span>
-                  ))}
-                </div>
-                <a className="btn-ghost inline-flex items-center gap-2 mt-9" href="/resume.html">
-                  Full background <span aria-hidden>↗</span>
-                </a>
-              </div>
-            </div>
-
-            <dl className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-9 mt-20 md:mt-28">
-              {credentials.map((c) => (
-                <div key={c.claim} className="border-t border-border pt-5">
-                  <dt className="display text-text text-base md:text-lg leading-tight mb-3 lg:min-h-[2.5em]">{c.claim}</dt>
-                  <dd className="text-sm text-text-secondary leading-relaxed">{c.detail}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </div>
 
