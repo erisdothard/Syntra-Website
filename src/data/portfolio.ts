@@ -9,6 +9,8 @@ export interface Project {
   github?: string
   /** Production URL, for client work that is live. */
   live?: string
+  /** One short line for the homepage proof strip. Presence opts a project in. */
+  proof?: string
 }
 
 export interface ExperienceSection {
@@ -45,12 +47,14 @@ export const projects: Project[] = [
     description:
       'Full ecosystem rebuild for the US distributor of the X1 ground-effects race car \u2014 Wix to Next.js 16, live in production. Public site with a pricing configurator, inventory, a Mapbox dealer network, gallery, news and events; behind it a 19-section admin CRM where the client edits their own live site content, works a leads \u2192 customers \u2192 deals pipeline, and audits every mutation in an activity log. Inbound leads run an Anthropic-SDK agent pipeline \u2014 junk filter, enrichment, then scoring \u2014 dry-run by default and graded by an eval harness against the same code path production runs, with tokens, cost and latency itemised per call. Offline kiosk capture for trade shows.',
     live: 'https://www.hyperracerusa.com',
+    proof: 'Site, configurator, CRM, and an AI lead pipeline.',
   },
   {
     title: 'FreightX',
     tag: 'Full-Stack Freight Marketplace',
     stack: 'React 19 · TypeScript · Vite · Supabase · Stripe · Anthropic Claude · Upstash Redis',
     featured: true,
+    proof: 'Freight marketplace \u2014 four roles, live GPS, automated billing.',
     description:
       'Multi-role logistics marketplace connecting carriers, brokers, shippers, and drivers — built across 20+ development phases. Features autonomous load management, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, and in-platform messaging.',
   },
@@ -67,6 +71,7 @@ export const projects: Project[] = [
     tag: 'Healthcare Data Interoperability',
     stack: 'Mirth Connect · PostgreSQL · HL7 v2.5 · FHIR R4',
     featured: true,
+    proof: 'HL7 v2.5 / FHIR R4 \u2014 four production channels.',
     description:
       'Production-style HL7 and FHIR R4 data integration engine. Orchestrates four automated pipeline channels covering high-volume ORU lab routing, clinical ADT transaction processing, and secure healthcare API infrastructure.',
     github: 'https://github.com/erisdothard/healthcare-integration-portfolio',

@@ -32,17 +32,17 @@ export const acts: Act[] = [
     title: 'Then we connect it',
     headline: 'Then we connect it.',
     body:
-      'Your tools start talking to each other. Orders, customers, payments, records. Information moves where it needs to go the moment it arrives, without anyone copying it over by hand.',
+      'Your tools start talking to each other. Orders, customers, payments, records. Information moves where it needs to go the moment it arrives, without anyone copying it over by hand — and you get one place that shows what it all adds up to.',
     tone: 'data',
     align: 'right',
   },
   {
     n: 3,
     label: 'Stage three · It flies itself',
-    title: 'Then it runs without you',
-    headline: 'Then it runs without you.',
+    title: 'Then it runs itself',
+    headline: 'Then it runs itself.',
     body:
-      'AI works inside your systems and handles the real tasks. Sorting requests, answering customers, moving work forward. Every step gets logged, so you can see exactly what it did.',
+      'AI works inside your systems and handles the real tasks. Sorting requests, answering customers, routing jobs to whoever should handle them. Every step gets logged, so you can see exactly what it did.',
     tone: 'hot',
     align: 'left',
   },

@@ -1,5 +1,5 @@
 import { MagneticButton } from '../ui/MagneticButton'
-import { services, credentials, backgroundOrgs } from '../../data/portfolio'
+import { services, credentials, backgroundOrgs, projects } from '../../data/portfolio'
 
 const marquee = [
   'Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Mapbox',
@@ -32,6 +32,33 @@ export function Outro({ onTabOpen }: Props) {
             <p className="mt-6 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed">
               No monthly license, no seats to pay for, no waiting on somebody else’s roadmap.
             </p>
+          </div>
+        </div>
+
+        {/* Proof strip — the three stages are all promises; this is the evidence,
+            on the main scroll rather than behind the Portfolio overlay. Driven by
+            `proof` on the project data so it cannot drift out of sync. */}
+        <div className="px-6 md:px-12 lg:px-16 pb-20 md:pb-24">
+          <div className="max-w-[1400px] mx-auto">
+            <p className="mono-label text-accent mb-7">Running in production</p>
+            <ul className="grid md:grid-cols-3 gap-x-10 gap-y-8">
+              {projects.filter((pr) => pr.proof).map((pr) => (
+                <li key={pr.title} className="border-t border-border pt-5">
+                  <h3 className="display text-text text-base md:text-lg mb-2">{pr.title}</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">{pr.proof}</p>
+                  {pr.live && (
+                    <a
+                      className="hud inline-flex items-center gap-2 mt-3 hover:text-text transition-colors"
+                      href={pr.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Visit the live site <span aria-hidden>↗</span>
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
