@@ -1,3 +1,14 @@
+export interface Spec {
+  /**
+   * Declares what kind of thing `values` are. Every value in a row must be
+   * that same kind — a stack row holds only tools, a status row only status.
+   * Mixing a claim, a tool and a feature in one row is what made the old chip
+   * strip meaningless.
+   */
+  label: string
+  values: string[]
+}
+
 export interface Act {
   n: 1 | 2 | 3
   label: string
@@ -9,8 +20,12 @@ export interface Act {
    */
   headline: string
   body: string
-  chips: string[]
-  /** Tailwind color class for the chip accent. */
+  /**
+   * Instrumentation. Omitted on Act 1 on purpose: a problem has no spec sheet,
+   * and the readout appearing at ignition is the point.
+   */
+  specs?: Spec[]
+  /** Drives --tone-color for the spec readout. */
   tone: 'ember' | 'data' | 'hot'
   align: 'left' | 'right' | 'center'
 }
@@ -22,8 +37,7 @@ export const acts: Act[] = [
     title: 'Pressure with nowhere to go',
     headline: 'Human speed is your ceiling.',
     body:
-      'Every quote, every lead, every order waits for someone to get to it. Growth means hiring more people to move the same information around. The limit was never your ambition — it is the software nobody ever built you.',
-    chips: ['Growth means headcount', 'Leads go cold waiting', 'One person, one bottleneck', 'No system of record'],
+      'Every quote, every lead, every order waits for someone to get to it. Growth means hiring more people to move the same information around. Leads go cold in the gap. The limit was never your ambition — it is the software nobody ever built you.',
     tone: 'ember',
     align: 'left',
   },
@@ -33,8 +47,12 @@ export const acts: Act[] = [
     title: 'One team, one machine',
     headline: 'You own what we build.',
     body:
-      'Hyper Racer USA got a public site, a pricing configurator, a dealer map, and the 19-section CRM their team now runs the company from. One codebase, one team, live in production. No seat licences, no roadmap to wait on.',
-    chips: ['Yours, not rented', 'Next.js 16 · React 19', 'Client-editable CMS', 'Live in production'],
+      'Hyper Racer USA got a public site, a pricing configurator, a dealer map, and the 19-section CRM their team now runs the company from. One codebase, one team. No seat licences, no roadmap to wait on — it is yours, not rented.',
+    specs: [
+      { label: 'Stack', values: ['Next.js 16', 'React 19', 'Supabase', 'Vercel'] },
+      { label: 'Surfaces', values: ['Public site', 'Configurator', 'Dealer map', 'CRM'] },
+      { label: 'Status', values: ['Live in production'] },
+    ],
     tone: 'data',
     align: 'right',
   },
@@ -44,8 +62,12 @@ export const acts: Act[] = [
     title: 'Judgment at machine speed',
     headline: 'It runs itself. And proves it.',
     body:
-      'Inbound leads are enriched, scored, and prioritised by a model before anyone opens them, every decision written to an audit trail. It runs dry first so you see the calls before they land, graded against a fixed eval set, with tokens, cost, and latency logged per request. Automation you cannot measure is a liability.',
-    chips: ['Scored before you see it', 'Graded against evals', 'Full audit trail', 'Voice agents · ElevenLabs'],
+      'Inbound leads are enriched, scored, and prioritised by a model before anyone opens them. It runs dry first so you see the calls before they land, it is graded against a fixed eval set on the same code path production runs, and every request reports what it cost. Automation you cannot measure is a liability.',
+    specs: [
+      { label: 'Pipeline', values: ['Enrich', 'Score', 'Prioritise'] },
+      { label: 'Guards', values: ['Dry-run default', 'Fixed eval set', 'Audit trail'] },
+      { label: 'Logged', values: ['Tokens', 'Cost', 'Latency'] },
+    ],
     tone: 'hot',
     align: 'left',
   },

@@ -20,13 +20,16 @@ export function ActPanel({ act }: { act: Act }) {
             {act.headline}
           </h2>
           <p className="mt-6 text-base md:text-lg text-text-secondary leading-relaxed">{act.body}</p>
-          <div className={`mt-7 flex flex-wrap gap-2 ${right ? 'md:justify-end' : ''}`}>
-            {act.chips.map((c) => (
-              <span key={c} className={`chip tone-${act.tone}`}>
-                {c}
-              </span>
-            ))}
-          </div>
+          {act.specs && (
+            <dl className={`spec-list tone-${act.tone} ${right ? 'is-right' : ''}`}>
+              {act.specs.map((spec) => (
+                <div key={spec.label} className="spec-row">
+                  <dt className="spec-label">{spec.label}</dt>
+                  <dd className="spec-value">{spec.values.join(' · ')}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </div>
     </div>

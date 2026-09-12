@@ -125,22 +125,43 @@ body {
   pointer-events: none;
 }
 
-.chip {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  padding: 7px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--chip-border, rgba(255, 255, 255, 0.12));
-  color: var(--chip-color, var(--color-text));
-  background: var(--chip-bg, rgba(255, 255, 255, 0.03));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  white-space: nowrap;
+/* Instrumentation readout under an act. One row = one kind of value, named by
+   its label, so a stack line can never sit beside a claim. */
+.spec-list {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
-.tone-ember { --chip-color: #FFB088; --chip-border: rgba(255, 106, 26, 0.35); --chip-bg: rgba(255, 106, 26, 0.08); }
-.tone-data  { --chip-color: #9ADCFF; --chip-border: rgba(92, 200, 255, 0.35); --chip-bg: rgba(92, 200, 255, 0.08); }
-.tone-hot   { --chip-color: #FFE7C4; --chip-border: rgba(255, 217, 168, 0.4); --chip-bg: rgba(255, 217, 168, 0.08); }
+.spec-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.spec-list.is-right .spec-row { flex-direction: row-reverse; }
+.spec-label {
+  flex: 0 0 auto;
+  min-width: 4.75rem;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(237, 237, 240, 0.42);
+}
+.spec-list.is-right .spec-label { min-width: 0; }
+.spec-value {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: var(--tone-color, var(--color-text));
+}
+.tone-ember { --tone-color: #FFB088; }
+.tone-data  { --tone-color: #9ADCFF; }
+.tone-hot   { --tone-color: #FFE7C4; }
 
 /* ─── HUD ─── */
 .hud {
@@ -247,7 +268,7 @@ body {
 
 /* ─── Mobile ─── */
 @media (max-width: 768px) {
-  .chip, .overlay-panel { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .overlay-panel { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
   .act-panel .display, .act-panel p { text-shadow: 0 2px 28px rgba(7, 8, 12, 0.75), 0 0 2px rgba(7, 8, 12, 0.6); }
 
 .act-number { -webkit-text-stroke: 1px rgba(255, 255, 255, 0.09); }
