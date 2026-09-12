@@ -163,17 +163,16 @@
 
       <div class="job-sub-label">Capabilities &amp; Execution</div>
       <ul>
-        <li>Engineering custom integration logic and agentic workflows that eliminate operational friction &mdash; replacing manual enterprise overhead with resilient, production-ready system architecture.</li>
-        <li>Cross-stack interoperability specialist: data pipelines connecting legacy system backbones to autonomous AI engines at production scale.</li>
-        <li>Full-lifecycle API and MCP orchestration with third-party pipeline implementation from scoping through production handoff.</li>
-        <li>Direct client communication for requirements, technical translation, and integration design &mdash; same methodology pattern carried forward from regulated banking work.</li>
+        <li>Deliver full builds end to end &mdash; frontend, backend, database, and the AI agents that run inside them &mdash; scoped directly with the client and owned through production deployment and support.</li>
+        <li>Custom integration and agentic workflow engineering: REST and MCP APIs, third-party pipelines, and legacy systems connected to model-driven automation, under the same change-management discipline carried forward from regulated banking work.</li>
       </ul>
 
       <div class="job-sub-label">Shipped Infrastructure</div>
       <ul>
+        <li><strong>Hyper Racer USA</strong> &mdash; full ecosystem rebuild for the US distributor of the X1 ground-effects race car, Wix to Next.js 16 and live in production: public site, pricing configurator, Mapbox dealer network, inventory and events, plus a 19-section admin CRM the client edits their own live pages from. Inbound leads run an Anthropic-SDK agent pipeline &mdash; enrich, score, prioritise &mdash; dry-run by default, graded by an eval harness against the production code path, with per-request cost logging. Next.js 16, React 19, TypeScript, Supabase, Vercel.</li>
         <li><strong>FreightX</strong> &mdash; multi-role logistics marketplace built across 20+ phases with autonomous load management, live GPS tracking, real-time bidding, billing automation, and carrier verification. React 19, TypeScript, Supabase, Stripe, Anthropic Claude, Upstash Redis.</li>
         <li><strong>3 Aces Trucking Inc.</strong> &mdash; full application and web development for a commercial trucking carrier; voice AI integration, autonomous load and document automation, and client-facing site built end-to-end.</li>
-        <li><strong>BridgeLink Core</strong> &mdash; HL7/FHIR R4 data integration engine orchestrating four automated channels: ORU lab routing, ADT processing, and secure healthcare API infrastructure. Mirth Connect, PostgreSQL.</li>
+        <li><strong>BridgeLink Core</strong> &mdash; HL7 v2.5 / FHIR R4 integration engine on BridgeLink 4.6.1 (Innovar fork of Mirth Connect) across four channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate-admit resilience, and FHIR R4 Patient/Observation Bundle endpoints with LOINC-coded results. Parses MSH, PID, PV1, OBR, OBX and EVN with ACK generation on every inbound message. PostgreSQL 14+, JavaScript transformers. <a href="https://github.com/erisdothard/healthcare-integration-portfolio">github.com/erisdothard</a></li>
         <li><strong>DispatchRelay</strong> &mdash; voice-AI engine for small-tier trucking fleets with automated dispatch handling and background workflow automation. ElevenLabs, Python, TypeScript.</li>
       </ul>
     </div>
@@ -247,23 +246,6 @@
         <li>Diagnosed network and configuration issues across 20+ daily live chat and phone interactions while maintaining 100% customer satisfaction; managed cases through Salesforce CRM.</li>
         <li>Reproduced and reported bugs to engineering with detailed issue reports that drove systemic platform fixes.</li>
       </ul>
-    </div>
-  </div>
-
-  <!-- HEALTHCARE PROJECTS -->
-  <div class="section">
-    <div class="section-title">Healthcare Integration Projects</div>
-    <div class="project">
-      <div class="project-title">BridgeLink HL7 / FHIR Healthcare Integration System</div>
-      <div class="project-meta">Solo build &nbsp;|&nbsp; <a href="https://github.com/erisdothard/healthcare-integration-portfolio">github.com/erisdothard</a></div>
-      <p>End-to-end healthcare integration on BridgeLink 4.6.1 (Innovar Healthcare fork of Mirth Connect) across four channels: ORU lab routing, ADT processing, and FHIR R4 Patient/Observation APIs.</p>
-      <ul>
-        <li>HL7 v2.5 parsing across MSH, PID, PV1, OBR, OBX, and EVN segments with try-catch error handling; ACK (MSH+MSA) response generation for every inbound message.</li>
-        <li><strong>ORU_Routing:</strong> parses PID/OBR/OBX; NPI provider enrichment via mid-flight reference table lookup against OBR-16; conditional routing of critical (HH/LL) vs normal results; multi-destination write to file and two PostgreSQL databases.</li>
-        <li><strong>ADT_Processing:</strong> handles A01 (admit), A03 (discharge), A08 (update) events with UPSERT logic for duplicate-admit resilience. Cross-channel data flow: ORU reads patient admission status from ADT-populated table for clinical-context enrichment.</li>
-        <li><strong>FHIR R4 APIs:</strong> separate endpoints returning Observation and Patient Bundles with searchset type, LOINC-coded lab results, unit coding via unitsofmeasure.org, interpretation flags via HL7 ObservationInterpretation CodeSystem.</li>
-      </ul>
-      <div class="project-stack">Stack: BridgeLink 4.6.1, Mirth Connect, PostgreSQL 14+, HL7 v2.5, FHIR R4, LOINC, JavaScript transformers.</div>
     </div>
   </div>
 

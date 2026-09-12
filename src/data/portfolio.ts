@@ -106,18 +106,16 @@ export const experience: Experience[] = [
       {
         label: 'Capabilities & Execution',
         bullets: [
-          'Autonomous infrastructure company — engineering custom integration logic and agentic workflows that replace manual enterprise overhead entirely',
-          'Cross-stack interoperability specialist — resilient data pipelines connecting legacy backbones to autonomous AI engines',
-          'Full-lifecycle API and MCP orchestration with third-party pipeline implementation from scoping through production handoff',
-          'Production-grade integration logic engineered for resilience, scale, and zero-downtime deployment',
-          'Custom Agentic OS pipelines, deep-tier data syncing, and automated workflow scripting',
+          'Deliver full builds end to end — frontend, backend, database, and the AI agents that run inside them — scoped directly with the client and owned through production deployment and support',
+          'Custom integration and agentic workflow engineering: REST and MCP APIs, third-party pipelines, and legacy systems connected to model-driven automation, under the change-management discipline carried forward from regulated banking work',
         ],
       },
       {
         label: 'Shipped Infrastructure',
         bullets: [
+          'Hyper Racer USA — full ecosystem rebuild for the US distributor of the X1 ground-effects race car, Wix to Next.js 16 and live in production: public site, pricing configurator, Mapbox dealer network, and a 19-section admin CRM the client edits their own live pages from; inbound leads run an Anthropic-SDK agent pipeline (enrich, score, prioritise) graded by an eval harness with per-request cost logging',
           'FreightX — multi-role logistics marketplace built across 20+ phases with autonomous load management, live GPS tracking, billing automation, and carrier verification',
-          'BridgeLink Core — HL7/FHIR R4 data integration engine orchestrating four automated channels: ORU lab routing, ADT processing, secure healthcare API infrastructure',
+          'BridgeLink Core — HL7 v2.5 / FHIR R4 integration engine across four channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate-admit resilience, and FHIR R4 Patient/Observation Bundles with LOINC-coded results',
           'DispatchRelay — voice-AI engine for small-tier trucking fleets with automated dispatch handling and background workflow automation',
           '3 Aces Trucking Inc. — full application and web development for a commercial trucking carrier; voice AI integration, autonomous load and document automation, and client-facing site',
         ],
