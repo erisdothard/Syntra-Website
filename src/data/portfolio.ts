@@ -7,6 +7,8 @@ export interface Project {
   featured: boolean
   description: string
   github?: string
+  /** Production URL, for client work that is live. */
+  live?: string
 }
 
 export interface ExperienceSection {
@@ -35,6 +37,15 @@ export interface SkillGroup {
 /* ── Projects ── */
 
 export const projects: Project[] = [
+  {
+    title: 'Hyper Racer USA',
+    tag: 'Website + CRM + Agentic Lead Pipeline',
+    stack: 'Next.js 16 \u00b7 React 19 \u00b7 TypeScript \u00b7 Supabase \u00b7 Anthropic SDK \u00b7 GSAP \u00b7 Mapbox \u00b7 Resend \u00b7 Vercel',
+    featured: true,
+    description:
+      'Full ecosystem rebuild for the US distributor of the X1 ground-effects race car \u2014 Wix to Next.js 16, live in production. Public site with a pricing configurator, inventory, a Mapbox dealer network, gallery, news and events; behind it a 19-section admin CRM where the client edits their own live site content, works a leads \u2192 customers \u2192 deals pipeline, and audits every mutation in an activity log. Inbound leads run an Anthropic-SDK agent pipeline \u2014 junk filter, enrichment, then scoring \u2014 dry-run by default and graded by an eval harness against the same code path production runs, with tokens, cost and latency itemised per call. Offline kiosk capture for trade shows.',
+    live: 'https://www.hyperracerusa.com',
+  },
   {
     title: 'FreightX',
     tag: 'Full-Stack Freight Marketplace',
@@ -174,11 +185,11 @@ export const experience: Experience[] = [
 export const services: Service[] = [
   {
     title: 'Web & Applications',
-    desc: 'FreightX is the proof: four user roles, 20+ build phases, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, in-platform messaging \u2014 React 19, TypeScript, Supabase, Postgres, Stripe. Same team from the first wireframe to the production deploy. Nothing gets handed off to a separate dev shop halfway through.',
+    desc: 'Hyper Racer USA is the proof: we replaced their Wix site with a Next.js 16 build \u2014 public site, pricing configurator, Mapbox dealer network, inventory, events \u2014 and put a 19-section CRM behind it, so they edit their own live pages, work a leads \u2192 customers \u2192 deals pipeline, and audit every change. FreightX before it: four user roles, 20+ phases, live GPS fleet tracking, Stripe billing, real-time bidding. Same team from the first wireframe to the production deploy, every time.',
   },
   {
     title: 'AI Automation',
-    desc: 'DispatchRelay answers dispatch calls with an ElevenLabs voice agent. Our extraction pipeline drives county appraiser sites through Playwright, pulls each field via Claude tool use with its own confidence score, and splits results into auto-approve, human-review, and reject lanes \u2014 a person only sees what is genuinely ambiguous. Shipped as a FastAPI gateway, an MCP server, and a monitoring dashboard.',
+    desc: 'Every lead that hits Hyper Racer runs a junk filter, an enrichment pass, then scoring before a human sees it \u2014 dry-run by default, graded by an eval harness against the same code path production runs, with tokens, cost and latency logged per call. DispatchRelay answers dispatch calls with an ElevenLabs voice agent. Our extraction pipeline reads county appraiser sites through Playwright and routes Claude-scored fields into auto-approve, human-review, and reject lanes.',
   },
   {
     title: 'Integration',

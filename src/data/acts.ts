@@ -28,8 +28,8 @@ export const acts: Act[] = [
     title: 'One build, not five vendors',
     headline: 'Site, app, backend, database.',
     body:
-      'FreightX: four user roles, 20+ build phases, live GPS on the map, Stripe billing, carrier verification, real-time bidding. React 19, TypeScript, Supabase, Postgres. One codebase, in production \u2014 not five vendors stitched together.',
-    chips: ['React 19 · TypeScript', 'Supabase · Postgres', 'Stripe billing', 'Live GPS fleet tracking', 'FastAPI · Node'],
+      'Hyper Racer USA runs on one of ours end to end \u2014 public site, pricing configurator, Mapbox dealer network, and a 19-section CRM they edit their own live pages from. Next.js 16, React 19, Supabase, Vercel. FreightX before it: four roles, live GPS, Stripe billing. One codebase each, no vendor relay race.',
+    chips: ['Next.js 16 \u00b7 React 19', 'Supabase \u00b7 Postgres', 'Client-editable CMS', 'Stripe billing', 'Live in production'],
     tone: 'data',
     align: 'right',
   },
@@ -39,8 +39,8 @@ export const acts: Act[] = [
     title: 'Agents that work the records',
     headline: 'Not a chatbot in the corner.',
     body:
-      'Our extraction pipeline drives county sites with Playwright and pulls every field through Claude tool use, each with a confidence score \u2014 then routes it to auto-approve, human review, or reject. DispatchRelay answers the phone. It runs whether anyone is logged in or not.',
-    chips: ['Claude tool use', 'Per-field confidence scoring', 'Voice agents · ElevenLabs', 'MCP servers', 'Human-review lanes'],
+      'Every lead that hits Hyper Racer runs a junk filter, an enrichment pass, then scoring before anyone looks at it \u2014 dry-run by default, graded by an eval harness against the code path production actually runs. DispatchRelay answers the phone. It runs whether anyone is logged in or not.',
+    chips: ['Anthropic SDK', 'Junk \u2192 enrich \u2192 score', 'Eval-harness graded', 'Per-run cost tracking', 'Voice agents \u00b7 ElevenLabs'],
     tone: 'hot',
     align: 'left',
   },

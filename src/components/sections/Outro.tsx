@@ -2,7 +2,8 @@ import { MagneticButton } from '../ui/MagneticButton'
 import { services } from '../../data/portfolio'
 
 const marquee = [
-  'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Claude tool use',
+  'Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Mapbox',
+  'Claude tool use',
   'MCP servers', 'ElevenLabs', 'Playwright', 'HL7 v2.5', 'FHIR R4', 'Mirth Connect',
   'Live GPS tracking', 'Agentic CRMs', 'Three.js',
 ]

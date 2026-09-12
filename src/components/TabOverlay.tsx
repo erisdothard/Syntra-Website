@@ -283,9 +283,20 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
             View on GitHub <span style={{ fontSize: 16 }}>&rarr;</span>
           </a>
         )}
+        {project.live && (
+          <a
+            href={project.live}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ghost"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          >
+            View live site <span style={{ fontSize: 16 }}>&rarr;</span>
+          </a>
+        )}
         {!project.github && (
           <a
-            href="mailto:agent@syntraai.tech?subject=FreightX Demo Request"
+            href={`mailto:agent@syntraai.tech?subject=${encodeURIComponent(`${project.title} demo request`)}`}
             className="btn-ghost"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
