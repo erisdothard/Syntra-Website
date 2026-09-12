@@ -96,9 +96,9 @@ export const experience: Experience[] = [
     org: 'Caterpillar Inc.',
     date: 'Aug 2026 –',
     bullets: [
-      'Financial Management — building and maintaining data and machine-learning pipelines that support financial analytics',
-      'Developing AI-assisted tooling and models that turn financial and operational data into decision-ready reporting',
-      'Partnering with business stakeholders to translate financial questions into data products, carried through validation and documentation to production',
+      'Developing automation across financial management workflows — replacing manual reporting steps with processes that run unattended',
+      'Applying AI to forecast potential outcomes from financial and operational data: scenario and predictive reporting rather than static dashboards',
+      'Data-warehouse engineering in Snowflake — modeling, transformation, and validation of the datasets the reporting layer runs on',
     ],
   },
   {

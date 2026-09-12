@@ -2,7 +2,7 @@ import { MagneticButton } from '../ui/MagneticButton'
 import { services } from '../../data/portfolio'
 
 const marquee = [
-  'Dataiku', 'Snowflake', 'Power BI', 'Automated CRMs', 'HL7 / FHIR', 'Supabase',
+  'Snowflake', 'Automated CRMs', 'HL7 / FHIR', 'Supabase',
   'Claude API', 'MCP', 'FastAPI', 'React', 'Postgres', 'ETL / ELT', 'Voice AI', 'Playwright',
 ]
 
