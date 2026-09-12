@@ -204,7 +204,7 @@ export const services: Service[] = [
   },
   {
     title: 'Integration',
-    desc: 'BridgeLink Core runs four HL7 v2.5 / FHIR R4 channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate admits, LOINC-coded Patient and Observation bundles. Behind that, five years of source-to-target file mappings for 50+ bank clients under formal change control. Integration either survives production or it does not.',
+    desc: 'BridgeLink Core runs four HL7 v2.5 / FHIR R4 channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate admits, LOINC-coded Patient and Observation bundles. Integration either survives production or it does not.',
   },
 ]
 
