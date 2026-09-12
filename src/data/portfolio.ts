@@ -125,23 +125,31 @@ export const experience: Experience[] = [
     ],
   },
   {
-    role: 'Data Scientist',
-    org: 'Caterpillar',
+    role: 'Data Scientist II / AI Engineer',
+    org: 'Caterpillar Financial',
     date: '2026 \u2013',
     sections: [
       {
-        label: 'AI Engineering & Process Automation',
+        label: 'AI Engineering & Agent Integration',
         bullets: [
-          'AI engineering and automation of manual business processes \u2014 replacing human-in-the-loop steps with automated pipelines and agent-driven systems',
-          'Connecting AI agents into business systems and workflows so analysis, routing, and hand-offs run without manual intervention',
+          'Build and deploy AI agents into core business workflows \u2014 wiring model-driven decisioning into the systems the business already runs on, rather than standing up parallel tooling nobody adopts',
+          'Replace manual, human-in-the-loop steps with automated pipelines: identify where analyst hours go to routing, lookup, and reconciliation, then move that work to scheduled or event-driven execution',
+          'Own solutions end to end \u2014 problem framing with business stakeholders, data sourcing, agent and model design, deployment, and the monitoring that keeps output trustworthy in production',
         ],
       },
       {
-        label: 'Data Platform',
+        label: 'Data Platform \u2014 Snowflake-first',
         bullets: [
-          'Snowflake as the primary platform \u2014 modeling, querying, and building the warehouse layer that reporting and automation run on',
-          'Dataiku flows for automated ingestion, transformation, and validation',
-          'Power BI reporting built on top of the warehouse layer',
+          'Snowflake as the primary platform: data modeling, SQL development, and the warehouse layer that downstream reporting and automation depend on',
+          'Dataiku flows for automated ingestion, transformation, and validation \u2014 repeatable pipelines in place of one-off extracts',
+          'Build and maintain the curated datasets analytics and AI workloads read from, with validation rules that catch bad data before it reaches a dashboard or a model',
+        ],
+      },
+      {
+        label: 'Reporting & Decision Support',
+        bullets: [
+          'Power BI reporting built directly on the warehouse layer, so figures refresh themselves instead of being rebuilt by hand each cycle',
+          'Translate stakeholder questions into data products \u2014 specify the metric, source the data, and deliver the view the decision actually needs',
         ],
       },
     ],
@@ -210,7 +218,7 @@ export interface Credential {
 }
 
 /** Names only. Titles and dates belong on the resume, not on a sales page. */
-export const backgroundOrgs = ['Google', 'CPI Card Group', 'Caterpillar']
+export const backgroundOrgs = ['Google', 'CPI Card Group', 'Caterpillar Financial']
 
 export const credentials: Credential[] = [
   {
@@ -226,7 +234,7 @@ export const credentials: Credential[] = [
   {
     claim: 'Enterprise AI, currently',
     detail:
-      'Data and AI engineering at Caterpillar \u2014 Snowflake, automated pipelines, and agents wired into live business systems.',
+      'Data Scientist II / AI Engineer at Caterpillar Financial \u2014 Snowflake, automated pipelines, and AI agents wired into live business systems.',
   },
   {
     claim: 'Published healthcare interop',
