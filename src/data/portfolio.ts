@@ -174,15 +174,15 @@ export const experience: Experience[] = [
 export const services: Service[] = [
   {
     title: 'Web & Applications',
-    desc: 'Websites and applications built end to end \u2014 the marketing site, the product, the backend, and the database as one system. React and TypeScript front ends, Python and Node services, Postgres underneath. Scoped, designed, built, and deployed by the same people, with proven commercial platforms like FreightX behind it.',
+    desc: 'FreightX is the proof: four user roles, 20+ build phases, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, in-platform messaging \u2014 React 19, TypeScript, Supabase, Postgres, Stripe. Same team from the first wireframe to the production deploy. Nothing gets handed off to a separate dev shop halfway through.',
   },
   {
     title: 'AI Automation',
-    desc: 'AI agents wired into the systems your team already runs. Agentic CRMs that act on their own records, voice agents that handle inbound calls, and background workflows that execute overnight and hand you the result \u2014 built on the Claude API, MCP, and custom orchestration.',
+    desc: 'DispatchRelay answers dispatch calls with an ElevenLabs voice agent. Our extraction pipeline drives county appraiser sites through Playwright, pulls each field via Claude tool use with its own confidence score, and splits results into auto-approve, human-review, and reject lanes \u2014 a person only sees what is genuinely ambiguous. Shipped as a FastAPI gateway, an MCP server, and a monitoring dashboard.',
   },
   {
     title: 'Integration',
-    desc: 'Cross-stack API orchestration and resilient data flow between the tools you already pay for. We lead integration projects from discovery through production go-live, so your core systems, third-party networks, and new automation layer all read from the same truth.',
+    desc: 'BridgeLink Core runs four HL7 v2.5 / FHIR R4 channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate admits, LOINC-coded Patient and Observation bundles. Behind that, five years of source-to-target file mappings for 50+ bank clients under formal change control. Integration either survives production or it does not.',
   },
 ]
 

@@ -40,8 +40,8 @@ export function Hero() {
             </span>
           </h1>
           <p className="fade-up mt-8 md:mt-10 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed" style={{ '--d': '600ms' } as React.CSSProperties}>
-            We build the websites, applications, and AI automations that take a business from
-            manual work to full thrust. Scroll to ignite.
+            We build the whole system — site, app, backend, database, and the agents that run it.
+            Freight marketplaces, HL7 pipelines, voice dispatch. Shipped, not slide-decked.
           </p>
           <div className="fade-up mt-8 flex items-center gap-4" style={{ '--d': '760ms' } as React.CSSProperties}>
             <span className="block w-px h-10 bg-white/40 scroll-hint-line" />

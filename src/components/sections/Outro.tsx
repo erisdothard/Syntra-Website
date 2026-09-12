@@ -2,9 +2,9 @@ import { MagneticButton } from '../ui/MagneticButton'
 import { services } from '../../data/portfolio'
 
 const marquee = [
-  'Web Development', 'Application Development', 'AI Agents', 'Agentic CRMs', 'Voice AI',
-  'Workflow Automation', 'Claude API', 'MCP', 'React', 'TypeScript', 'FastAPI', 'Node',
-  'Postgres', 'Supabase', 'REST APIs', 'HL7 / FHIR', 'Playwright',
+  'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Claude tool use',
+  'MCP servers', 'ElevenLabs', 'Playwright', 'HL7 v2.5', 'FHIR R4', 'Mirth Connect',
+  'Live GPS tracking', 'Agentic CRMs', 'Three.js',
 ]
 
 interface Props {
@@ -41,8 +41,8 @@ export function Outro({ onTabOpen }: Props) {
                 Ready for<br />liftoff?
               </h2>
               <p className="mt-8 max-w-lg text-text-secondary text-base md:text-lg leading-relaxed">
-                Tell us where the friction is. We scope it, wire it, and hand you a system that
-                runs without anyone pushing it.
+                Tell us what your team still does by hand. We scope it, build it, and hand back the
+                system — front end through database, agents included.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <MagneticButton href="mailto:agent@syntraai.tech?subject=Launch%20request">
