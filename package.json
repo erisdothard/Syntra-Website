@@ -26,8 +26,10 @@
     "n8ao": "^2.0.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "resend": "^6.28.0",
     "tailwindcss": "^4.3.0",
-    "three": "^0.184.0"
+    "three": "^0.184.0",
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

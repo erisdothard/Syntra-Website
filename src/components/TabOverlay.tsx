@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import gsap from 'gsap'
 import { projects, experience, services, skills, certifications, backgroundOrgs } from '../data/portfolio'
 import type { Project } from '../data/portfolio'
+import { DEMO_TOPICS, projectDemoTopic, useDemoRequest } from './demo-request/context'
 
 /* ── component ── */
 
@@ -223,6 +224,7 @@ function PortfolioView() {
 /* ── Project detail sub-view ── */
 
 function ProjectDetail({ project, onBack }: { project: Project; onBack: () => void }) {
+  const requestDemo = useDemoRequest()
   return (
     <>
       <div data-animate="header" style={{ marginBottom: 32 }}>
@@ -297,13 +299,14 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
           </a>
         )}
         {!project.github && (
-          <a
-            href={`mailto:agent@syntraai.tech?subject=${encodeURIComponent(`${project.title} demo request`)}`}
+          <button
+            type="button"
+            onClick={() => requestDemo(projectDemoTopic(project.title))}
             className="btn-ghost"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
             Request a Demo <span style={{ fontSize: 16 }}>&rarr;</span>
-          </a>
+          </button>
         )}
       </div>
     </>
@@ -313,6 +316,7 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
 /* ═══════════════ SERVICES ═══════════════ */
 
 function ServicesView() {
+  const requestDemo = useDemoRequest()
   return (
     <>
       {/* Header */}
@@ -355,13 +359,14 @@ function ServicesView() {
 
       {/* CTA */}
       <div data-animate="item">
-        <a
-          href="mailto:agent@syntraai.tech"
+        <button
+          type="button"
+          onClick={() => requestDemo(DEMO_TOPICS.project)}
           className="btn-ghost"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
           Start a Project <span style={{ fontSize: 16 }}>&rarr;</span>
-        </a>
+        </button>
       </div>
     </>
   )

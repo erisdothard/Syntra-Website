@@ -14,6 +14,7 @@
   --color-accent-glow: rgba(255, 106, 26, 0.18);
   --color-data: #5CC8FF;
   --color-data-glow: rgba(92, 200, 255, 0.16);
+  --color-danger: #FF7A6B;
   --font-display: 'Unbounded', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -220,6 +221,117 @@ body {
   border-color: rgba(255, 106, 26, 0.3);
   transform: translateY(-3px);
   box-shadow: 0 14px 44px rgba(255, 106, 26, 0.1);
+}
+
+/* ─── Demo request dialog ─── */
+.btn-primary { border: 0; cursor: pointer; }
+.btn-primary:disabled { opacity: 0.6; cursor: progress; }
+
+.demo-dialog {
+  width: min(600px, calc(100vw - 32px));
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  overflow: visible;
+}
+.demo-dialog[open] { animation: demo-in 0.55s cubic-bezier(0.16, 1, 0.3, 1); }
+.demo-dialog::backdrop {
+  background: rgba(7, 8, 12, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.demo-dialog[open]::backdrop { animation: demo-fade 0.35s ease; }
+@keyframes demo-in { from { opacity: 0; transform: translateY(18px) scale(0.985); } }
+@keyframes demo-fade { from { opacity: 0; } }
+
+.demo-panel {
+  position: relative;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(28px, 6vw, 48px);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse 80% 45% at 50% 0%, rgba(255, 106, 26, 0.1), transparent 70%),
+    linear-gradient(180deg, var(--color-surface-2) 0%, var(--color-surface) 60%, var(--color-void-2) 100%);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Viewfinder brackets, the same HUD corner the telemetry readout uses. */
+.demo-corner { position: absolute; width: 14px; height: 14px; border: 1px solid rgba(255, 106, 26, 0.45); pointer-events: none; }
+.demo-corner--tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+.demo-corner--tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; }
+.demo-corner--bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; }
+.demo-corner--br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+
+.demo-close {
+  position: absolute; top: 20px; right: 20px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+  font-size: 20px; line-height: 1;
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+.demo-close:hover { color: var(--color-text); border-color: rgba(255, 106, 26, 0.4); }
+.demo-close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+.demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 18px; }
+.demo-field { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.demo-field--wide { grid-column: 1 / -1; }
+.demo-field label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+.demo-optional { color: var(--color-text-muted); letter-spacing: 0.12em; margin-left: 6px; text-transform: lowercase; }
+
+.demo-input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(7, 8, 12, 0.55);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px; /* 16px stops iOS zooming the page on focus */
+  line-height: 1.5;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+textarea.demo-input { min-height: 132px; resize: vertical; }
+.demo-input::placeholder { color: rgba(237, 237, 240, 0.34); }
+.demo-input:hover { border-color: rgba(255, 255, 255, 0.18); }
+.demo-input:focus { outline: none; border-color: rgba(255, 106, 26, 0.65); box-shadow: 0 0 0 3px rgba(255, 106, 26, 0.15); background: rgba(7, 8, 12, 0.85); }
+.demo-input[aria-invalid="true"] { border-color: var(--color-danger); }
+.demo-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(255, 122, 107, 0.18); }
+.demo-error { font-size: 12.5px; color: var(--color-danger); }
+
+.demo-alert {
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 122, 107, 0.35);
+  border-radius: 10px;
+  background: rgba(255, 122, 107, 0.06);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+.demo-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (max-width: 560px) {
+  .demo-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .demo-dialog[open], .demo-dialog[open]::backdrop { animation: none; }
 }
 
 /* ─── Poster fallback while WebGL loads ─── */

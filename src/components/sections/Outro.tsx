@@ -1,5 +1,6 @@
 import { MagneticButton } from '../ui/MagneticButton'
 import { services, projects } from '../../data/portfolio'
+import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
 
 const marquee = [
   'Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Mapbox',
@@ -14,6 +15,7 @@ interface Props {
 
 /** Post-launch section: normal scroll, single strong CTA, quick links, footer. */
 export function Outro({ onTabOpen }: Props) {
+  const requestDemo = useDemoRequest()
   return (
     <section id="outro" className="relative z-10 pointer-events-auto">
       {/* Gradient veil so the canvas settles behind the content */}
@@ -94,7 +96,7 @@ export function Outro({ onTabOpen }: Props) {
                 front end through database, agents included. You own it outright.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-6">
-                <MagneticButton href="mailto:agent@syntraai.tech?subject=Launch%20request">
+                <MagneticButton onClick={() => requestDemo(DEMO_TOPICS.launch)}>
                   <span>Start a launch</span>
                   <span aria-hidden>→</span>
                 </MagneticButton>

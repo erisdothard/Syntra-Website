@@ -7,6 +7,7 @@ import { Hero } from './components/sections/Hero'
 import { ActPanel } from './components/sections/ActPanel'
 import { Telemetry } from './components/sections/Telemetry'
 import { Outro } from './components/sections/Outro'
+import { DemoRequestProvider } from './components/demo-request/DemoRequestProvider'
 import { acts } from './data/acts'
 
 const LaunchCanvas = lazy(() =>
@@ -21,7 +22,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>(null)
 
   return (
-    <>
+    <DemoRequestProvider>
       <div className="poster" aria-hidden />
       <Suspense fallback={null}>
         <LaunchCanvas />
@@ -40,6 +41,6 @@ export default function App() {
         </section>
         <Outro onTabOpen={setActiveTab} />
       </main>
-    </>
+    </DemoRequestProvider>
   )
 }
