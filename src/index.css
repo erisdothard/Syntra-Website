@@ -14,7 +14,7 @@
   --color-accent-glow: rgba(255, 106, 26, 0.18);
   --color-data: #5CC8FF;
   --color-data-glow: rgba(92, 200, 255, 0.16);
-  --font-display: 'Unbounded', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -124,7 +124,7 @@ body {
 
 .act-number {
   font-family: var(--font-display);
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(6rem, 18vw, 16rem);
   line-height: 0.8;
   color: transparent;

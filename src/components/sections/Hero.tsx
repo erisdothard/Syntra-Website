@@ -30,11 +30,12 @@ export function Hero() {
           <p className="mono-label fade-up mb-6" style={{ '--d': '80ms' } as React.CSSProperties}>
             Syntra AI · Software · Data · AI
           </p>
-          {/* One line per row down to 390px. The longest line measures 13.4x the
-              font size in Unbounded 900, against an available width of
+          {/* One line per row down to 390px. The longest line measures 9.5x the
+              font size in Space Grotesk 700, against an available width of
               min(1400, vw - 2 * gutter) — so the cap and the vw factor are both
-              derived, not guessed. Re-measure if the wording changes length. */}
-          <h1 className="display text-text" style={{ fontSize: 'clamp(1.5rem, 6.3vw, 6.25rem)' }}>
+              derived, not guessed. Re-measure if the wording or the face changes;
+              Unbounded ran 14x, which is why this was 6.25rem before. */}
+          <h1 className="display text-text" style={{ fontSize: 'clamp(2rem, 8.8vw, 8.5rem)' }}>
             <SplitWord text="WE" offset={0} />{' '}
             <SplitWord text="BUILD" offset={2} />{' '}
             <SplitWord text="SOFTWARE" offset={7} />
