@@ -1,10 +1,13 @@
 import { z } from 'zod'
+import { BitmapCache, type DecodeStats } from './bitmapCache'
 
 /**
  * Loader for the scroll-scrubbed launch frames (render/SPEC.md → "Frame
- * contract"). Owns the manifest, the decoded bitmaps, and the download order:
- * coarse-to-fine passes over the whole sequence, with a small priority window
- * around the frame the user is currently looking at that jumps the queue.
+ * contract"). Owns the manifest, the download order (coarse-to-fine passes
+ * over the whole sequence with a priority window around the current frame),
+ * and the persistent store — which holds only the COMPRESSED bytes (~17 MB
+ * for 240 frames). Decoded pixels live in a small windowed BitmapCache; keeping
+ * every frame decoded is ~2 GB at 1080p and gets the tab killed.
  *
  * No React, no DOM: the player (FrameScrub) drives it from a rAF loop.
  */
@@ -22,23 +25,30 @@ export type FrameManifest = z.infer<typeof manifestSchema>
 export interface FrameSequenceOptions {
   /** URL directory the manifest and frames live in, no trailing slash. */
   base: string
-  /** Decode at this size instead of native (mobile memory budget). */
-  decodeWidth?: number
-  decodeHeight?: number
   /** Simultaneous fetches. */
   concurrency?: number
-  /** Frames either side of the focus that jump the queue. */
+  /** Frames either side of the focus whose bytes jump the download queue. */
   priorityRadius?: number
-  /** Called after any frame becomes drawable (or is given up on). */
+  /** Frames either side of the focus kept decoded. */
+  decodeRadius: number
+  /** Hard cap on live bitmaps. */
+  maxBitmaps: number
+  /** Simultaneous decodes. */
+  decodeConcurrency?: number
+  /** A frame's bytes arrived (or it was given up on). */
   onFrame?: (index: number) => void
+  /** A frame became drawable. */
+  onDecoded?: (index: number) => void
 }
 
-export interface FrameSequenceStats {
+export interface FrameSequenceStats extends DecodeStats {
   loaded: number
   failed: number
   bytes: number
   /** performance.now() when the first bitmap became drawable, or -1. */
   firstFrameAt: number
+  /** Last frame index the player drew (written by the player). */
+  drawn: number
 }
 
 /** Strides for the coarse-to-fine passes; the final pass fills every gap. */
@@ -73,33 +83,48 @@ type Slot = 'idle' | 'loading' | 'done' | 'failed'
 
 export class FrameSequence {
   readonly manifest: FrameManifest
-  readonly stats: FrameSequenceStats = { loaded: 0, failed: 0, bytes: 0, firstFrameAt: -1 }
+  readonly stats: FrameSequenceStats = {
+    loaded: 0, failed: 0, bytes: 0, firstFrameAt: -1, drawn: 0,
+    decoded: 0, decodeErrors: 0, droppedDecodes: 0, maxInFlightDecodes: 0, cached: 0,
+  }
 
   private readonly base: string
-  private readonly opts: Required<Pick<FrameSequenceOptions, 'concurrency' | 'priorityRadius'>> &
-    Pick<FrameSequenceOptions, 'decodeWidth' | 'decodeHeight' | 'onFrame'>
-  /** 1-based; index 0 unused. */
-  private readonly bitmaps: Array<ImageBitmap | undefined>
+  private readonly concurrency: number
+  private readonly priorityRadius: number
+  private readonly onFrame?: (index: number) => void
+  private readonly cache: BitmapCache
+  /** 1-based; index 0 unused. Compressed bytes only. */
+  private readonly blobs: Array<Blob | undefined>
   private readonly slots: Slot[]
   private readonly order: number[]
   private cursor = 0
   private inFlight = 0
   private focus = 1
+  private direction: 1 | -1 = 1
   private disposed = false
 
   constructor(manifest: FrameManifest, options: FrameSequenceOptions) {
     this.manifest = manifest
     this.base = options.base
-    this.opts = {
-      concurrency: options.concurrency ?? 6,
-      priorityRadius: options.priorityRadius ?? 3,
-      decodeWidth: options.decodeWidth,
-      decodeHeight: options.decodeHeight,
-      onFrame: options.onFrame,
-    }
-    this.bitmaps = new Array<ImageBitmap | undefined>(manifest.count + 1)
+    this.concurrency = options.concurrency ?? 6
+    this.priorityRadius = options.priorityRadius ?? 3
+    this.onFrame = options.onFrame
+    this.blobs = new Array<Blob | undefined>(manifest.count + 1)
     this.slots = new Array<Slot>(manifest.count + 1).fill('idle')
     this.order = coarseToFineOrder(manifest.count)
+    this.cache = new BitmapCache({
+      radius: options.decodeRadius,
+      maxEntries: Math.max(options.maxBitmaps, 2 * options.decodeRadius + 1),
+      concurrency: options.decodeConcurrency ?? 2,
+      sourceWidth: manifest.width,
+      sourceHeight: manifest.height,
+      source: (i) => this.blobs[i],
+      stats: this.stats,
+      onDecoded: (i) => {
+        if (this.stats.firstFrameAt < 0) this.stats.firstFrameAt = performance.now()
+        options.onDecoded?.(i)
+      },
+    })
   }
 
   get count() {
@@ -109,52 +134,54 @@ export class FrameSequence {
   /** Begin (or resume) downloading. Safe to call repeatedly. */
   start() {
     if (this.disposed) return
-    while (this.inFlight < this.opts.concurrency) {
+    while (this.inFlight < this.concurrency) {
       const next = this.pickNext()
       if (next === 0) return
       void this.load(next)
     }
   }
 
-  /** Tell the loader which frame the viewer is on so its neighbours go first. */
-  setFocus(index: number) {
+  /**
+   * The viewer is on `index`, moving in `direction`: its neighbours download
+   * first and the decode window re-centres (ahead of the scroll first).
+   */
+  setFocus(index: number, direction: 1 | -1 = this.direction) {
     this.focus = Math.min(this.count, Math.max(1, index))
+    this.direction = direction
+    this.cache.request(this.focus, direction, this.count)
     this.start()
   }
 
-  has(index: number) {
+  /** Decode target for new bitmaps; never exceeds the source. */
+  setDecodeSize(width: number, height: number) {
+    this.cache.setDecodeSize(width, height)
+  }
+
+  hasBytes(index: number) {
     return this.slots[index] === 'done'
   }
 
+  /** Decoded bitmap for `index`, if it is in the cache. */
   get(index: number): ImageBitmap | undefined {
-    return this.bitmaps[index]
+    return this.cache.get(index)
   }
 
-  /** Nearest drawable frame to `index`, preferring the lower side on ties; 0 if none. */
-  nearest(index: number): number {
-    if (this.slots[index] === 'done') return index
-    for (let d = 1; d < this.count; d++) {
-      const lo = index - d
-      const hi = index + d
-      if (lo >= 1 && this.slots[lo] === 'done') return lo
-      if (hi <= this.count && this.slots[hi] === 'done') return hi
-    }
-    return 0
+  /** Nearest decoded frame to `index`; 0 if nothing is decoded yet. */
+  nearestDecoded(index: number): number {
+    return this.cache.nearest(index)
   }
 
   dispose() {
     this.disposed = true
-    for (let i = 1; i <= this.count; i++) {
-      this.bitmaps[i]?.close()
-      this.bitmaps[i] = undefined
-    }
+    this.cache.dispose()
+    for (let i = 1; i <= this.count; i++) this.blobs[i] = undefined
   }
 
   /** Priority window first, then the coarse-to-fine baseline. Returns 0 when nothing is left. */
   private pickNext(): number {
-    const r = this.opts.priorityRadius
+    const r = this.priorityRadius
     for (let d = 0; d <= r; d++) {
-      for (const i of [this.focus + d, this.focus - d]) {
+      for (const i of [this.focus + d * this.direction, this.focus - d * this.direction]) {
         if (i >= 1 && i <= this.count && this.slots[i] === 'idle') return i
       }
     }
@@ -169,15 +196,12 @@ export class FrameSequence {
     this.slots[index] = 'loading'
     this.inFlight++
     try {
-      const bmp = await this.fetchBitmap(index)
-      if (this.disposed) {
-        bmp.close()
-        return
-      }
-      this.bitmaps[index] = bmp
+      const blob = await this.fetchBytes(index)
+      if (this.disposed) return
+      this.blobs[index] = blob
       this.slots[index] = 'done'
       this.stats.loaded++
-      if (this.stats.firstFrameAt < 0) this.stats.firstFrameAt = performance.now()
+      this.stats.bytes += blob.size
     } catch (err) {
       this.slots[index] = 'failed'
       this.stats.failed++
@@ -186,12 +210,13 @@ export class FrameSequence {
       this.inFlight--
     }
     if (this.disposed) return
-    this.opts.onFrame?.(index)
+    this.onFrame?.(index)
+    this.cache.pump()
     this.start()
   }
 
   /** One retry on any failure, then the caller marks the frame as skipped. */
-  private async fetchBitmap(index: number): Promise<ImageBitmap> {
+  private async fetchBytes(index: number): Promise<Blob> {
     try {
       return await this.fetchOnce(index)
     } catch {
@@ -199,19 +224,9 @@ export class FrameSequence {
     }
   }
 
-  private async fetchOnce(index: number): Promise<ImageBitmap> {
+  private async fetchOnce(index: number): Promise<Blob> {
     const res = await fetch(frameUrl(this.base, this.manifest, index))
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-    const blob = await res.blob()
-    this.stats.bytes += blob.size
-    const { decodeWidth, decodeHeight } = this.opts
-    if (decodeWidth && decodeHeight) {
-      try {
-        return await createImageBitmap(blob, { resizeWidth: decodeWidth, resizeHeight: decodeHeight, resizeQuality: 'medium' })
-      } catch {
-        // Older WebKit rejects resize options; decode at native size instead.
-      }
-    }
-    return createImageBitmap(blob)
+    return res.blob()
   }
 }

@@ -12,7 +12,9 @@ const MAX_DPR = 2
  * LaunchCanvas used to occupy and carries its id so TabOverlay can dim it.
  *
  * Reads scrollState on rAF, redraws only when the target frame or the canvas
- * size changes, and never touches React state on the hot path.
+ * size changes, and never touches React state on the hot path. Frames are
+ * decoded on demand into a small window around the current one; the draw
+ * always uses the nearest decoded frame so decoding never blocks it.
  */
 export const FrameScrub = memo(function FrameScrub() {
   const mobile = useIsMobile()
@@ -35,12 +37,15 @@ export const FrameScrub = memo(function FrameScrub() {
     let frameDirty = false
     let lastTarget = 0
     let lastDrawn = 0
+    let lastProgress = scrollState.progress
+    let direction: 1 | -1 = 1
     let revealed = false
 
     const resize = () => {
-      const src = seq?.manifest
+      if (!seq) return
+      const src = seq.manifest
       // Never allocate a backing store larger than the source can fill.
-      const cap = src ? Math.max(1, src.width / window.innerWidth) : MAX_DPR
+      const cap = Math.max(1, src.width / window.innerWidth)
       const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR, cap)
       const w = Math.round(window.innerWidth * dpr)
       const h = Math.round(window.innerHeight * dpr)
@@ -48,6 +53,10 @@ export const FrameScrub = memo(function FrameScrub() {
         canvas.width = w
         canvas.height = h
       }
+      // Decode no larger than cover-fit needs for this backing store; half size on mobile.
+      const cover = Math.max(w / src.width, h / src.height)
+      const scale = Math.min(1, cover, mobile ? 0.5 : 1)
+      seq.setDecodeSize(src.width * scale, src.height * scale)
       sizeDirty = false
     }
 
@@ -73,27 +82,33 @@ export const FrameScrub = memo(function FrameScrub() {
     const tick = () => {
       raf = requestAnimationFrame(tick)
       if (!seq) return
-      const target = Math.round(scrollState.progress * (seq.count - 1)) + 1
+      const p = scrollState.progress
+      if (p !== lastProgress) {
+        direction = p > lastProgress ? 1 : -1
+        lastProgress = p
+      }
+      const target = Math.round(p * (seq.count - 1)) + 1
+      if (sizeDirty) resize()
       if (target !== lastTarget) {
         lastTarget = target
-        seq.setFocus(target)
-      } else if (!sizeDirty && !frameDirty) {
+        seq.setFocus(target, direction)
+      } else if (!frameDirty && lastDrawn !== 0) {
         return
       }
       frameDirty = false
-      const index = seq.nearest(target)
-      if (index === 0) return
-      if (sizeDirty) resize()
-      else if (index === lastDrawn) return
+      const index = seq.nearestDecoded(target)
+      if (index === 0 || index === lastDrawn) return
       const bmp = seq.get(index)
       if (!bmp) return
       draw(bmp)
       lastDrawn = index
+      seq.stats.drawn = index
       if (!revealed) reveal()
     }
 
     const onResize = () => {
       sizeDirty = true
+      lastDrawn = 0 // the backing store was cleared; redraw whatever is nearest
     }
     window.addEventListener('resize', onResize)
 
@@ -104,15 +119,18 @@ export const FrameScrub = memo(function FrameScrub() {
           base: FRAMES_BASE,
           concurrency: 6,
           priorityRadius: 3,
-          decodeWidth: mobile ? Math.round(manifest.width / 2) : undefined,
-          decodeHeight: mobile ? Math.round(manifest.height / 2) : undefined,
+          decodeRadius: mobile ? 5 : 8,
+          maxBitmaps: mobile ? 12 : 24,
+          decodeConcurrency: 2,
           onFrame: () => {
+            frameDirty = true
+          },
+          onDecoded: () => {
             frameDirty = true
           },
         })
         if (import.meta.env.DEV) (window as unknown as { __frames: FrameSequence }).__frames = seq
         sizeDirty = true
-        seq.setFocus(Math.round(scrollState.progress * (manifest.count - 1)) + 1)
         raf = requestAnimationFrame(tick)
       })
       .catch((err: unknown) => {
