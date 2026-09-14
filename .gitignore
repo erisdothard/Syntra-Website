@@ -34,3 +34,7 @@ dist-ssr
 render/assets/
 render/cache/
 render/out/
+
+# Python bytecode from the render scripts
+__pycache__/
+*.pyc
