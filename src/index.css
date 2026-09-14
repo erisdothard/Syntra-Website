@@ -145,6 +145,9 @@ body {
   z-index: -1;
   user-select: none;
   pointer-events: none;
+  /* Promote to its own layer: a stroked glyph this large otherwise repaints on
+     every scroll frame over the canvas and halves the scrub frame rate. */
+  will-change: transform;
 }
 
 .hud {

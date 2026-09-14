@@ -5,16 +5,23 @@ import { FrameSequence, fetchManifest } from '../../lib/frameSequence'
 
 const FRAMES_BASE = '/frames/desktop'
 const MAX_DPR = 2
+/** Redraw once the fractional frame position moves this much. */
+const SUBFRAME_STEP = 1 / 64
+/** Below this weight the second frame of a dissolve is invisible; skip the draw. */
+const MIN_BLEND = 0.02
+/** How far ahead (ms) the decode window is pushed from the scroll velocity. */
+const LOOKAHEAD_MS = 150
 
 /**
  * Fixed full-screen canvas that scrubs the offline-rendered launch sequence
  * with scroll (see render/SPEC.md → "Frame contract"). Sits in the slot
  * LaunchCanvas used to occupy and carries its id so TabOverlay can dim it.
  *
- * Reads scrollState on rAF, redraws only when the target frame or the canvas
- * size changes, and never touches React state on the hot path. Frames are
- * decoded on demand into a small window around the current one; the draw
- * always uses the nearest decoded frame so decoding never blocks it.
+ * Reads scrollState on rAF, redraws only when the (fractional) frame position
+ * or the canvas size changes, and never touches React state on the hot path.
+ * Between two frames it dissolves: frame ⌊f⌋ then ⌈f⌉ on top at alpha = frac,
+ * which the renders' motion blur supports. Frames are decoded on demand into a
+ * window ahead of the scroll; the draw always uses the nearest decoded frame.
  */
 export const FrameScrub = memo(function FrameScrub() {
   const mobile = useIsMobile()
@@ -35,35 +42,41 @@ export const FrameScrub = memo(function FrameScrub() {
     let cancelled = false
     let sizeDirty = true
     let frameDirty = false
-    let lastTarget = 0
-    let lastDrawn = 0
-    let lastProgress = scrollState.progress
+    let lastF = -1
+    let lastLo = 0
+    let lastBase = 0
+    let lastTop = 0
+    let lastFrac = 0
+    let lastTime = 0
+    let velocity = 0 // frames per ms, smoothed
     let direction: 1 | -1 = 1
     let revealed = false
 
     const resize = () => {
       if (!seq) return
       const src = seq.manifest
-      // Never allocate a backing store larger than the source can fill.
-      const cap = Math.max(1, src.width / window.innerWidth)
+      // The backing store never exceeds what the source can cover, so the
+      // decoded bitmap is exactly the draw size and drawImage is a 1:1 copy.
+      const cap = Math.min(src.width / window.innerWidth, src.height / window.innerHeight)
       const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR, cap)
-      const w = Math.round(window.innerWidth * dpr)
-      const h = Math.round(window.innerHeight * dpr)
+      const w = Math.max(1, Math.round(window.innerWidth * dpr))
+      const h = Math.max(1, Math.round(window.innerHeight * dpr))
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w
         canvas.height = h
       }
-      // Decode no larger than cover-fit needs for this backing store; half size on mobile.
-      const cover = Math.max(w / src.width, h / src.height)
-      const scale = Math.min(1, cover, mobile ? 0.5 : 1)
-      seq.setDecodeSize(src.width * scale, src.height * scale)
+      // Cover-fit, centre anchor: the vehicle is centred in the render.
+      const s = Math.max(w / src.width, h / src.height)
+      const sw = w / s
+      const sh = h / s
+      seq.setDecodeSpec({ sx: (src.width - sw) / 2, sy: (src.height - sh) / 2, sw, sh, width: w, height: h })
       sizeDirty = false
     }
 
     const draw = (bmp: ImageBitmap) => {
       const cw = canvas.width
       const ch = canvas.height
-      // Cover-fit, centre anchor: the vehicle is centred in the render.
+      // 1:1 when the bitmap was decoded for this size; cover-fit for a native-size fallback.
       const s = Math.max(cw / bmp.width, ch / bmp.height)
       const dw = bmp.width * s
       const dh = bmp.height * s
@@ -79,36 +92,62 @@ export const FrameScrub = memo(function FrameScrub() {
       }
     }
 
-    const tick = () => {
+    const tick = (now: number) => {
       raf = requestAnimationFrame(tick)
       if (!seq) return
-      const p = scrollState.progress
-      if (p !== lastProgress) {
-        direction = p > lastProgress ? 1 : -1
-        lastProgress = p
+      const count = seq.count
+      const f = scrollState.progress * (count - 1) // fractional, 0-based
+      const lo = Math.min(count, Math.floor(f) + 1)
+      const hi = Math.min(count, lo + 1)
+      const frac = f - Math.floor(f)
+
+      if (lastF >= 0 && now > lastTime) {
+        const v = (f - lastF) / (now - lastTime)
+        velocity = velocity * 0.7 + v * 0.3
+        if (f !== lastF) direction = f > lastF ? 1 : -1
       }
-      const target = Math.round(p * (seq.count - 1)) + 1
+      const moved = lastF < 0 || Math.abs(f - lastF) >= SUBFRAME_STEP
+      if (moved) {
+        lastF = f
+        lastTime = now
+      }
       if (sizeDirty) resize()
-      if (target !== lastTarget) {
-        lastTarget = target
-        seq.setFocus(target, direction)
-      } else if (!frameDirty && lastDrawn !== 0) {
+      if (lo !== lastLo) {
+        lastLo = lo
+        seq.stats.target = lo
+        const predicted = Math.round(f + velocity * LOOKAHEAD_MS)
+        seq.setFocus(lo, direction, predicted)
+      } else if (!moved && !frameDirty && lastBase !== 0) {
         return
       }
       frameDirty = false
-      const index = seq.nearestDecoded(target)
-      if (index === 0 || index === lastDrawn) return
-      const bmp = seq.get(index)
-      if (!bmp) return
-      draw(bmp)
-      lastDrawn = index
-      seq.stats.drawn = index
+
+      const base = seq.nearestDecoded(lo)
+      if (base === 0) return
+      const blend = frac >= MIN_BLEND && hi !== lo
+      const topBmp = blend ? seq.get(hi) : undefined
+      const top = topBmp ? hi : 0
+      if (blend && !topBmp) seq.stats.blendMisses++
+      if (base === lastBase && top === lastTop && Math.abs(frac - lastFrac) < SUBFRAME_STEP) return
+      const baseBmp = seq.get(base)
+      if (!baseBmp) return
+
+      draw(baseBmp)
+      if (topBmp) {
+        ctx.globalAlpha = frac
+        draw(topBmp)
+        ctx.globalAlpha = 1
+      }
+      lastBase = base
+      lastTop = top
+      lastFrac = frac
+      seq.stats.drawn = base
       if (!revealed) reveal()
     }
 
     const onResize = () => {
       sizeDirty = true
-      lastDrawn = 0 // the backing store was cleared; redraw whatever is nearest
+      lastBase = 0 // the backing store was cleared; redraw whatever is nearest
     }
     window.addEventListener('resize', onResize)
 
@@ -119,9 +158,12 @@ export const FrameScrub = memo(function FrameScrub() {
           base: FRAMES_BASE,
           concurrency: 6,
           priorityRadius: 3,
-          decodeRadius: mobile ? 5 : 8,
-          maxBitmaps: mobile ? 12 : 24,
-          decodeConcurrency: 2,
+          // Desktop bitmaps are ~7.5 MB each (1728×1080); the cap keeps the renderer
+          // under ~350 MB. Mobile crops to ~500×1080 (2 MB) and can afford more.
+          decodeAhead: mobile ? 16 : 9,
+          decodeBehind: mobile ? 4 : 2,
+          maxBitmaps: mobile ? 24 : 12,
+          decodeConcurrency: 4,
           onFrame: () => {
             frameDirty = true
           },

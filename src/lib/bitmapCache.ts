@@ -1,8 +1,11 @@
 /**
  * On-demand decode cache for the launch frames. Holds at most `maxEntries`
- * ImageBitmaps, centred on the frame the viewer is on, and closes anything it
- * evicts immediately. Decoding never blocks a draw: the player draws whatever
- * is nearest in the cache and this fills in the gaps in priority order.
+ * ImageBitmaps in a window around the frame the viewer is on (long ahead of
+ * the scroll, short behind), closes anything it evicts immediately, and never
+ * blocks a draw: the player draws whatever is nearest in the cache while this
+ * fills the gaps in priority order. Chromium decodes createImageBitmap(Blob)
+ * on its worker pool, so no Web Worker is needed for the main thread to stay
+ * free; concurrency only sets how many decodes are queued there at once.
  */
 
 export interface DecodeStats {
@@ -14,10 +17,22 @@ export interface DecodeStats {
   cached: number
 }
 
+/** Source crop + output size, so a bitmap is exactly what drawImage puts on the canvas. */
+export interface DecodeSpec {
+  sx: number
+  sy: number
+  sw: number
+  sh: number
+  width: number
+  height: number
+}
+
 export interface BitmapCacheOptions {
-  /** Frames either side of the target that are kept decoded. */
-  radius: number
-  /** Hard cap on live bitmaps (≥ 2·radius + 1). */
+  /** Frames kept decoded ahead of the scroll direction. */
+  ahead: number
+  /** Frames kept decoded behind it. */
+  behind: number
+  /** Hard cap on live bitmaps (≥ ahead + behind + 1). */
   maxEntries: number
   /** Simultaneous decodes. */
   concurrency?: number
@@ -31,9 +46,11 @@ export interface BitmapCacheOptions {
 
 interface Entry {
   bmp: ImageBitmap
-  /** Decode width at the time; entries decoded for an older canvas size are redecoded on demand. */
-  width: number
+  /** Spec key at decode time; entries decoded for an older canvas size are redecoded on demand. */
+  key: string
 }
+
+const specKey = (s: DecodeSpec) => `${s.sx},${s.sy},${s.sw},${s.sh}:${s.width}x${s.height}`
 
 export class BitmapCache {
   private readonly opts: Required<Omit<BitmapCacheOptions, 'onDecoded'>> & Pick<BitmapCacheOptions, 'onDecoded'>
@@ -42,36 +59,48 @@ export class BitmapCache {
   private readonly inFlight = new Set<number>()
   private desired: number[] = []
   private wanted = new Set<number>()
-  private decodeW: number
-  private decodeH: number
+  private spec: DecodeSpec
+  private key: string
   private disposed = false
 
   constructor(options: BitmapCacheOptions) {
-    this.opts = { concurrency: 2, ...options }
-    this.decodeW = options.sourceWidth
-    this.decodeH = options.sourceHeight
+    this.opts = { concurrency: 4, ...options }
+    this.spec = { sx: 0, sy: 0, sw: options.sourceWidth, sh: options.sourceHeight, width: options.sourceWidth, height: options.sourceHeight }
+    this.key = specKey(this.spec)
   }
 
-  /** Target size for new decodes, clamped to the source. Existing entries stay drawable until redecoded. */
-  setDecodeSize(width: number, height: number) {
-    const w = Math.max(1, Math.min(this.opts.sourceWidth, Math.round(width)))
-    const h = Math.max(1, Math.min(this.opts.sourceHeight, Math.round(height)))
-    if (w === this.decodeW && h === this.decodeH) return
-    this.decodeW = w
-    this.decodeH = h
+  /** Crop/size for new decodes, clamped to the source. Existing entries stay drawable until redecoded. */
+  setDecodeSpec(spec: DecodeSpec) {
+    const { sourceWidth: W, sourceHeight: H } = this.opts
+    const sw = Math.max(1, Math.min(W, Math.round(spec.sw)))
+    const sh = Math.max(1, Math.min(H, Math.round(spec.sh)))
+    const next: DecodeSpec = {
+      sx: Math.max(0, Math.min(W - sw, Math.round(spec.sx))),
+      sy: Math.max(0, Math.min(H - sh, Math.round(spec.sy))),
+      sw,
+      sh,
+      width: Math.max(1, Math.min(sw, Math.round(spec.width))),
+      height: Math.max(1, Math.min(sh, Math.round(spec.height))),
+    }
+    const key = specKey(next)
+    if (key === this.key) return
+    this.spec = next
+    this.key = key
     this.pump()
   }
 
   /**
-   * Re-centre the window on `target`; `direction` (+1 / −1) puts the frames
-   * ahead of the scroll first. Replaces any queued requests outright, so a
-   * fast scrub never leaves a backlog of frames nobody is looking at.
+   * Re-centre the window on `target`, moving in `direction` (+1 / −1). The
+   * ahead side extends past `predicted` (where the scroll will be shortly) so
+   * decodes land before the frames are needed. Replaces any queued requests
+   * outright, so a fast scrub never leaves a backlog nobody is looking at.
    */
-  request(target: number, direction: 1 | -1, count: number) {
-    const r = this.opts.radius
+  request(target: number, direction: 1 | -1, predicted: number, count: number) {
+    const { ahead, behind, maxEntries } = this.opts
+    const reach = Math.min(maxEntries - behind - 1, Math.abs(predicted - target) + ahead)
     const desired: number[] = [target]
-    for (let d = 1; d <= r; d++) desired.push(target + direction * d)
-    for (let d = 1; d <= r; d++) desired.push(target - direction * d)
+    for (let d = 1; d <= reach; d++) desired.push(target + direction * d)
+    for (let d = 1; d <= behind; d++) desired.push(target - direction * d)
     this.desired = desired.filter((i) => i >= 1 && i <= count)
     this.wanted = new Set(this.desired)
     this.pump()
@@ -121,16 +150,17 @@ export class BitmapCache {
 
   private isFresh(i: number) {
     const e = this.entries.get(i)
-    return !!e && e.width === this.decodeW
+    return !!e && e.key === this.key
   }
 
   private async decode(index: number, blob: Blob) {
     const stats = this.opts.stats
+    const key = this.key
     this.inFlight.add(index)
     stats.maxInFlightDecodes = Math.max(stats.maxInFlightDecodes, this.inFlight.size)
     let bmp: ImageBitmap
     try {
-      bmp = await this.createBitmap(blob)
+      bmp = await this.createBitmap(blob, this.spec)
     } catch (err) {
       stats.decodeErrors++
       this.inFlight.delete(index)
@@ -146,7 +176,7 @@ export class BitmapCache {
       return
     }
     stats.decoded++
-    this.insert(index, { bmp, width: this.decodeW })
+    this.insert(index, { bmp, key })
     this.opts.onDecoded?.(index)
     this.pump()
   }
@@ -177,13 +207,16 @@ export class BitmapCache {
     this.entries.delete(victim)
   }
 
-  private async createBitmap(blob: Blob): Promise<ImageBitmap> {
+  /** Crop to the visible region and resize to the draw size in one decode; native-size fallback for older engines. */
+  private async createBitmap(blob: Blob, s: DecodeSpec): Promise<ImageBitmap> {
     const { sourceWidth, sourceHeight } = this.opts
-    if (this.decodeW < sourceWidth || this.decodeH < sourceHeight) {
+    const cropped = s.sw < sourceWidth || s.sh < sourceHeight
+    const resized = s.width !== s.sw || s.height !== s.sh
+    if (cropped || resized) {
       try {
-        return await createImageBitmap(blob, { resizeWidth: this.decodeW, resizeHeight: this.decodeH, resizeQuality: 'high' })
+        return await createImageBitmap(blob, s.sx, s.sy, s.sw, s.sh, { resizeWidth: s.width, resizeHeight: s.height, resizeQuality: 'high' })
       } catch {
-        // Older WebKit rejects resize options; fall through to a native-size decode.
+        // Older WebKit rejects crop/resize options; the player cover-fits whatever size it gets.
       }
     }
     return createImageBitmap(blob)

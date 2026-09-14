@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { BitmapCache, type DecodeStats } from './bitmapCache'
+import { BitmapCache, type DecodeSpec, type DecodeStats } from './bitmapCache'
 
 /**
  * Loader for the scroll-scrubbed launch frames (render/SPEC.md → "Frame
@@ -29,8 +29,9 @@ export interface FrameSequenceOptions {
   concurrency?: number
   /** Frames either side of the focus whose bytes jump the download queue. */
   priorityRadius?: number
-  /** Frames either side of the focus kept decoded. */
-  decodeRadius: number
+  /** Frames kept decoded ahead of / behind the scroll direction. */
+  decodeAhead: number
+  decodeBehind: number
   /** Hard cap on live bitmaps. */
   maxBitmaps: number
   /** Simultaneous decodes. */
@@ -47,8 +48,10 @@ export interface FrameSequenceStats extends DecodeStats {
   bytes: number
   /** performance.now() when the first bitmap became drawable, or -1. */
   firstFrameAt: number
-  /** Last frame index the player drew (written by the player). */
+  /** Written by the player: base frame it wanted on its last tick, the one it drew, and blends it had to skip. */
+  target: number
   drawn: number
+  blendMisses: number
 }
 
 /** Strides for the coarse-to-fine passes; the final pass fills every gap. */
@@ -84,7 +87,7 @@ type Slot = 'idle' | 'loading' | 'done' | 'failed'
 export class FrameSequence {
   readonly manifest: FrameManifest
   readonly stats: FrameSequenceStats = {
-    loaded: 0, failed: 0, bytes: 0, firstFrameAt: -1, drawn: 0,
+    loaded: 0, failed: 0, bytes: 0, firstFrameAt: -1, target: 0, drawn: 0, blendMisses: 0,
     decoded: 0, decodeErrors: 0, droppedDecodes: 0, maxInFlightDecodes: 0, cached: 0,
   }
 
@@ -113,9 +116,10 @@ export class FrameSequence {
     this.slots = new Array<Slot>(manifest.count + 1).fill('idle')
     this.order = coarseToFineOrder(manifest.count)
     this.cache = new BitmapCache({
-      radius: options.decodeRadius,
-      maxEntries: Math.max(options.maxBitmaps, 2 * options.decodeRadius + 1),
-      concurrency: options.decodeConcurrency ?? 2,
+      ahead: options.decodeAhead,
+      behind: options.decodeBehind,
+      maxEntries: Math.max(options.maxBitmaps, options.decodeAhead + options.decodeBehind + 1),
+      concurrency: options.decodeConcurrency ?? 4,
       sourceWidth: manifest.width,
       sourceHeight: manifest.height,
       source: (i) => this.blobs[i],
@@ -142,19 +146,20 @@ export class FrameSequence {
   }
 
   /**
-   * The viewer is on `index`, moving in `direction`: its neighbours download
-   * first and the decode window re-centres (ahead of the scroll first).
+   * The viewer is on `index`, moving in `direction`, and will be near
+   * `predicted` shortly: neighbours download first and the decode window
+   * re-centres with its long side ahead of the scroll.
    */
-  setFocus(index: number, direction: 1 | -1 = this.direction) {
+  setFocus(index: number, direction: 1 | -1 = this.direction, predicted = index) {
     this.focus = Math.min(this.count, Math.max(1, index))
     this.direction = direction
-    this.cache.request(this.focus, direction, this.count)
+    this.cache.request(this.focus, direction, Math.min(this.count, Math.max(1, predicted)), this.count)
     this.start()
   }
 
-  /** Decode target for new bitmaps; never exceeds the source. */
-  setDecodeSize(width: number, height: number) {
-    this.cache.setDecodeSize(width, height)
+  /** Source crop and output size for new bitmaps: exactly what the canvas draws. */
+  setDecodeSpec(spec: DecodeSpec) {
+    this.cache.setDecodeSpec(spec)
   }
 
   hasBytes(index: number) {

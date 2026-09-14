@@ -33,7 +33,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        scrolled || menuOpen ? 'bg-void/60 backdrop-blur-xl border-b border-border' : 'bg-transparent border-b border-transparent'
+        scrolled || menuOpen ? 'bg-[rgba(7,8,12,0.88)] border-b border-border' : 'bg-transparent border-b border-transparent'
       }`}
     >
       {/* Same container idiom as the sections: padding outside, max-width inside.
