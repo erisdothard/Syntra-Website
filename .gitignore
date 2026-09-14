@@ -29,3 +29,8 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Offline render pipeline: sources, sim caches and raw frames are rebuilt, not committed
+render/assets/
+render/cache/
+render/out/

@@ -9,7 +9,11 @@ import { Telemetry } from './components/sections/Telemetry'
 import { Outro } from './components/sections/Outro'
 import { DemoRequestProvider } from './components/demo-request/DemoRequestProvider'
 import { acts } from './data/acts'
+import { FrameScrub } from './components/scene/FrameScrub'
+import { dbg } from './lib/dbg'
 
+// The live WebGL scene stays reachable in dev via ?webgl for side-by-side
+// comparison with the rendered sequence; it is never in the default bundle path.
 const LaunchCanvas = lazy(() =>
   import('./components/scene/LaunchCanvas').then((m) => ({ default: m.LaunchCanvas })),
 )
@@ -24,9 +28,13 @@ export default function App() {
   return (
     <DemoRequestProvider>
       <div className="poster" aria-hidden />
-      <Suspense fallback={null}>
-        <LaunchCanvas />
-      </Suspense>
+      {dbg('webgl') ? (
+        <Suspense fallback={null}>
+          <LaunchCanvas />
+        </Suspense>
+      ) : (
+        <FrameScrub />
+      )}
       <Telemetry />
       <Navbar onTabOpen={setActiveTab} />
       <TabOverlay activeTab={activeTab} onClose={() => setActiveTab(null)} />

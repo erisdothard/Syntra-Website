@@ -13,7 +13,9 @@
     "gen:og": "tsx scripts/generate-assets.ts --section og",
     "gen:textures": "tsx scripts/generate-assets.ts --section tex",
     "gen:explore": "tsx scripts/generate-assets.ts --section explore",
-    "prepare:models": "node scripts/prepare-models.mjs"
+    "prepare:models": "node scripts/prepare-models.mjs",
+    "frames:encode": "node render/scripts/encode.mjs",
+    "frames:placeholder": "node render/scripts/encode.mjs --placeholder"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

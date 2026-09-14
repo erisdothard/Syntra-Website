@@ -122,6 +122,17 @@ body {
   text-shadow: 0 1px 2px rgba(7, 8, 12, 0.95), 0 2px 16px rgba(7, 8, 12, 0.9), 0 0 40px rgba(7, 8, 12, 0.75);
 }
 .act-body { color: rgba(237, 237, 240, 0.94); }
+/* The rendered frames put the act-3 copy on a near-white pad cloud, where a
+   text halo alone is not enough. A soft local scrim behind the copy block
+   darkens the render under the words only; it has no visible edge. */
+.act-inner::before {
+  content: '';
+  position: absolute;
+  inset: -22% -26%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, rgba(7, 8, 12, 0.66) 0%, rgba(7, 8, 12, 0.42) 38%, rgba(7, 8, 12, 0) 72%);
+}
 
 .act-number {
   font-family: var(--font-display);
@@ -352,7 +363,13 @@ textarea.demo-input { min-height: 132px; resize: vertical; }
 /* ─── Mobile ─── */
 @media (max-width: 768px) {
   .overlay-panel { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-  .act-panel .display, .act-panel p { text-shadow: 0 2px 28px rgba(7, 8, 12, 0.75), 0 0 2px rgba(7, 8, 12, 0.6); }
+  .act-panel .display, .act-panel p { text-shadow: 0 1px 2px rgba(7, 8, 12, 0.95), 0 2px 16px rgba(7, 8, 12, 0.9), 0 0 40px rgba(7, 8, 12, 0.75); }
 
 .act-number { -webkit-text-stroke: 1px rgba(255, 255, 255, 0.09); }
+  /* Narrow frames crop to the brightest part of the cloud; keep the scrim wider
+     and lighter so its falloff is never perceptible as a shape. */
+  .act-inner::before {
+    inset: -34% -44%;
+    background: radial-gradient(ellipse at 50% 50%, rgba(7, 8, 12, 0.52) 0%, rgba(7, 8, 12, 0.30) 40%, rgba(7, 8, 12, 0) 74%);
+  }
 }
