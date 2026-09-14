@@ -6,7 +6,7 @@ The syntraai.tech site: a full-screen, scroll-scrubbed rocket launch that tells 
 | --- | --- | --- |
 | 0–6% | Hero | Wordmark over the pad at night |
 | 6–34% | 1 · Venting & pressure build-up | Somebody on your team is the API — re-typing, phone tag, status in one person’s head |
-| 34–66% | 2 · Core ignition & shockwaves | One build, not five vendors — FreightX as the proof: site, app, backend, database |
+| 34–66% | 2 · Core ignition & shockwaves | One build, not five vendors — DispatchRelay as the proof: site, app, backend, database |
 | 66–100% | 3 · Final thrust & liftoff | Agents that work the records — Claude tool use, confidence scoring, voice dispatch |
 
 After the launch track ends, a normal-scroll outro carries the contact CTA, service list, and footer. Portfolio, Services, and Resume open in the nav overlay.
