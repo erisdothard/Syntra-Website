@@ -58,6 +58,11 @@ def _hull_detail(t, P, ring_pitch=2.6):
     zones = t.math("MAXIMUM", _band(t, z, 4.5, 12.0), t.math("MAXIMUM", _band(t, z, 21.0, 26.5), _band(t, z, 41.0, 47.5)))
     corr = t.math("SINE", t.math("MULTIPLY", circ, 2 * math.pi / 0.9))
     corr = t.math("MULTIPLY", t.math("ABSOLUTE", corr), zones)
+    tail = _band(t, z, 4.0, 12.8)                             # fin fairings + tail skirt: deeper corrugation
+    corr = t.math("MULTIPLY", corr, t.math("MULTIPLY_ADD", tail, 1.2, 1.0))
+    # fairing panel lines every 1.3 m on the tail section
+    ft = t.math("ABSOLUTE", t.math("SUBTRACT", t.math("FRACT", t.math("DIVIDE", z, 1.3)), 0.5))
+    seam = t.math("MAXIMUM", seam, t.math("MULTIPLY", t.smoothstep(0.47, 0.5, ft), tail))
     # rivet rows above each ring seam
     rv = t.voronoi(t.comb_xyz(circ, z, 0.0), scale=6.0, randomness=0.0)
     rivet = t.math("MULTIPLY", t.smoothstep(0.07, 0.03, rv.outputs["Distance"]), t.smoothstep(0.5, 0.46, d))
@@ -77,6 +82,7 @@ def _hull_detail(t, P, ring_pitch=2.6):
     base_w = t.math("POWER", t.smoothstep(110.0, 0.0, z), 1.5)
     grime = t.math("MULTIPLY", t.math("MULTIPLY", drip, streak), t.math("MULTIPLY_ADD", base_w, 0.8, 0.2))
     grime = t.math("MULTIPLY_ADD", t.math("MULTIPLY", corr, t.math("MULTIPLY", streak, 0.3)), 1.0, grime)
+    grime = t.math("MULTIPLY_ADD", t.math("MULTIPLY", tail, streak), 0.6, grime)
     return height, rough, grime
 
 
@@ -105,15 +111,84 @@ def _frost(t, P, base_col, base_rough, height):
 def _paint_base(t, P, dark):
     height, rough, grime = _hull_detail(t, P)
     if dark:
-        base = t.rgb(0.020, 0.019, 0.021)
-        base = t.mix_rgb(t.math("MULTIPLY", grime, 0.6), base, (0.045, 0.042, 0.040))
-        rough = t.math("ADD", rough, 0.08)
-        coat = 0.15
+        # matte black paint: base ≤ 0.006 linear, no coat, rough 0.55 (+ a little noise), slight cool specular tint
+        base = t.rgb(0.005, 0.005, 0.0055)
+        base = t.mix_rgb(t.math("MULTIPLY", grime, 0.5), base, (0.012, 0.011, 0.010))
+        rough = t.math("MULTIPLY_ADD", t.noise(P, scale=6.0, detail=2.0), 0.08, 0.58)
+        coat = 0.0
     else:
         base = t.rgb(0.86, 0.80, 0.70)      # warm ivory under xenon (S72-54814)
         base = t.mix_rgb(t.math("MULTIPLY", grime, 0.55, clamp=True), base, (0.40, 0.37, 0.33))
         coat = 0.2
     return base, rough, height, coat
+
+
+DECAL_DIR = "/Users/erisdothard/Syntra-Website/render/assets/tex/decals/"
+# image, surface radius (m), width (m), z0, z1 (m above the F-1 exit plane), azimuth (0..1, 0 = +Y, increasing toward +X)
+DECALS = (
+    # 45° clear gap between the model's raised black quarters (0.875-1.0); S-II text above the aft black ring (z 48-52)
+    ("usa_flag.png", 5.09, 3.6, 13.6, 19.0, 0.9375),
+    ("united_states.png", 5.09, 1.8, 53.0, 63.8, 0.9375),
+)
+
+
+def _decals(t, P, base):
+    """Cylindrically projected decals in VEHICLE space, two copies 180° apart."""
+    x, y, z = t.sep_xyz(P)
+    ang = t.math("FRACT", t.math("ADD", t.math("DIVIDE", t.math("ARCTAN2", x, y), 2 * math.pi), 0.5))
+    for fn, r, w, z0, z1, a0 in DECALS:
+        for a in (a0, a0 + 0.5):
+            du = t.math("SUBTRACT", t.math("FRACT", t.math("ADD", t.math("SUBTRACT", ang, a), 0.5)), 0.5)
+            u = t.math("MULTIPLY_ADD", du, -2 * math.pi * r / w, 0.5)   # viewed from outside, ang runs right→left
+            v = t.math("DIVIDE", t.math("SUBTRACT", z, z0), z1 - z0)
+            tex = t.image(DECAL_DIR + fn, t.comb_xyz(u, v, 0.0), "sRGB")
+            tex.extension = "CLIP"
+            base = t.mix_rgb(tex.outputs["Alpha"], base, tex.outputs["Color"])
+    return base
+
+
+def sf_hull(vehicle_obj, palette_img):
+    """Sketchfab stack: the meshes pick colours from a palette atlas by UV, so one
+    material routes white → paint preset (+decals, frost), grey → engine metal,
+    orange → tank interiors."""
+    mat, t = new_material("SF_hull")
+    P = t.texcoord(vehicle_obj).outputs["Object"]
+    pal = t.image(palette_img, colorspace="sRGB", interpolation="Closest")   # atlas cells with dark grid lines: never blend
+    r, g, b = t.sep_rgb(pal.outputs["Color"])
+    lum = t.math("DIVIDE", t.math("ADD", t.math("ADD", r, g), b), 3.0)
+    sat = t.math("SUBTRACT", t.math("MAXIMUM", r, t.math("MAXIMUM", g, b)), t.math("MINIMUM", r, t.math("MINIMUM", g, b)))
+    # the author's roll-pattern "black" is a linear 0.271 grey cell; engines are other greys
+    # palette cells (linear): roll pattern 0.271, IU trim 0.337 | engines 0.40-0.60 | hull whites 0.67-0.93
+    unsat = t.smoothstep(0.15, 0.08, sat)
+    black = t.math("MULTIPLY", t.smoothstep(0.37, 0.33, lum), unsat)
+    grey = t.math("MULTIPLY", t.math("MULTIPLY", t.smoothstep(0.645, 0.625, lum), unsat), t.math("SUBTRACT", 1.0, black))
+    orange = t.smoothstep(0.12, 0.25, sat)
+    dbase, drough, dheight, dcoat = _paint_base(t, P, dark=True)
+    dark = t.principled(**{
+        "Base Color": dbase, "Roughness": drough, "Coat Weight": dcoat, "Coat Roughness": 0.3,
+        "Specular IOR Level": 0.15, "Specular Tint": (0.85, 0.88, 0.95, 1.0),
+        "Normal": t.bump(dheight, strength=1.0, distance=0.08),
+    })
+    base, rough, height, coat = _paint_base(t, P, dark=False)
+    base = _decals(t, P, base)
+    col, rough, height, sheen = _frost(t, P, base, rough, height)
+    nrm = t.bump(height, strength=1.0, distance=0.08)
+    paint = t.principled(**{
+        "Base Color": col, "Roughness": rough, "Coat Weight": coat, "Coat Roughness": 0.3,
+        "Normal": nrm, "Sheen Weight": sheen, "Sheen Roughness": 0.6,
+    })
+    mnoise = t.noise(P, scale=3.0, detail=3.0)
+    metal = t.principled(**{
+        "Base Color": t.vmath("SCALE", pal.outputs["Color"], scale=0.8),
+        "Roughness": t.math("MULTIPLY_ADD", mnoise, 0.2, 0.38), "Metallic": 0.85,
+        "Normal": t.bump(t.noise(P, scale=25.0, detail=2.0), strength=0.3, distance=0.01),
+    })
+    interior = t.principled(**{"Base Color": pal.outputs["Color"], "Roughness": 0.75, "Metallic": 0.0})
+    shader = t.mix_shader(black, paint.outputs[0], dark.outputs[0])
+    shader = t.mix_shader(grey, shader, metal.outputs[0])
+    shader = t.mix_shader(orange, shader, interior.outputs[0])
+    t.out(shader)
+    return mat
 
 
 def vehicle_paint(vehicle_obj, dark=False):
@@ -123,11 +198,14 @@ def vehicle_paint(vehicle_obj, dark=False):
     base, rough, height, coat = _paint_base(t, P, dark)
     col, rough, height, sheen = _frost(t, P, base, rough, height)
     nrm = t.bump(height, strength=1.0, distance=0.08)
-    bsdf = t.principled(**{
+    kw = {
         "Base Color": col, "Roughness": rough, "Metallic": 0.0,
         "Coat Weight": coat, "Coat Roughness": 0.3, "Normal": nrm,
         "Sheen Weight": sheen, "Sheen Roughness": 0.6,
-    })
+    }
+    if dark:
+        kw.update({"Specular IOR Level": 0.15, "Specular Tint": (0.85, 0.88, 0.95, 1.0)})
+    bsdf = t.principled(**kw)
     t.out(bsdf.outputs[0])
     return mat
 

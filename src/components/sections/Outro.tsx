@@ -141,6 +141,28 @@ export function Outro({ onTabOpen }: Props) {
               <span className="hud">© {new Date().getFullYear()}</span>
             </div>
           </div>
+          {/* CC-BY-4.0 attribution for the vehicle model in the launch render. */}
+          <p className="max-w-[1400px] mx-auto pt-6 hud text-text-secondary/70">
+            Launch rendered in Blender. Saturn V model based on{' '}
+            <a
+              className="underline decoration-border hover:text-text transition-colors"
+              href="https://sketchfab.com/3d-models/apollo-saturn-v-launch-vehicle-7c61146069134981a84dc7ed951609a0"
+              target="_blank"
+              rel="noopener noreferrer license"
+            >
+              “Apollo | Saturn V Launch Vehicle”
+            </a>{' '}
+            by{' '}
+            <a
+              className="underline decoration-border hover:text-text transition-colors"
+              href="https://sketchfab.com/devPilot0615"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              devPilot
+            </a>
+            , CC BY 4.0. Pad and launcher from NASA 3D Resources.
+          </p>
         </footer>
       </div>
     </section>

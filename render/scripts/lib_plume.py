@@ -172,7 +172,7 @@ def build_shape_group():
     tree.is_modifier = True
     it = tree.interface
     it.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
-    for nm, dv in (("W", 0.0), ("Cut", 400.0), ("Expand", 0.0), ("ExpandRamp", 120.0),
+    for nm, dv in (("W", 0.0), ("Cut", 400.0), ("Expand", 0.0), ("ExpandRamp", 160.0),
                    ("Amp", 1.0), ("NoiseScale", 0.11), ("Flow", 4.0), ("AmpGrow", 0.035)):  # ExpandRamp: far-field only
         s = it.new_socket(nm, in_out="INPUT", socket_type="NodeSocketFloat")
         s.default_value = dv
@@ -200,8 +200,13 @@ def build_shape_group():
     b.l.new(dele.outputs[0], sub.inputs["Mesh"])
     b.feed(sub.inputs["Level"], I["Level"])
 
-    # Radial expansion with altitude.
-    e = b.math("MULTIPLY_ADD", b.math("MULTIPLY", I["Expand"], 1.6), b.smoothstep(d, 0.0, I["ExpandRamp"]), 1.0)
+    # Vacuum fan: Expand metres are ADDED to the radius (ramping in over ExpandRamp m
+    # of plume), so the fan opens right behind the bells regardless of the base profile.
+    rxy = b.node("ShaderNodeVectorMath", operation="LENGTH")
+    b.feed(rxy.inputs[0], b.comb(px, py, 0.0))
+    e = b.math("DIVIDE", b.math("MULTIPLY", I["Expand"], b.smoothstep(d, 0.0, I["ExpandRamp"])),
+               b.math("MAXIMUM", rxy.outputs["Value"], 1.0))
+    e = b.math("ADD", e, 1.0)
     setp = b.node("GeometryNodeSetPosition")
     b.l.new(sub.outputs[0], setp.inputs["Geometry"])
     b.feed(setp.inputs["Position"], b.comb(b.math("MULTIPLY", px, e), b.math("MULTIPLY", py, e), pz))
@@ -346,11 +351,20 @@ def build_fire_group():
     s = nt.math("MULTIPLY", s, nt.math("MULTIPLY", I["Ignition"], I["Gain"]))
     # Vacuum (Vac -> 1): the envelope becomes a faint, huge, diffuse fan -- strength
     # VacStrength x (0.5..1.5), alpha VacAlpha x (0.6..1.4) -- so stars read through it.
+    # Faint longitudinal streaks: noise stretched ~9x along the plume axis.
+    ns = _noise4(nt, nt.comb_xyz(nt.math("MULTIPLY", ox, 0.16), nt.math("MULTIPLY", oy, 0.16),
+                                 nt.math("MULTIPLY_ADD", I["Time"], 0.2, nt.math("MULTIPLY", oz, 0.025))),
+                 nt.math("MULTIPLY", I["Time"], 0.03), 1.0, 2.0, 0.5)
+    streak = nt.smoothstep(0.3, 0.72, ns)
     vac_s = nt.math("MULTIPLY", I["VacStrength"], nt.math("MULTIPLY_ADD", n2, 1.0, 0.5))
+    vac_s = nt.math("MULTIPLY", vac_s, nt.math("MULTIPLY_ADD", streak, 0.7, 0.65))
     vac_s = nt.math("MULTIPLY", vac_s, nt.math("MULTIPLY_ADD", fringe, -0.5, 1.0))
     s = nt.mix_f(I["Vac"], s, nt.math("MULTIPLY", vac_s, I["Ignition"]))
     vac_a = nt.math("MULTIPLY", I["VacAlpha"], nt.math("MULTIPLY_ADD", n1r, 0.8, 0.6))
+    vac_a = nt.math("MULTIPLY", vac_a, nt.math("MULTIPLY_ADD", streak, 0.5, 0.75))
     vac_a = nt.math("MULTIPLY", vac_a, nt.math("MULTIPLY", tailvis, nt.smoothstep(0.0, 0.12, I["Ignition"])))
+    # Fully feathered silhouette in vacuum (no mesh rim), independent of EdgeFade.
+    vac_a = nt.math("MULTIPLY", vac_a, nt.math("SUBTRACT", 1.0, nt.smoothstep(0.15, 0.85, facing)))
     alpha = nt.mix_f(I["Vac"], alpha, vac_a)
 
     em = nt.emission(col, s)

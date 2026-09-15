@@ -12,6 +12,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lib_scene as S                      # noqa: E402
+import lib_vehicle_sf as SF                # noqa: E402
 import lib_materials as M                  # noqa: E402
 from lib_nodes import key_anim             # noqa: E402
 from lib_timeline import frame_state, FRAME_COUNT   # noqa: E402
@@ -20,7 +21,7 @@ ROOT = "/Users/erisdothard/Syntra-Website/render/"
 HDRI = ROOT + "assets/hdri/kloppenheim_02_4k.hdr"
 OUT_BLEND = ROOT + "cache/launch.blend"
 
-DEFAULTS = dict(exposure=-0.35, flood=1.3, hdri=0.04, sodium=3.5)
+DEFAULTS = dict(exposure=-0.35, flood=1.3, hdri=0.04, sodium=3.5, vehicle="sketchfab")
 
 
 def parse_args():
@@ -29,7 +30,7 @@ def parse_args():
     for i in range(0, len(argv) - 1, 2):
         key = argv[i].lstrip("-")
         if key in args:
-            args[key] = float(argv[i + 1])
+            args[key] = argv[i + 1] if isinstance(args[key], str) else float(argv[i + 1])
     return args
 
 
@@ -117,7 +118,10 @@ def main():
     c_cam = S.collection("CAMERA")
     S.collection("FLUIDS")
 
-    vehicle, sv_objs = S.build_vehicle(c_vehicle)
+    if args["vehicle"] == "sketchfab":
+        vehicle, sv_objs = SF.build_vehicle_sketchfab(c_vehicle)
+    else:
+        vehicle, sv_objs = S.build_vehicle(c_vehicle)
     ml = S.build_launcher(c_pad)
     S.build_ground(c_site)
     S.build_structures(c_site)
@@ -139,6 +143,7 @@ def main():
 
     states = [frame_state(f) for f in range(1, FRAME_COUNT + 1)]
     S.animate(vehicle, rig, cam, look, states)
+    S.hide_ground_props(states)
     key_anim(states, {
         "frost": lambda s: s["frost"],
         "ignition": lambda s: s["ignition"],

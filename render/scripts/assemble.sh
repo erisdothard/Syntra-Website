@@ -9,8 +9,8 @@ cd "$(dirname "$0")/../.."
 
 RUN="python3 render/scripts/run_blender.py"
 
-echo "== 1/4 build_scene"
-$RUN --timeout 600 render/scripts/build_scene.py
+echo "== 1/4 build_scene (vehicle=${VEHICLE:-sketchfab})"
+$RUN --timeout 600 render/scripts/build_scene.py -- --vehicle "${VEHICLE:-sketchfab}"
 
 echo "== 2/4 add_fluids (smoke only)"
 cp render/cache/launch.blend render/cache/launch_fx.blend

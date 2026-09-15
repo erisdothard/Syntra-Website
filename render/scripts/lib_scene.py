@@ -455,6 +455,32 @@ def animate(vehicle, rig, cam, look, states):
         _linear(ob)
 
 
+def hide_ground_props(states, threshold=0.25, keep=("EARTH_LIMB",)):
+    """Once the sky/limb cheat starts (altitude > threshold) the far ground props and
+    the pad would stand against the Earth limb: key hide_render/hide_viewport on
+    everything in PAD, SITE and the light poles from that frame on."""
+    first = next(s["frame"] for s in states if s["altitude"] > threshold)
+    targets = []
+    for cname in ("PAD", "SITE", "LIGHTS"):
+        c = bpy.data.collections.get(cname)
+        if not c:
+            continue
+        for ob in c.all_objects:
+            if ob.name in keep or ob.type in ("LIGHT", "CAMERA") or ob.name == "TRENCH":
+                continue
+            targets.append(ob)
+    for ob in targets:
+        for prop in ("hide_render", "hide_viewport"):
+            setattr(ob, prop, False)
+            ob.keyframe_insert(prop, frame=1)
+            setattr(ob, prop, True)
+            ob.keyframe_insert(prop, frame=first)
+            setattr(ob, prop, False)
+    print(f"[hide] {len(targets)} ground/pad objects hidden from frame {first} "
+          f"(altitude {states[first - 1]['altitude']:.3f} > {threshold}; f{first - 1} = {states[first - 2]['altitude']:.3f})")
+    return first
+
+
 def build_hooks(col):
     tr = empty("TRENCH", (0, 0, -TRENCH_DEPTH / 2), col, "CUBE", 1.0)
     tr.scale = (TRENCH_W / 2, TRENCH_D / 2, TRENCH_DEPTH / 2)   # half-extents: the cube display IS the trench

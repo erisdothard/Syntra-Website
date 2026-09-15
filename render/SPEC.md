@@ -57,7 +57,7 @@ launch (Apollo 17, Pad 39A, 7 Dec 1972). Realism target ≥ 9/10 at the review g
 ## Outputs
 
 - `render/scripts/assemble.sh` → `render/cache/launch_final.blend` (build_scene → add_fluids → add_plume)
-- `render/scripts/build_scene.py` → `render/cache/launch.blend` (pad, vehicle, lights, camera)
+- `render/scripts/build_scene.py [-- --vehicle sketchfab|nasa]` → `render/cache/launch.blend` (pad, vehicle, lights, camera). Default vehicle: "Apollo | Saturn V Launch Vehicle" by devPilot, CC-BY-4.0 (render/assets/models/saturn-v-sketchfab.glb, exploded in the file, stacked by lib_vehicle_sf.py); the NASA model remains selectable.
 - `render/scripts/add_fluids.py` → attaches the baked Mantaflow pad cloud + LOX vent (cache in `render/cache/fluids/`)
 - `render/scripts/add_plume.py -- --blend IN --out OUT` → emissive plume core, fire lights, glare
 - `python3 render/scripts/run_blender.py --timeout N --blend render/cache/launch_final.blend render/scripts/render.py -- --frames a:b --samples N --scale S --out DIR`

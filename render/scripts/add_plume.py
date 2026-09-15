@@ -33,6 +33,8 @@ TRENCH_HALF_LEN = 34.5        # +-Y trench ends
 DECK_Z = 13.4
 FIRST_FRAME = 86              # ignition starts at 87
 MESH_LIGHTING = False
+FAN_RADIUS = 45.0             # vacuum fan: added radius at altitude 1, reached 200 m downstream (cone, ~10 diameters wide)
+CORE_VAC_LEN = 120.0          # clipped inner core length in vacuum (~1.1 vehicle lengths)
 
 
 def parse_args():
@@ -100,11 +102,12 @@ def per_frame_state(f):
     pad_len = oz - DEFLECTOR_Z
     length = min(free_len, pad_len) * min(1.0, ig * 1.6)
     vac = tl.smoothstep(0.3, 0.7, alt)
+    fan = FAN_RADIUS * tl.smoothstep(0.3, 1.0, alt)      # metres added to the envelope radius
     flight = tl.smoothstep(0.03, 0.10, lift)        # airborne: ring lights on, A boosted; pad frames untouched
     lobe = (ig ** 1.5) * (1.0 - tl.smoothstep(0.03, 0.10, lift))
     # Ignition fireball above the deck: up with ignition, gone once hold-down release starts.
     flare = tl.smoothstep(0.15, 0.7, ig) * (1.0 - tl.smoothstep(0.45, 0.50, s["progress"]))
-    return dict(frame=f, oz=oz, ig=ig, alt=alt, length=length, lobe=lobe, flare=flare, vac=vac, flight=flight)
+    return dict(frame=f, oz=oz, ig=ig, alt=alt, length=length, lobe=lobe, flare=flare, vac=vac, flight=flight, fan=fan)
 
 
 def build_column(name, coll, parent, group, mat, stations, mod_vals):
@@ -158,28 +161,28 @@ def main():
 
     # 1. CORE envelope (goes translucent/diffuse in vacuum) + INNER core (0.4x, stays clipped white)
     core_mat = lp.make_fire_material("PLUME_CORE", fire, Gain=a.core_gain, Collar=1.0, Band=30.0,
-                                     VacStrength=1.8, VacAlpha=0.05)
+                                     VacStrength=1.8, VacAlpha=0.07)
     core, cmod, cids = build_column("PLUME_CORE", coll, origin, shape, core_mat, lp.core_stations(step=2.0),
                                     dict(Amp=1.2, NoiseScale=0.11, Flow=4.0, Level=2))
     key_column(core, cmod, cids, core_mat.node_tree.nodes["FIRE"], states,
-               lambda s: s["length"], lambda s: s["ig"], lambda s: s["alt"], lambda s: s["vac"])
+               lambda s: s["length"], lambda s: s["ig"], lambda s: s["fan"], lambda s: s["vac"])
     # Inner core: 0.6x the sea-level radius, NO altitude expansion, tail fading over ~200 m.
-    in_mat = lp.make_fire_material("PLUME_INNER", fire, Gain=a.core_gain, Collar=1.0, Band=200.0, Decay=45.0,
+    in_mat = lp.make_fire_material("PLUME_INNER", fire, Gain=a.core_gain, Collar=1.0, Band=60.0, Decay=45.0,
                                    EdgeFade=0.3)
     inner, imod, iids = build_column("PLUME_INNER", coll, origin, shape, in_mat,
                                      lp.core_stations(scale=0.6, top=-2.0, step=4.0),
                                      dict(Amp=0.5, NoiseScale=0.14, Flow=5.0, Level=1, AmpGrow=0.02))
     key_column(inner, imod, iids, in_mat.node_tree.nodes["FIRE"], states,
-               lambda s: s["length"], lambda s: s["ig"])
+               lambda s: s["length"] + s["vac"] * (min(CORE_VAC_LEN, s["length"]) - s["length"]), lambda s: s["ig"])
 
     # 2. SHEATH (1.4x radius, translucent; fainter still in vacuum)
     sh_mat = lp.make_fire_material("PLUME_SHEATH", fire, Gain=3.0 / 40.0, Collar=0.0, Band=30.0,
-                                   Translucent=1.0, TempOffset=-1200.0, Holes=0.3, VacStrength=1.5, VacAlpha=0.06)
+                                   Translucent=1.0, TempOffset=-1200.0, Holes=0.3, VacStrength=1.0, VacAlpha=0.02)
     sheath, smod, sids = build_column("PLUME_SHEATH", coll, origin, shape, sh_mat,
                                       lp.core_stations(scale=1.4, step=3.0),
                                       dict(Amp=1.3, NoiseScale=0.08, Flow=6.0, Level=1))
     key_column(sheath, smod, sids, sh_mat.node_tree.nodes["FIRE"], states,
-               lambda s: s["length"] * 1.05, lambda s: s["ig"], lambda s: s["alt"], lambda s: s["vac"])
+               lambda s: s["length"] * 1.05, lambda s: s["ig"], lambda s: s["fan"], lambda s: s["vac"])
 
     # 3. TRENCH LOBES at the +-Y trench ends, tilted 10 deg up
     lobe_mat = lp.make_fire_material("PLUME_LOBE", fire, Gain=15.0 / 40.0, Collar=0.0, Band=15.0,
