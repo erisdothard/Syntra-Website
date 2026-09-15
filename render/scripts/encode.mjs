@@ -6,13 +6,16 @@
  *   public/frames/desktop/manifest.json           { count, width, height, ext, pad }
  *
  *   npm run frames:encode        reads render/out/final/<n>.png (any zero-padded
- *                                numeric name), sorts numerically, renumbers 1..N
+ *                                numeric name; <n>_5.png is the half-step n + 0.5),
+ *                                sorts by that value, renumbers 1..N and writes a
+ *                                "progress" table (one entry per output frame, on the
+ *                                original 240-frame timeline grid) so the player can
+ *                                scrub a non-uniform sequence
  *   npm run frames:placeholder   generates 240 synthetic frames so the player can
  *                                be exercised before a single frame is rendered
  *
- * Flags: --src <dir> --out <dir> --quality <n> --count <n> (placeholder: frames to
- *        generate; encode: manifest count, so a partial render can ship while the rest
- *        is still rendering — missing frames are skipped by the player)
+ * Flags: --src <dir> --out <dir> --quality <n> --count <n> (placeholder mode only:
+ *        frames to generate; encode mode always counts the source files)
  */
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
@@ -29,6 +32,8 @@ const EXT = 'webp'
 const DEFAULT_QUALITY = 82
 const PLACEHOLDER_COUNT = 240
 const CONCURRENCY = 4
+/** The timeline (src/lib/launchTimeline.ts PHASES) is defined on this grid; half-step renders sit between its frames. */
+const TIMELINE_FRAMES = 240
 
 /* Mirrors PHASES.liftStart / liftEnd in src/lib/launchTimeline.ts (0.70 → 0.97). */
 const LIFT_START = 0.7
@@ -79,9 +84,10 @@ async function pool(items, limit, fn) {
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
 }
 
-async function writeManifest(out, count) {
-  const manifest = { count, width: WIDTH, height: HEIGHT, ext: EXT, pad: PAD }
-  await writeFile(path.join(out, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+/** `progress` (optional): scroll progress of each output frame on the timeline grid, strictly increasing. */
+async function writeManifest(out, count, progress) {
+  const manifest = { count, width: WIDTH, height: HEIGHT, ext: EXT, pad: PAD, ...(progress ? { progress } : {}) }
+  await writeFile(path.join(out, 'manifest.json'), `${JSON.stringify(manifest)}\n`)
   return manifest
 }
 
@@ -100,23 +106,33 @@ async function listSourceFrames(src) {
   }
   const frames = entries
     .map((name) => {
-      const m = /^(\d+)\.png$/i.exec(name)
-      return m ? { name, n: Number(m[1]) } : null
+      const m = /^(\d+)(_5)?\.png$/i.exec(name)
+      return m ? { name, value: Number(m[1]) + (m[2] ? 0.5 : 0) } : null
     })
     .filter((f) => f !== null)
-    .sort((a, b) => a.n - b.n)
+    .sort((a, b) => a.value - b.value)
   if (frames.length === 0) throw new Error(`no numeric .png frames in ${src}`)
+  for (let i = 1; i < frames.length; i++) {
+    if (frames[i].value === frames[i - 1].value) throw new Error(`duplicate frame value ${frames[i].value}: ${frames[i - 1].name}, ${frames[i].name}`)
+  }
+  const last = frames[frames.length - 1].value
+  if (frames[0].value < 1 || last > TIMELINE_FRAMES) throw new Error(`frame values must lie in 1..${TIMELINE_FRAMES}, got ${frames[0].value}..${last}`)
   return frames
 }
+
+/** Scroll progress of a source frame value on the timeline grid: frame 1 → 0, frame 240 → 1. */
+const progressOf = (value) => Number(((value - 1) / (TIMELINE_FRAMES - 1)).toFixed(6))
 
 async function encode(opts) {
   const frames = await listSourceFrames(opts.src)
   await resetOut(opts.out)
   const t0 = performance.now()
   let bytes = 0
+  if (opts.countExplicit) process.stderr.write('note: --count only applies to --placeholder; encode mode counts the source files\n')
   await pool(frames, CONCURRENCY, async (f, idx) => {
-    // Keep the source frame number: partial and resumed renders must not renumber.
-    const target = path.join(opts.out, frameName(f.n))
+    // Output is renumbered 1..N in timeline order; the manifest's progress table
+    // carries each frame's position (half-steps included), not the file name.
+    const target = path.join(opts.out, frameName(idx + 1))
     const info = await sharp(path.join(opts.src, f.name))
       .flatten({ background: '#000000' })
       .resize(WIDTH, HEIGHT, { fit: 'cover', position: 'centre', kernel: 'lanczos3' })
@@ -125,12 +141,12 @@ async function encode(opts) {
       .toFile(target)
     bytes += info.size
   })
-  const last = frames[frames.length - 1].n
-  const manifest = await writeManifest(opts.out, opts.countExplicit ? opts.count : last)
+  const halves = frames.filter((f) => f.value % 1 !== 0).length
+  const manifest = await writeManifest(opts.out, frames.length, frames.map((f) => progressOf(f.value)))
   const secs = ((performance.now() - t0) / 1000).toFixed(1)
   process.stdout.write(
-    `encoded ${frames.length} frames → ${opts.out} (${(bytes / 1024 / 1024).toFixed(1)} MB, ${secs}s)\n` +
-      `manifest ${JSON.stringify(manifest)}\n`,
+    `encoded ${frames.length} frames (${halves} half-steps) → ${opts.out} (${(bytes / 1024 / 1024).toFixed(1)} MB, ${secs}s)\n` +
+      `manifest count=${manifest.count} progress=[${manifest.progress.slice(0, 3).join(', ')} … ${manifest.progress.at(-1)}]\n`,
   )
 }
 

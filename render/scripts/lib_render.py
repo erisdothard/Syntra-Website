@@ -24,7 +24,8 @@ def enable_metal():
     print(f"[render] devices: {names or 'CPU'}")
 
 
-def render_frames(frames, samples=None, scale=100, out_dir=None, exposure=None, vstep=None, adaptive=None, skip_existing=False):
+def render_frames(frames, samples=None, scale=100, out_dir=None, exposure=None, vstep=None, adaptive=None, skip_existing=False,
+                  sub=0.0, shutter=None):
     if not bpy.data.filepath:
         bpy.ops.wm.open_mainfile(filepath=BLEND)
     sc = bpy.context.scene
@@ -48,13 +49,17 @@ def render_frames(frames, samples=None, scale=100, out_dir=None, exposure=None, 
     os.makedirs(out_dir, exist_ok=True)
     times = []
     for f in frames:
-        if skip_existing and os.path.exists(os.path.join(out_dir, f"{f:04d}.png")):
-            print(f"[render] frame {f:04d} exists, skipped")
+        # Sub-frames (sub=0.5 → frame f+0.5) are written as NNNN_5.png so the
+        # encoder can order them between the integer frames; used to double
+        # frame density where the camera moves fastest.
+        name = f"{f:04d}.png" if not sub else f"{f:04d}_{int(round(sub * 10))}.png"
+        if skip_existing and os.path.exists(os.path.join(out_dir, name)):
+            print(f"[render] frame {name} exists, skipped")
             continue
         # RenderSettings are not animatable: short shutter once the camera is pitching fast (star streaks)
-        sc.render.motion_blur_shutter = 0.15 if f >= 200 else 0.5
-        sc.frame_set(f)
-        sc.render.filepath = os.path.join(out_dir, f"{f:04d}.png")
+        sc.render.motion_blur_shutter = float(shutter) if shutter is not None else (0.15 if f >= 200 else 0.5)
+        sc.frame_set(f, subframe=float(sub))
+        sc.render.filepath = os.path.join(out_dir, name)
         t0 = time.time()
         bpy.ops.render.render(write_still=True)
         dt = time.time() - t0

@@ -12,15 +12,57 @@ import { BitmapCache, type DecodeSpec, type DecodeStats } from './bitmapCache'
  * No React, no DOM: the player (FrameScrub) drives it from a rAF loop.
  */
 
-const manifestSchema = z.object({
-  count: z.number().int().min(2),
-  width: z.number().int().positive(),
-  height: z.number().int().positive(),
-  ext: z.string().min(1),
-  pad: z.number().int().min(1),
-})
+const manifestSchema = z
+  .object({
+    count: z.number().int().min(2),
+    width: z.number().int().positive(),
+    height: z.number().int().positive(),
+    ext: z.string().min(1),
+    pad: z.number().int().min(1),
+    /**
+     * Optional non-uniform map: scroll progress of each output frame (0..1,
+     * strictly increasing, one per frame). Lets the renderer add half-step
+     * frames in fast-camera passes. Absent → frames are spread uniformly.
+     */
+    progress: z.array(z.number().min(0).max(1)).optional(),
+  })
+  .superRefine((m, ctx) => {
+    if (!m.progress) return
+    if (m.progress.length !== m.count) {
+      ctx.addIssue({ code: 'custom', message: `progress has ${m.progress.length} entries, count is ${m.count}` })
+      return
+    }
+    for (let i = 1; i < m.progress.length; i++) {
+      if (m.progress[i] <= m.progress[i - 1]) {
+        ctx.addIssue({ code: 'custom', message: `progress not strictly increasing at index ${i}` })
+        return
+      }
+    }
+  })
 
 export type FrameManifest = z.infer<typeof manifestSchema>
+
+/**
+ * Fractional 0-based output frame for scroll progress `p`. With a progress
+ * table: binary search for the bracketing frames and interpolate linearly, so
+ * the dissolve blends the two neighbouring output frames by that fraction.
+ * Without one: uniform spread over the sequence.
+ */
+export function fractionalFrame(m: FrameManifest, p: number): number {
+  const last = m.count - 1
+  const t = m.progress
+  if (!t) return Math.min(1, Math.max(0, p)) * last
+  if (p <= t[0]) return 0
+  if (p >= t[last]) return last
+  let lo = 0
+  let hi = last
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1
+    if (t[mid] <= p) lo = mid
+    else hi = mid
+  }
+  return lo + (p - t[lo]) / (t[hi] - t[lo])
+}
 
 export interface FrameSequenceOptions {
   /** URL directory the manifest and frames live in, no trailing slash. */
@@ -133,6 +175,11 @@ export class FrameSequence {
 
   get count() {
     return this.manifest.count
+  }
+
+  /** Fractional 0-based frame for scroll progress `p` (see fractionalFrame). */
+  frameAt(p: number): number {
+    return fractionalFrame(this.manifest, p)
   }
 
   /** Begin (or resume) downloading. Safe to call repeatedly. */

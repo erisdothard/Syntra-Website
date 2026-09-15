@@ -3,8 +3,15 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { scrollState } from '../../lib/scrollState'
 import { FrameSequence, fetchManifest } from '../../lib/frameSequence'
 
-const FRAMES_BASE = '/frames/desktop'
+const DEFAULT_FRAMES_BASE = '/frames/desktop'
 const MAX_DPR = 2
+
+/** Dev-only `?frames=<dir>` points the player at another sequence under /frames/ (e.g. a placeholder set). */
+function framesBase(): string {
+  if (!import.meta.env.DEV || typeof window === 'undefined') return DEFAULT_FRAMES_BASE
+  const dir = new URLSearchParams(window.location.search).get('frames')
+  return dir && /^[a-z0-9-]+$/i.test(dir) ? `/frames/${dir}` : DEFAULT_FRAMES_BASE
+}
 /** Redraw once the fractional frame position moves this much. */
 const SUBFRAME_STEP = 1 / 64
 /** Below this weight the second frame of a dissolve is invisible; skip the draw. */
@@ -96,7 +103,7 @@ export const FrameScrub = memo(function FrameScrub() {
       raf = requestAnimationFrame(tick)
       if (!seq) return
       const count = seq.count
-      const f = scrollState.progress * (count - 1) // fractional, 0-based
+      const f = seq.frameAt(scrollState.progress) // fractional, 0-based output index
       const lo = Math.min(count, Math.floor(f) + 1)
       const hi = Math.min(count, lo + 1)
       const frac = f - Math.floor(f)
@@ -151,11 +158,12 @@ export const FrameScrub = memo(function FrameScrub() {
     }
     window.addEventListener('resize', onResize)
 
-    fetchManifest(FRAMES_BASE)
+    const base = framesBase()
+    fetchManifest(base)
       .then((manifest) => {
         if (cancelled) return
         seq = new FrameSequence(manifest, {
-          base: FRAMES_BASE,
+          base,
           concurrency: 6,
           priorityRadius: 3,
           // Desktop bitmaps are ~7.5 MB each (1728×1080); the cap keeps the renderer
