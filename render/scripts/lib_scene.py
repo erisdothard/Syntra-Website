@@ -455,10 +455,14 @@ def animate(vehicle, rig, cam, look, states):
         _linear(ob)
 
 
-def hide_ground_props(states, threshold=0.25, keep=("EARTH_LIMB",)):
-    """Once the sky/limb cheat starts (altitude > threshold) the far ground props and
-    the pad would stand against the Earth limb: key hide_render/hide_viewport on
-    everything in PAD, SITE and the light poles from that frame on."""
+def hide_ground_props(states, threshold=0.64, keep=("EARTH_LIMB",)):
+    """Key hide_render/hide_viewport on everything in PAD, SITE and the light poles
+    from the first frame with altitude > threshold. 0.64 is the first frame (215)
+    after the tower has dropped out of the bottom of the shot; the earlier 0.25
+    (frame 203) cut it while it was still mid-frame, a visible pop in the climb.
+    Between the limb fade-in (~211) and 214 the tower is a sliver at the bottom
+    edge, below the horizon line, so it reads as ground rather than as a prop
+    standing against the Earth limb."""
     first = next(s["frame"] for s in states if s["altitude"] > threshold)
     targets = []
     for cname in ("PAD", "SITE", "LIGHTS"):
