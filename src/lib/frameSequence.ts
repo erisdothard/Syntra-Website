@@ -113,8 +113,13 @@ export function coarseToFineOrder(count: number): number[] {
   return order
 }
 
+/**
+ * Always revalidate the manifest (ETag round-trip, ~3 KB). A re-encode changes
+ * the frame count and timing under the same URL; `force-cache` served a stale
+ * 240-frame manifest against the 325-frame set and the ascent never reached space.
+ */
 export async function fetchManifest(base: string): Promise<FrameManifest> {
-  const res = await fetch(`${base}/manifest.json`, { cache: 'force-cache' })
+  const res = await fetch(`${base}/manifest.json`, { cache: 'no-cache' })
   if (!res.ok) throw new Error(`manifest ${res.status} ${res.statusText}`)
   const parsed = manifestSchema.safeParse(await res.json())
   if (!parsed.success) throw new Error(`manifest invalid: ${parsed.error.issues.map((i) => i.message).join('; ')}`)
