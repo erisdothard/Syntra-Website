@@ -26,7 +26,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
   }, [menuOpen])
 
   const handleTab = useCallback((tab: Tab) => { setMenuOpen(false); onTabOpen(tab) }, [onTabOpen])
-  const handleContact = useCallback((e: React.MouseEvent) => { e.preventDefault(); setMenuOpen(false); scrollToId('outro') }, [])
+  const handleContact = useCallback((e: React.MouseEvent) => { e.preventDefault(); setMenuOpen(false); scrollToId('contact') }, [])
 
   const link = 'font-mono text-[11px] uppercase tracking-[0.18em] text-text-secondary transition-colors duration-300 hover:text-text'
 
@@ -54,7 +54,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
             {TABS.map((t) => (
               <li key={t}><button onClick={() => handleTab(t)} className={link}>{t}</button></li>
             ))}
-            <li><a href="#outro" onClick={handleContact} className={`${link} text-accent hover:text-accent-hot`}>Contact</a></li>
+            <li><a href="#contact" onClick={handleContact} className={`${link} text-accent hover:text-accent-hot`}>Contact</a></li>
           </ul>
 
           <button
@@ -79,7 +79,7 @@ export function Navbar({ onTabOpen }: NavbarProps) {
               <button onClick={() => handleTab(t)} className={`w-full text-left py-3 px-2 rounded ${link} text-[12px]`}>{t}</button>
             </li>
           ))}
-          <li><a href="#outro" onClick={handleContact} className={`block py-3 px-2 rounded ${link} text-[12px] text-accent`}>Contact</a></li>
+          <li><a href="#contact" onClick={handleContact} className={`block py-3 px-2 rounded ${link} text-[12px] text-accent`}>Contact</a></li>
         </ul>
       </div>
     </nav>

@@ -83,8 +83,8 @@ export function Outro({ onTabOpen }: Props) {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="px-6 md:px-12 lg:px-16 py-28 md:py-40">
+        {/* CTA — the navbar's Contact link lands here (scrollToId('contact')). */}
+        <div id="contact" className="px-6 md:px-12 lg:px-16 py-28 md:py-40 scroll-mt-16">
           <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-16 items-end">
             <div>
               <p className="mono-label mb-6 text-accent">Mission control</p>
