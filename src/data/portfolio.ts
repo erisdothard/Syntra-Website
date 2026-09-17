@@ -50,13 +50,14 @@ export const projects: Project[] = [
     proof: 'Site, configurator, CRM, and an AI lead pipeline.',
   },
   {
-    title: 'FreightX',
-    tag: 'Full-Stack Freight Marketplace',
-    stack: 'React 19 · TypeScript · Vite · Supabase · Stripe · Anthropic Claude · Upstash Redis',
+    title: 'DispatchRelay',
+    tag: 'Freight Dispatch Platform',
+    stack: 'React 19 · TypeScript · Vite · Turborepo · Stripe · Anthropic Claude · Vercel',
     featured: true,
-    proof: 'Freight marketplace \u2014 four roles, live GPS, automated billing.',
+    proof: 'Freight dispatch platform \u2014 four roles, live GPS, automated billing.',
     description:
-      'Multi-role logistics marketplace connecting carriers, brokers, shippers, and drivers — built across 20+ development phases. Features autonomous load management, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, and in-platform messaging.',
+      'Our own multi-role freight dispatch platform for carriers, brokers, shippers, and drivers, built across 20+ development phases and live at dispatchrelay.co. Autonomous load management, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, and in-platform messaging, with a public demo of every role so a prospect can work a load end to end before signing anything.',
+    live: 'https://www.dispatchrelay.co',
   },
   {
     title: '3 Aces Trucking Inc.',
@@ -75,14 +76,6 @@ export const projects: Project[] = [
     description:
       'Production-style HL7 and FHIR R4 data integration engine. Orchestrates four automated pipeline channels covering high-volume ORU lab routing, clinical ADT transaction processing, and secure healthcare API infrastructure.',
     github: 'https://github.com/erisdothard/healthcare-integration-portfolio',
-  },
-  {
-    title: 'DispatchRelay',
-    tag: 'Autonomous Voice Infrastructure',
-    stack: 'ElevenLabs · Python · TypeScript',
-    featured: true,
-    description:
-      'Voice-AI engine for small-tier trucking fleets. Automated dispatch handling with background workflow automation and natural-language voice agents.',
   },
   {
     title: 'PropLogix Extraction Pipeline',
@@ -114,9 +107,8 @@ export const experience: Experience[] = [
         label: 'Shipped Infrastructure',
         bullets: [
           'Hyper Racer USA — full ecosystem rebuild for the US distributor of the X1 ground-effects race car, Wix to Next.js 16 and live in production: public site, pricing configurator, Mapbox dealer network, and a 19-section admin CRM the client edits their own live pages from; inbound leads run an Anthropic-SDK agent pipeline (enrich, score, prioritise) graded by an eval harness with per-request cost logging',
-          'FreightX — multi-role logistics marketplace built across 20+ phases with autonomous load management, live GPS tracking, billing automation, and carrier verification',
+          'DispatchRelay — our own multi-role freight dispatch platform (dispatchrelay.co), built across 20+ phases with autonomous load management, live GPS tracking, billing automation, carrier verification, and a public demo of every role',
           'BridgeLink Core — HL7 v2.5 / FHIR R4 integration engine across four channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate-admit resilience, and FHIR R4 Patient/Observation Bundles with LOINC-coded results',
-          'DispatchRelay — voice-AI engine for small-tier trucking fleets with automated dispatch handling and background workflow automation',
           '3 Aces Trucking Inc. — full application and web development for a commercial trucking carrier; voice AI integration, autonomous load and document automation, and client-facing site',
         ],
       },
