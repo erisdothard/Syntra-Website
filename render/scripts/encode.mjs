@@ -3,19 +3,25 @@
  * site consumes (render/SPEC.md → "Frame contract"):
  *
  *   public/frames/desktop/0001.webp … NNNN.webp   (1920×1080, WebP q82, sRGB, no alpha)
- *   public/frames/desktop/manifest.json           { count, width, height, ext, pad }
+ *   public/frames/desktop/manifest.json           { count, width, height, ext, pad, progress }
+ *   public/frames/portrait/…                      (810×1080 centre crop of the same frames;
+ *                                                  phones and portrait tablets decode 2.4×
+ *                                                  fewer pixels and download ~1/3 the bytes)
  *
  *   npm run frames:encode        reads render/out/final/<n>.png (any zero-padded
- *                                numeric name; <n>_5.png is the half-step n + 0.5),
+ *                                numeric name; <n>_5.png / <n>_25.png / <n>_75.png are
+ *                                the sub-steps n + 0.5 / 0.25 / 0.75),
  *                                sorts by that value, renumbers 1..N and writes a
  *                                "progress" table (one entry per output frame, on the
  *                                original 240-frame timeline grid) so the player can
  *                                scrub a non-uniform sequence
+ *   npm run frames:portrait      same, cropped to PORTRAIT_WIDTH and written to
+ *                                public/frames/portrait (run after every frames:encode)
  *   npm run frames:placeholder   generates 240 synthetic frames so the player can
  *                                be exercised before a single frame is rendered
  *
- * Flags: --src <dir> --out <dir> --quality <n> --count <n> (placeholder mode only:
- *        frames to generate; encode mode always counts the source files)
+ * Flags: --portrait --src <dir> --out <dir> --quality <n> --count <n> (placeholder mode
+ *        only: frames to generate; encode mode always counts the source files)
  */
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
@@ -27,6 +33,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 /* ── Contract ── */
 const WIDTH = 1920
 const HEIGHT = 1080
+/** Portrait set: centre crop wide enough for a 3:4 tablet; phones use ~500 px of it. */
+const PORTRAIT_WIDTH = 810
 const PAD = 4
 const EXT = 'webp'
 const DEFAULT_QUALITY = 82
@@ -43,12 +51,15 @@ const LIFT_END = 0.97
 function parseArgs(argv) {
   const opts = {
     placeholder: false,
+    portrait: false,
     countExplicit: false,
+    width: WIDTH,
     src: path.join(root, 'render', 'out', 'final'),
     out: path.join(root, 'public', 'frames', 'desktop'),
     quality: DEFAULT_QUALITY,
     count: PLACEHOLDER_COUNT,
   }
+  let outExplicit = false
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     const next = () => {
@@ -57,8 +68,9 @@ function parseArgs(argv) {
       return v
     }
     if (a === '--placeholder') opts.placeholder = true
+    else if (a === '--portrait') { opts.portrait = true; opts.width = PORTRAIT_WIDTH; if (!outExplicit) opts.out = path.join(root, 'public', 'frames', 'portrait') }
     else if (a === '--src') opts.src = path.resolve(root, next())
-    else if (a === '--out') opts.out = path.resolve(root, next())
+    else if (a === '--out') { opts.out = path.resolve(root, next()); outExplicit = true }
     else if (a === '--quality') opts.quality = Number(next())
     else if (a === '--count') { opts.count = Number(next()); opts.countExplicit = true }
     else throw new Error(`unknown argument ${a}`)
@@ -85,8 +97,8 @@ async function pool(items, limit, fn) {
 }
 
 /** `progress` (optional): scroll progress of each output frame on the timeline grid, strictly increasing. */
-async function writeManifest(out, count, progress) {
-  const manifest = { count, width: WIDTH, height: HEIGHT, ext: EXT, pad: PAD, ...(progress ? { progress } : {}) }
+async function writeManifest(out, count, progress, width = WIDTH) {
+  const manifest = { count, width, height: HEIGHT, ext: EXT, pad: PAD, ...(progress ? { progress } : {}) }
   await writeFile(path.join(out, 'manifest.json'), `${JSON.stringify(manifest)}\n`)
   return manifest
 }
@@ -106,8 +118,9 @@ async function listSourceFrames(src) {
   }
   const frames = entries
     .map((name) => {
-      const m = /^(\d+)(_5)?\.png$/i.exec(name)
-      return m ? { name, value: Number(m[1]) + (m[2] ? 0.5 : 0) } : null
+      // NNNN.png is frame N; NNNN_5.png / NNNN_25.png / NNNN_75.png are N + 0.5 / 0.25 / 0.75.
+      const m = /^(\d+)(?:_(\d+))?\.png$/i.exec(name)
+      return m ? { name, value: Number(m[1]) + (m[2] ? Number(`0.${m[2]}`) : 0) } : null
     })
     .filter((f) => f !== null)
     .sort((a, b) => a.value - b.value)
@@ -135,17 +148,17 @@ async function encode(opts) {
     const target = path.join(opts.out, frameName(idx + 1))
     const info = await sharp(path.join(opts.src, f.name))
       .flatten({ background: '#000000' })
-      .resize(WIDTH, HEIGHT, { fit: 'cover', position: 'centre', kernel: 'lanczos3' })
+      .resize(opts.width, HEIGHT, { fit: 'cover', position: 'centre', kernel: 'lanczos3' })
       .toColourspace('srgb')
       .webp({ quality: opts.quality, effort: 5, smartSubsample: true })
       .toFile(target)
     bytes += info.size
   })
   const halves = frames.filter((f) => f.value % 1 !== 0).length
-  const manifest = await writeManifest(opts.out, frames.length, frames.map((f) => progressOf(f.value)))
+  const manifest = await writeManifest(opts.out, frames.length, frames.map((f) => progressOf(f.value)), opts.width)
   const secs = ((performance.now() - t0) / 1000).toFixed(1)
   process.stdout.write(
-    `encoded ${frames.length} frames (${halves} half-steps) → ${opts.out} (${(bytes / 1024 / 1024).toFixed(1)} MB, ${secs}s)\n` +
+    `encoded ${frames.length} frames (${halves} half-steps, ${opts.width}×${HEIGHT}) → ${opts.out} (${(bytes / 1024 / 1024).toFixed(1)} MB, ${secs}s)\n` +
       `manifest count=${manifest.count} progress=[${manifest.progress.slice(0, 3).join(', ')} … ${manifest.progress.at(-1)}]\n`,
   )
 }

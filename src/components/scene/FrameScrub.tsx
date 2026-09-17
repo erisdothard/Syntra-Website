@@ -1,16 +1,37 @@
-import { memo, useEffect, useRef } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { scrollState } from '../../lib/scrollState'
-import { FrameSequence, fetchManifest } from '../../lib/frameSequence'
+import { FrameSequence, fetchManifest, type FrameManifest } from '../../lib/frameSequence'
 
-const DEFAULT_FRAMES_BASE = '/frames/desktop'
+const DESKTOP_FRAMES_BASE = '/frames/desktop'
+/**
+ * 810×1080 centre crop of the same frames (render/scripts/encode.mjs --portrait).
+ * A phone shows only ~500 px of the 1920 px render, but decoding is paid on the
+ * full source: 2.4× fewer pixels to decode and ~1/3 the download, which is what
+ * keeps a thumb flick through the act-1 push-in from out-running the decoder.
+ */
+const PORTRAIT_FRAMES_BASE = '/frames/portrait'
+/** Viewports at or narrower than 3:4 are covered by the portrait crop. */
+const PORTRAIT_QUERY = '(max-aspect-ratio: 3/4)'
 const MAX_DPR = 2
 
 /** Dev-only `?frames=<dir>` points the player at another sequence under /frames/ (e.g. a placeholder set). */
-function framesBase(): string {
-  if (!import.meta.env.DEV || typeof window === 'undefined') return DEFAULT_FRAMES_BASE
+function devFramesOverride(): string | null {
+  if (!import.meta.env.DEV || typeof window === 'undefined') return null
   const dir = new URLSearchParams(window.location.search).get('frames')
-  return dir && /^[a-z0-9-]+$/i.test(dir) ? `/frames/${dir}` : DEFAULT_FRAMES_BASE
+  return dir && /^[a-z0-9-]+$/i.test(dir) ? `/frames/${dir}` : null
+}
+
+/** True while the viewport is 3:4 or narrower; tracks rotation. */
+function usePortrait() {
+  const [portrait, setPortrait] = useState(() => typeof window !== 'undefined' && window.matchMedia(PORTRAIT_QUERY).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(PORTRAIT_QUERY)
+    const handler = () => setPortrait(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+  return portrait
 }
 /** Redraw once the fractional frame position moves this much. */
 const SUBFRAME_STEP = 1 / 64
@@ -18,6 +39,8 @@ const SUBFRAME_STEP = 1 / 64
 const MIN_BLEND = 0.02
 /** How far ahead (ms) the decode window is pushed from the scroll velocity. */
 const LOOKAHEAD_MS = 150
+/** Touch flicks move faster and are smoothed longer (useLaunchScroll), so look further ahead. */
+const LOOKAHEAD_TOUCH_MS = 300
 
 /**
  * Fixed full-screen canvas that scrubs the offline-rendered launch sequence
@@ -32,6 +55,7 @@ const LOOKAHEAD_MS = 150
  */
 export const FrameScrub = memo(function FrameScrub() {
   const mobile = useIsMobile()
+  const portrait = usePortrait()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -58,6 +82,8 @@ export const FrameScrub = memo(function FrameScrub() {
     let velocity = 0 // frames per ms, smoothed
     let direction: 1 | -1 = 1
     let revealed = false
+    const coarse = window.matchMedia('(pointer: coarse)').matches
+    const lookahead = coarse ? LOOKAHEAD_TOUCH_MS : LOOKAHEAD_MS
 
     const resize = () => {
       if (!seq) return
@@ -122,7 +148,7 @@ export const FrameScrub = memo(function FrameScrub() {
       if (lo !== lastLo) {
         lastLo = lo
         seq.stats.target = lo
-        const predicted = Math.round(f + velocity * LOOKAHEAD_MS)
+        const predicted = Math.round(f + velocity * lookahead)
         seq.setFocus(lo, direction, predicted)
       } else if (!moved && !frameDirty && lastBase !== 0) {
         return
@@ -158,20 +184,30 @@ export const FrameScrub = memo(function FrameScrub() {
     }
     window.addEventListener('resize', onResize)
 
-    const base = framesBase()
-    fetchManifest(base)
-      .then((manifest) => {
+    const override = devFramesOverride()
+    const preferred = override ?? (portrait ? PORTRAIT_FRAMES_BASE : DESKTOP_FRAMES_BASE)
+    // The portrait set is optional (an older deploy may lack it): fall back to the full frames.
+    const loadManifest = (base: string): Promise<[string, FrameManifest]> =>
+      fetchManifest(base).then((m) => [base, m] as [string, FrameManifest])
+    loadManifest(preferred)
+      .catch((err: unknown) => {
+        if (preferred === DESKTOP_FRAMES_BASE) throw err
+        console.warn('FrameScrub: falling back to the desktop frames —', err instanceof Error ? err.message : err)
+        return loadManifest(DESKTOP_FRAMES_BASE)
+      })
+      .then(([base, manifest]) => {
         if (cancelled) return
         seq = new FrameSequence(manifest, {
           base,
           concurrency: 6,
           priorityRadius: 3,
           // Desktop bitmaps are ~7.5 MB each (1728×1080); the cap keeps the renderer
-          // under ~350 MB. Mobile crops to ~500×1080 (2 MB) and can afford more.
-          decodeAhead: mobile ? 16 : 9,
+          // under ~350 MB. Portrait/mobile bitmaps are ~2 MB (≤810×1080), so the
+          // window can reach further ahead of a flick and decode more at once.
+          decodeAhead: mobile ? 24 : 9,
           decodeBehind: mobile ? 4 : 2,
-          maxBitmaps: mobile ? 24 : 12,
-          decodeConcurrency: 4,
+          maxBitmaps: mobile ? 32 : 12,
+          decodeConcurrency: mobile ? 6 : 4,
           onFrame: () => {
             frameDirty = true
           },
@@ -199,7 +235,7 @@ export const FrameScrub = memo(function FrameScrub() {
         poster.style.opacity = ''
       }
     }
-  }, [mobile])
+  }, [mobile, portrait])
 
   return (
     <canvas

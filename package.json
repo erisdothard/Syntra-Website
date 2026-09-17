@@ -15,6 +15,7 @@
     "gen:explore": "tsx scripts/generate-assets.ts --section explore",
     "prepare:models": "node scripts/prepare-models.mjs",
     "frames:encode": "node render/scripts/encode.mjs",
+    "frames:portrait": "node render/scripts/encode.mjs --portrait",
     "frames:placeholder": "node render/scripts/encode.mjs --placeholder"
   },
   "dependencies": {

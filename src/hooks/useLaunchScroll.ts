@@ -63,7 +63,9 @@ export function useLaunchScroll() {
       trigger: launch,
       start: 'top top',
       end: 'bottom bottom',
-      scrub: reduced ? false : 1.15,
+      // Touch flicks are fast: a longer catch-up caps the frame rate the player asks for
+      // so the decoder keeps up (see FrameScrub), at the cost of a little float after the thumb stops.
+      scrub: reduced ? false : coarse ? 1.8 : 1.15,
       onUpdate: (self) => update(self.progress),
       onRefresh: (self) => update(self.progress),
     })
