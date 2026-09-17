@@ -196,15 +196,15 @@ export const experience: Experience[] = [
 export const services: Service[] = [
   {
     title: 'Web & Applications',
-    desc: 'Hyper Racer USA is the proof: we replaced their Wix site with a Next.js 16 build \u2014 public site, pricing configurator, Mapbox dealer network, inventory, events \u2014 and put a 19-section CRM behind it, so they edit their own live pages, work a leads \u2192 customers \u2192 deals pipeline, and audit every change. FreightX before it: four user roles, 20+ phases, live GPS fleet tracking, Stripe billing, real-time bidding. Same team from the first wireframe to the production deploy, every time.',
+    desc: 'Design and development of websites and web applications for businesses of any size: marketing sites, customer portals, dashboards, e-commerce, internal tools, and custom software, with the backend, database, and hosting behind it. That includes the admin panel or CRM you need to manage it yourself. We build new, rebuild what has outgrown its platform, or extend what you already have, and hand you full ownership of the finished system.',
   },
   {
     title: 'AI Automation',
-    desc: 'Every lead that hits Hyper Racer runs a junk filter, an enrichment pass, then scoring before a human sees it \u2014 dry-run by default, graded by an eval harness against the same code path production runs, with tokens, cost and latency logged per call. DispatchRelay answers dispatch calls with an ElevenLabs voice agent. Our extraction pipeline reads county appraiser sites through Playwright and routes Claude-scored fields into auto-approve, human-review, and reject lanes.',
+    desc: 'AI agents and automated workflows that take repetitive work off your team: lead qualification and follow-up, document processing, customer communication, data entry, reporting, and internal assistants that know your business. Every automation is scoped around a task you already do, includes a human check wherever it matters, and reports on what it did. Delivered as a working system your team can run, adjust, and expand.',
   },
   {
     title: 'Integration',
-    desc: 'BridgeLink Core runs four HL7 v2.5 / FHIR R4 channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate admits, LOINC-coded Patient and Observation bundles. Integration either survives production or it does not.',
+    desc: 'Connecting the tools your business already relies on so they share data automatically: CRMs, accounting software, payment processors, email and marketing platforms, spreadsheets, and legacy systems, linked through their APIs or custom middleware. That includes the layer that lets AI agents read from and act on those systems securely. Every connection ships with the error handling, logging, and monitoring that keeps it reliable over time.',
   },
 ]
 
