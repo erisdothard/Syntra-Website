@@ -2,6 +2,7 @@ import { memo, useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { scrollState } from '../../lib/scrollState'
 import { FrameSequence, fetchManifest, type FrameManifest } from '../../lib/frameSequence'
+import { isDiag } from '../../lib/diag'
 
 const DESKTOP_FRAMES_BASE = '/frames/desktop'
 /**
@@ -201,12 +202,14 @@ export const FrameScrub = memo(function FrameScrub() {
           base,
           concurrency: 6,
           priorityRadius: 3,
-          // Desktop bitmaps are ~7.5 MB each (1728×1080); the cap keeps the renderer
-          // under ~350 MB. Portrait/mobile bitmaps are ~2 MB (≤810×1080), so the
-          // window can reach further ahead of a flick and decode more at once.
-          decodeAhead: mobile ? 24 : 9,
+          // Desktop bitmaps are ~7 MB each (1920×~900 on a 1080p display). 24 of
+          // them measured 358 MB renderer RSS vs 308 MB with 12; the deeper window
+          // is what lets a slow decoder stay ahead of a wheel notch through the
+          // quarter-stepped push-in (~24 frames per notch). Portrait/mobile
+          // bitmaps are ~2 MB (≤810×1080), so the window can reach further still.
+          decodeAhead: mobile ? 24 : 20,
           decodeBehind: mobile ? 4 : 2,
-          maxBitmaps: mobile ? 32 : 12,
+          maxBitmaps: mobile ? 32 : 24,
           decodeConcurrency: mobile ? 6 : 4,
           onFrame: () => {
             frameDirty = true
@@ -215,7 +218,7 @@ export const FrameScrub = memo(function FrameScrub() {
             frameDirty = true
           },
         })
-        if (import.meta.env.DEV) (window as unknown as { __frames: FrameSequence }).__frames = seq
+        if (import.meta.env.DEV || isDiag()) window.__frames = seq
         sizeDirty = true
         raf = requestAnimationFrame(tick)
       })

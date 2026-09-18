@@ -50,6 +50,13 @@ interface Entry {
   key: string
 }
 
+/** Predicted-minus-target distance (frames) past which the window is filled coarse-to-fine. */
+const SPREAD_SPAN = 4
+/** Fill order for a fast scroll: every 8th frame along the path, then 4th, 2nd, the rest. */
+const SPREAD_STRIDES = [8, 4, 2, 1] as const
+/** A finished decode this close to the window is kept instead of closed. */
+const KEEP_MARGIN = 6
+
 const specKey = (s: DecodeSpec) => `${s.sx},${s.sy},${s.sw},${s.sh}:${s.width}x${s.height}`
 
 export class BitmapCache {
@@ -97,9 +104,23 @@ export class BitmapCache {
    */
   request(target: number, direction: 1 | -1, predicted: number, count: number) {
     const { ahead, behind, maxEntries } = this.opts
-    const reach = Math.min(maxEntries - behind - 1, Math.abs(predicted - target) + ahead)
+    const span = Math.abs(predicted - target)
+    const reach = Math.min(maxEntries - behind - 1, span + ahead)
+    // Slow scroll: the next frames in order. Fast scroll (the prediction is more
+    // than SPREAD_SPAN frames out): coarse-to-fine across the path, so a decoder
+    // that cannot keep up leaves evenly spaced frames along it instead of a
+    // pile-up just behind the viewer that is stale by the time it lands.
+    const strides: readonly number[] = span > SPREAD_SPAN ? SPREAD_STRIDES : [1]
     const desired: number[] = [target]
-    for (let d = 1; d <= reach; d++) desired.push(target + direction * d)
+    const seen = new Set(desired)
+    for (const stride of strides) {
+      for (let d = stride; d <= reach; d += stride) {
+        const i = target + direction * d
+        if (seen.has(i)) continue
+        seen.add(i)
+        desired.push(i)
+      }
+    }
     for (let d = 1; d <= behind; d++) desired.push(target - direction * d)
     this.desired = desired.filter((i) => i >= 1 && i <= count)
     this.wanted = new Set(this.desired)
@@ -148,6 +169,18 @@ export class BitmapCache {
     this.opts.stats.cached = 0
   }
 
+  /**
+   * In the window, or within KEEP_MARGIN frames of it. The window re-centres on
+   * every tick, so under load a decode often finishes for a frame the viewer
+   * just passed; closing it wastes the work (and it is exactly what a reverse
+   * scrub or a catching-up window asks for next).
+   */
+  private isNearWindow(index: number) {
+    if (this.wanted.has(index)) return true
+    for (const k of this.wanted) if (Math.abs(k - index) <= KEEP_MARGIN) return true
+    return false
+  }
+
   private isFresh(i: number) {
     const e = this.entries.get(i)
     return !!e && e.key === this.key
@@ -169,7 +202,7 @@ export class BitmapCache {
       return
     }
     this.inFlight.delete(index)
-    if (this.disposed || !this.wanted.has(index)) {
+    if (this.disposed || !this.isNearWindow(index)) {
       bmp.close()
       stats.droppedDecodes++
       this.pump()

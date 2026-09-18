@@ -103,6 +103,11 @@ body {
   transition: opacity 0.45s ease, visibility 0s linear 0.45s;
 }
 .act-panel.is-active { visibility: visible; opacity: 1; transition-delay: 0s; }
+/* Act 1 switches on at PHASES.act1Start (0.06 × 540vh = 32.4vh of scroll), but its
+   slot in the flow starts after the 100dvh hero, so the copy rode up the screen
+   for the whole push-in and across the telemetry readout. Pull the panel up so it
+   is already pinned when it activates. Acts 2 and 3 activate past their slots. */
+.act-panel[data-act="1"] { margin-top: calc(32.4vh - 100dvh); }
 .act-panel .act-inner > * {
   opacity: 0;
   transform: translateY(28px);

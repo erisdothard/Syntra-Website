@@ -10,6 +10,8 @@ import { Outro } from './components/sections/Outro'
 import { DemoRequestProvider } from './components/demo-request/DemoRequestProvider'
 import { acts } from './data/acts'
 import { FrameScrub } from './components/scene/FrameScrub'
+import { FrameDiag } from './components/scene/FrameDiag'
+import { isDiag } from './lib/diag'
 import { dbg } from './lib/dbg'
 
 // The live WebGL scene stays reachable in dev via ?webgl for side-by-side
@@ -35,6 +37,7 @@ export default function App() {
       ) : (
         <FrameScrub />
       )}
+      {isDiag() && <FrameDiag />}
       <Telemetry />
       <Navbar onTabOpen={setActiveTab} />
       <TabOverlay activeTab={activeTab} onClose={() => setActiveTab(null)} />
