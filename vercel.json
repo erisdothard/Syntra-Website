@@ -3,9 +3,34 @@
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "syntraai.tech" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "syntraai.tech"
+        }
+      ],
       "destination": "https://www.syntraai.tech/:path*",
       "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/frames/(.*)\\.webp",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/frames/(.*)/manifest.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     }
   ]
 }

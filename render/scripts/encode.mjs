@@ -23,7 +23,8 @@
  * Flags: --portrait --src <dir> --out <dir> --quality <n> --count <n> (placeholder mode
  *        only: frames to generate; encode mode always counts the source files)
  */
-import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import sharp from 'sharp'
@@ -96,9 +97,20 @@ async function pool(items, limit, fn) {
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
 }
 
+/**
+ * Content hash of the encoded frames, in output order. The player appends it to
+ * every frame URL (`?v=`), so a re-encode under the same paths is a new cache
+ * key and the CDN can serve the frames as immutable (vercel.json).
+ */
+async function hashFrames(out, count) {
+  const h = createHash('sha1')
+  for (let i = 1; i <= count; i++) h.update(await readFile(path.join(out, frameName(i))))
+  return h.digest('hex').slice(0, 12)
+}
+
 /** `progress` (optional): scroll progress of each output frame on the timeline grid, strictly increasing. */
-async function writeManifest(out, count, progress, width = WIDTH) {
-  const manifest = { count, width, height: HEIGHT, ext: EXT, pad: PAD, ...(progress ? { progress } : {}) }
+async function writeManifest(out, count, progress, width = WIDTH, version) {
+  const manifest = { count, width, height: HEIGHT, ext: EXT, pad: PAD, ...(progress ? { progress } : {}), ...(version ? { version } : {}) }
   await writeFile(path.join(out, 'manifest.json'), `${JSON.stringify(manifest)}\n`)
   return manifest
 }
@@ -155,11 +167,12 @@ async function encode(opts) {
     bytes += info.size
   })
   const halves = frames.filter((f) => f.value % 1 !== 0).length
-  const manifest = await writeManifest(opts.out, frames.length, frames.map((f) => progressOf(f.value)), opts.width)
+  const version = await hashFrames(opts.out, frames.length)
+  const manifest = await writeManifest(opts.out, frames.length, frames.map((f) => progressOf(f.value)), opts.width, version)
   const secs = ((performance.now() - t0) / 1000).toFixed(1)
   process.stdout.write(
     `encoded ${frames.length} frames (${halves} half-steps, ${opts.width}×${HEIGHT}) → ${opts.out} (${(bytes / 1024 / 1024).toFixed(1)} MB, ${secs}s)\n` +
-      `manifest count=${manifest.count} progress=[${manifest.progress.slice(0, 3).join(', ')} … ${manifest.progress.at(-1)}]\n`,
+      `manifest count=${manifest.count} version=${manifest.version} progress=[${manifest.progress.slice(0, 3).join(', ')} … ${manifest.progress.at(-1)}]\n`,
   )
 }
 

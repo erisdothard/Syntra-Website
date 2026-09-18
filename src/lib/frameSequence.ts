@@ -25,6 +25,12 @@ const manifestSchema = z
      * frames in fast-camera passes. Absent → frames are spread uniformly.
      */
     progress: z.array(z.number().min(0).max(1)).optional(),
+    /**
+     * Content hash of the encoded set. Appended to every frame URL so a
+     * re-encode under the same paths is a different cache key, which is what
+     * lets the CDN and the browser hold the frames as immutable.
+     */
+    version: z.string().min(1).optional(),
   })
   .superRefine((m, ctx) => {
     if (!m.progress) return
@@ -136,7 +142,7 @@ export async function fetchManifest(base: string): Promise<FrameManifest> {
 }
 
 export const frameUrl = (base: string, m: FrameManifest, index: number) =>
-  `${base}/${String(index).padStart(m.pad, '0')}.${m.ext}`
+  `${base}/${String(index).padStart(m.pad, '0')}.${m.ext}${m.version ? `?v=${m.version}` : ''}`
 
 type Slot = 'idle' | 'loading' | 'done' | 'failed'
 
