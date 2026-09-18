@@ -69,8 +69,10 @@ export interface FrameSequenceOptions {
   base: string
   /** Simultaneous fetches. */
   concurrency?: number
-  /** Frames either side of the focus whose bytes jump the download queue. */
+  /** Frames either side of the focus whose bytes jump the download queue; the window also stretches to the predicted position. */
   priorityRadius?: number
+  /** Download frames 1..N in order right after the first coarse pass (see coarseToFineOrder). */
+  sequentialUntil?: number
   /** Frames kept decoded ahead of / behind the scroll direction. */
   decodeAhead: number
   decodeBehind: number
@@ -99,17 +101,24 @@ export interface FrameSequenceStats extends DecodeStats {
 /** Strides for the coarse-to-fine passes; the final pass fills every gap. */
 const PASSES = [16, 8, 4, 2, 1] as const
 
-/** Every frame index exactly once, ordered coarse → fine. */
-export function coarseToFineOrder(count: number): number[] {
+/**
+ * Every frame index exactly once. One coarse pass over the whole sequence
+ * first (a preview wherever the viewer jumps), then frames 1..`sequentialUntil`
+ * in order — the stretch a visitor reaches first, at full density — then the
+ * finer passes over the rest.
+ */
+export function coarseToFineOrder(count: number, sequentialUntil = 0): number[] {
   const seen = new Uint8Array(count + 1)
   const order: number[] = []
-  for (const stride of PASSES) {
-    for (let i = 1; i <= count; i += stride) {
-      if (seen[i]) continue
-      seen[i] = 1
-      order.push(i)
-    }
+  const take = (i: number) => {
+    if (seen[i]) return
+    seen[i] = 1
+    order.push(i)
   }
+  const [coarse, ...fine] = PASSES
+  for (let i = 1; i <= count; i += coarse) take(i)
+  for (let i = 1; i <= Math.min(count, sequentialUntil); i++) take(i)
+  for (const stride of fine) for (let i = 1; i <= count; i += stride) take(i)
   return order
 }
 
@@ -150,6 +159,7 @@ export class FrameSequence {
   private cursor = 0
   private inFlight = 0
   private focus = 1
+  private predicted = 1
   private direction: 1 | -1 = 1
   private disposed = false
 
@@ -161,7 +171,7 @@ export class FrameSequence {
     this.onFrame = options.onFrame
     this.blobs = new Array<Blob | undefined>(manifest.count + 1)
     this.slots = new Array<Slot>(manifest.count + 1).fill('idle')
-    this.order = coarseToFineOrder(manifest.count)
+    this.order = coarseToFineOrder(manifest.count, options.sequentialUntil ?? 0)
     this.cache = new BitmapCache({
       ahead: options.decodeAhead,
       behind: options.decodeBehind,
@@ -204,8 +214,9 @@ export class FrameSequence {
    */
   setFocus(index: number, direction: 1 | -1 = this.direction, predicted = index) {
     this.focus = Math.min(this.count, Math.max(1, index))
+    this.predicted = Math.min(this.count, Math.max(1, predicted))
     this.direction = direction
-    this.cache.request(this.focus, direction, Math.min(this.count, Math.max(1, predicted)), this.count)
+    this.cache.request(this.focus, direction, this.predicted, this.count)
     this.start()
   }
 
@@ -234,12 +245,20 @@ export class FrameSequence {
     for (let i = 1; i <= this.count; i++) this.blobs[i] = undefined
   }
 
-  /** Priority window first, then the coarse-to-fine baseline. Returns 0 when nothing is left. */
+  /**
+   * Priority window first — ahead of the focus as far as the scroll is predicted
+   * to reach plus the radius, the radius behind — then the baseline order.
+   * Returns 0 when nothing is left.
+   */
   private pickNext(): number {
     const r = this.priorityRadius
-    for (let d = 0; d <= r; d++) {
-      for (const i of [this.focus + d * this.direction, this.focus - d * this.direction]) {
-        if (i >= 1 && i <= this.count && this.slots[i] === 'idle') return i
+    const ahead = Math.abs(this.predicted - this.focus) + r
+    for (let d = 0; d <= ahead; d++) {
+      const i = this.focus + d * this.direction
+      if (i >= 1 && i <= this.count && this.slots[i] === 'idle') return i
+      if (d <= r) {
+        const j = this.focus - d * this.direction
+        if (j >= 1 && j <= this.count && this.slots[j] === 'idle') return j
       }
     }
     while (this.cursor < this.order.length) {
