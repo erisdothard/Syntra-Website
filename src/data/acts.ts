@@ -22,7 +22,7 @@ export const acts: Act[] = [
     title: 'First, we build it',
     headline: 'First, we build it.',
     body:
-      'Websites, customer portals, booking and ordering systems, marketplaces, internal tools. If your business needs it and nothing off the shelf does the job, we build it from scratch.',
+      'Websites, CRMs, customer portals, booking and ordering systems, marketplaces, internal tools. If your business needs it and nothing off the shelf does the job, we build it from scratch.',
     tone: 'ember',
     align: 'left',
   },
