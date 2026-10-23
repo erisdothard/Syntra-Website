@@ -66,6 +66,8 @@ export const projects: Project[] = [
     featured: true,
     description:
       'Full application and web development for a commercial trucking carrier. Voice AI integration, autonomous load and document automation, and client-facing site built end-to-end.',
+    live: 'https://3acestruckinginc.com',
+    proof: 'Carrier site with a customer portal, voice AI, and automated load and document handling.',
   },
   {
     title: 'BridgeLink Core',

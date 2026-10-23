@@ -7,7 +7,7 @@ import { DEMO_TOPICS, projectDemoTopic, useDemoRequest } from './demo-request/co
 /* ── component ── */
 
 interface TabOverlayProps {
-  activeTab: 'portfolio' | 'services' | 'resume' | null
+  activeTab: 'portfolio' | 'services' | 'about' | null
   onClose: () => void
 }
 
@@ -129,7 +129,7 @@ export function TabOverlay({ activeTab, onClose }: TabOverlayProps) {
       >
         {activeTab === 'portfolio' && <PortfolioView />}
         {activeTab === 'services' && <ServicesView />}
-        {activeTab === 'resume' && <ResumeView />}
+        {activeTab === 'about' && <AboutView />}
       </div>
     </div>
   )
@@ -372,9 +372,12 @@ function ServicesView() {
   )
 }
 
-/* ═══════════════ RESUME ═══════════════ */
+/* ═══════════════ ABOUT ═══════════════ */
 
-function ResumeView() {
+/* The firm's background as trust evidence: who builds it and where that experience comes from.
+   Credentials stay; resume packaging (dates, download, personal email) does not. */
+function AboutView() {
+  const requestDemo = useDemoRequest()
   const [expanded, setExpanded] = useState<string | null>(null)
 
   return (
@@ -382,10 +385,10 @@ function ResumeView() {
       {/* Header */}
       <div data-animate="header" style={{ marginBottom: 40 }}>
         <p className="font-mono" style={{ fontSize: 10, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.3em', opacity: 0.7, marginBottom: 8 }}>
-          Background
+          Who builds it
         </p>
         <h2 className="font-display" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', fontWeight: 700, color: '#fff', letterSpacing: '-0.03em', lineHeight: 0.95 }}>
-          Resume<span style={{ color: 'var(--color-accent)' }}>.</span>
+          About<span style={{ color: 'var(--color-accent)' }}>.</span>
         </h2>
       </div>
 
@@ -412,7 +415,7 @@ function ResumeView() {
                     {item.role}
                   </h3>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
-                    {item.org} · {item.date}
+                    {item.org}
                   </p>
                 </div>
                 {isExpanded && item.sections && (
@@ -513,20 +516,20 @@ function ResumeView() {
 
       {/* CTAs */}
       <div data-animate="item" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={() => requestDemo(DEMO_TOPICS.launch)}
+          className="btn-ghost"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+        >
+          Start a build <span style={{ fontSize: 16 }}>&rarr;</span>
+        </button>
         <a
-          href="/resume.html"
-          download="Eris_Dothard_Resume.html"
+          href="mailto:agent@syntraai.tech"
           className="btn-ghost"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
-          Download Resume <span style={{ fontSize: 16 }}>&darr;</span>
-        </a>
-        <a
-          href="mailto:erisdothard1@gmail.com"
-          className="btn-ghost"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
-        >
-          Get in Touch <span style={{ fontSize: 16 }}>&rarr;</span>
+          agent@syntraai.tech <span style={{ fontSize: 16 }}>&rarr;</span>
         </a>
       </div>
     </>

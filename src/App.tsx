@@ -20,7 +20,7 @@ const LaunchCanvas = lazy(() =>
   import('./components/scene/LaunchCanvas').then((m) => ({ default: m.LaunchCanvas })),
 )
 
-type Tab = 'portfolio' | 'services' | 'resume' | null
+type Tab = 'portfolio' | 'services' | 'about' | null
 
 export default function App() {
   useMouseTracking()

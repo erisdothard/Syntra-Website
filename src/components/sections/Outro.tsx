@@ -2,15 +2,15 @@ import { MagneticButton } from '../ui/MagneticButton'
 import { services, projects } from '../../data/portfolio'
 import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
 
+/* What gets built, in the buyer's words. The stack lives in the Portfolio and About tabs. */
 const marquee = [
-  'Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'Postgres', 'FastAPI', 'Stripe', 'Mapbox',
-  'Claude tool use',
-  'MCP servers', 'ElevenLabs', 'Playwright', 'HL7 v2.5', 'FHIR R4', 'Mirth Connect',
-  'Live GPS tracking', 'Agentic CRMs', 'Three.js',
+  'Websites', 'Customer portals', 'Booking and ordering', 'Marketplaces', 'CRMs and admin panels',
+  'Lead pipelines', 'Payments', 'Live GPS tracking', 'Voice agents', 'Document automation',
+  'Healthcare data (HL7 / FHIR)', 'AI agents that log every step',
 ]
 
 interface Props {
-  onTabOpen: (tab: 'portfolio' | 'services' | 'resume') => void
+  onTabOpen: (tab: 'portfolio' | 'services' | 'about') => void
 }
 
 /** Post-launch section: normal scroll, single strong CTA, quick links, footer. */
@@ -43,7 +43,7 @@ export function Outro({ onTabOpen }: Props) {
         <div className="px-6 md:px-12 lg:px-16 pb-20 md:pb-24">
           <div className="max-w-[1400px] mx-auto">
             <p className="mono-label text-accent mb-7">Recent builds</p>
-            <ul className="grid md:grid-cols-3 gap-x-10 gap-y-8">
+            <ul className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-8">
               {projects.filter((pr) => pr.proof).map((pr) => (
                 <li key={pr.title} className="border-t border-border pt-5">
                   <h3 className="display text-text text-base md:text-lg mb-2">{pr.title}</h3>
@@ -97,7 +97,7 @@ export function Outro({ onTabOpen }: Props) {
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <MagneticButton onClick={() => requestDemo(DEMO_TOPICS.launch)}>
-                  <span>Start a launch</span>
+                  <span>Start a build</span>
                   <span aria-hidden>→</span>
                 </MagneticButton>
                 <button className="btn-ghost" onClick={() => onTabOpen('portfolio')}>
@@ -127,12 +127,12 @@ export function Outro({ onTabOpen }: Props) {
           <div className="max-w-[1400px] mx-auto pt-8 flex flex-col md:flex-row gap-6 md:items-center justify-between">
             <div className="flex flex-col gap-1">
               <span className="display text-text text-sm tracking-wide">SYNTRA AI</span>
-              <span className="hud">Eris Dothard · Web · Applications · AI</span>
+              <span className="hud">Software · Automation · Integration · Nashville, TN</span>
             </div>
             <div className="flex flex-wrap gap-6">
               <button className="btn-ghost" onClick={() => onTabOpen('portfolio')}>Portfolio</button>
               <button className="btn-ghost" onClick={() => onTabOpen('services')}>Services</button>
-              <button className="btn-ghost" onClick={() => onTabOpen('resume')}>Resume</button>
+              <button className="btn-ghost" onClick={() => onTabOpen('about')}>About</button>
               <a className="btn-ghost" href="mailto:agent@syntraai.tech">agent@syntraai.tech</a>
             </div>
             <div className="flex gap-6">

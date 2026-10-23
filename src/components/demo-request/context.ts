@@ -15,8 +15,8 @@ const REPLY_LINE = 'Eris reads every request and replies from agent@syntraai.tec
 export const DEMO_TOPICS = {
   launch: {
     eyebrow: 'Mission control',
-    title: 'Start a launch',
-    topic: 'Launch request',
+    title: 'Start a build',
+    topic: 'Build request',
     lead: `Tell us what you need built and what it has to connect to. ${REPLY_LINE}`,
     placeholder: 'What the team runs on today, where the hours go, and what the new system has to do.',
   },

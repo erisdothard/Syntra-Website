@@ -46,8 +46,8 @@ export function Hero() {
             </span>
           </h1>
           <p className="fade-up mt-8 md:mt-10 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed" style={{ '--d': '600ms' } as React.CSSProperties}>
-            Start with a site that works. End with a system that runs itself. You own every
-            stage of it.
+            For businesses that have outgrown off-the-shelf tools. Start with a site that works.
+            End with a system that runs itself. You own every stage of it.
           </p>
           <div className="fade-up mt-8 flex items-center gap-4" style={{ '--d': '760ms' } as React.CSSProperties}>
             <span className="block w-px h-10 bg-white/40 scroll-hint-line" />

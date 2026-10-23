@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback } from 'react'
 import { scrollToId } from '../../hooks/useLaunchScroll'
 
-type Tab = 'portfolio' | 'services' | 'resume'
+type Tab = 'portfolio' | 'services' | 'about'
 
 interface NavbarProps {
   onTabOpen: (tab: Tab) => void
 }
 
-const TABS: Tab[] = ['portfolio', 'services', 'resume']
+const TABS: Tab[] = ['portfolio', 'services', 'about']
 
 export function Navbar({ onTabOpen }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
