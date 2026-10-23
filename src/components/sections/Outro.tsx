@@ -4,9 +4,24 @@ import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
 
 /* What gets built, in the buyer's words. The stack lives in the Portfolio and About tabs. */
 const marquee = [
-  'Websites', 'Customer portals', 'Booking and ordering', 'Marketplaces', 'CRMs and admin panels',
-  'Lead pipelines', 'Payments', 'Live GPS tracking', 'Voice agents', 'Document automation',
-  'Healthcare data (HL7 / FHIR)', 'AI agents that log every step',
+  'Websites', 'Pricing configurators', 'Customer portals', 'Booking and ordering', 'CRMs',
+  'Admin panels', 'Lead research', 'Follow-up drafts', 'Document reading', 'Payments',
+  'Live GPS tracking', 'Voice agents',
+]
+
+/* Things that fly under our own name. Launch Control works the market once the
+   vehicle is up; Syntra builds and flies it. The two must not sell the same thing. */
+const ventures = [
+  {
+    name: 'DispatchRelay',
+    line: 'Freight dispatch for carriers, brokers, shippers and drivers. Our own product, built the way we build for clients.',
+    href: 'https://www.dispatchrelay.co',
+  },
+  {
+    name: 'Launch Control',
+    line: 'Once the rocket is flying, they find the customers and run the outreach, on a CRM from this shop. Co-founded with Max Hartmann.',
+    href: 'https://golaunchcontrol.com',
+  },
 ]
 
 interface Props {
@@ -32,7 +47,7 @@ export function Outro({ onTabOpen }: Props) {
               You own all of it. The code, the database, the accounts.
             </p>
             <p className="mt-6 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed">
-              No monthly license, no seats to pay for, no waiting on somebody else’s roadmap.
+              Built once, handed over on orbit, yours to run or hand to the next developer.
             </p>
           </div>
         </div>
@@ -72,6 +87,29 @@ export function Outro({ onTabOpen }: Props) {
           </div>
         </div>
 
+        {/* Ventures — our own things, kept out of the hero and the services list. */}
+        <div className="px-6 md:px-12 lg:px-16 pb-20 md:pb-24">
+          <div className="max-w-[1400px] mx-auto">
+            <p className="mono-label text-accent mb-7">Also in orbit</p>
+            <ul className="grid md:grid-cols-2 gap-x-10 gap-y-8">
+              {ventures.map((v) => (
+                <li key={v.name} className="border-t border-border pt-5">
+                  <h3 className="display text-text text-base md:text-lg mb-2">{v.name}</h3>
+                  <p className="text-sm text-text-secondary leading-relaxed max-w-md">{v.line}</p>
+                  <a
+                    className="hud inline-flex items-center gap-2 mt-3 hover:text-text transition-colors"
+                    href={v.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visit <span aria-hidden>↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
         {/* Marquee */}
         <div className="overflow-hidden border-y border-border py-4">
           <div className="marquee-track gap-10">
@@ -92,8 +130,8 @@ export function Outro({ onTabOpen }: Props) {
                 Ready for<br />liftoff?
               </h2>
               <p className="mt-8 max-w-lg text-text-secondary text-base md:text-lg leading-relaxed">
-                Tell us what you need built. We scope it, build it, and hand you the system —
-                front end through database, agents included. You own it outright.
+                Tell us what you need built. We build the whole rocket, fly it with you,
+                and hand it over. You own it outright.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <MagneticButton onClick={() => requestDemo(DEMO_TOPICS.launch)}>
@@ -127,7 +165,7 @@ export function Outro({ onTabOpen }: Props) {
           <div className="max-w-[1400px] mx-auto pt-8 flex flex-col md:flex-row gap-6 md:items-center justify-between">
             <div className="flex flex-col gap-1">
               <span className="display text-text text-sm tracking-wide">SYNTRA AI</span>
-              <span className="hud">Software · Automation · Integration · Nashville, TN</span>
+              <span className="hud">Built here · Flown with you · Yours at orbit · Nashville, TN</span>
             </div>
             <div className="flex flex-wrap gap-6">
               <button className="btn-ghost" onClick={() => onTabOpen('portfolio')}>Portfolio</button>

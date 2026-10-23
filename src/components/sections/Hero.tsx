@@ -28,26 +28,28 @@ export function Hero() {
       <div className="relative w-full px-6 md:px-12 lg:px-16 pointer-events-none">
         <div className="max-w-[1400px] mx-auto">
           <p className="mono-label fade-up mb-6" style={{ '--d': '80ms' } as React.CSSProperties}>
-            Syntra AI · Software · Data · AI
+            Syntra AI · Nashville
           </p>
-          {/* One line per row down to 390px. The longest line measures 13.4x the
-              font size in Unbounded 900, against an available width of
-              min(1400, vw - 2 * gutter) — so the cap and the vw factor are both
-              derived, not guessed. Re-measure if the wording changes length. */}
-          <h1 className="display text-text" style={{ fontSize: 'clamp(1.5rem, 6.3vw, 6.25rem)' }}>
+          {/* One line per row down to 390px. "WE BUILD SOFTWARE" measured 13.4x the
+              font size in Unbounded 900; "WE BUILD THE ROCKET." is 20 chars to
+              its 17, so the cap and vw factor are scaled by 17/20 against an
+              available width of min(1400, vw - 2 * gutter). Re-measure if the
+              wording changes length. */}
+          <h1 className="display text-text" style={{ fontSize: 'clamp(1.3rem, 5.35vw, 5.3rem)' }}>
             <SplitWord text="WE" offset={0} />{' '}
             <SplitWord text="BUILD" offset={2} />{' '}
-            <SplitWord text="SOFTWARE" offset={7} />
+            <SplitWord text="THE" offset={7} />{' '}
+            <SplitWord text="ROCKET." offset={10} />
             <br />
             <span className="text-accent">
-              <SplitWord text="FOR" offset={15} />{' '}
-              <SplitWord text="YOUR" offset={18} />{' '}
-              <SplitWord text="BUSINESS" offset={22} />
+              <SplitWord text="YOU" offset={17} />{' '}
+              <SplitWord text="OWN" offset={20} />{' '}
+              <SplitWord text="IT." offset={23} />
             </span>
           </h1>
           <p className="fade-up mt-8 md:mt-10 max-w-xl text-base md:text-lg text-text-secondary leading-relaxed" style={{ '--d': '600ms' } as React.CSSProperties}>
-            For businesses that have outgrown off-the-shelf tools. Start with a site that works.
-            End with a system that runs itself. You own every stage of it.
+            Your site, your CRM and the agents inside it, built as one system and handed over.
+            Your business flies on it.
           </p>
           <div className="fade-up mt-8 flex items-center gap-4" style={{ '--d': '760ms' } as React.CSSProperties}>
             <span className="block w-px h-10 bg-white/40 scroll-hint-line" />

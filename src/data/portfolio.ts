@@ -54,7 +54,6 @@ export const projects: Project[] = [
     tag: 'Freight Dispatch Platform',
     stack: 'React 19 · TypeScript · Vite · Turborepo · Stripe · Anthropic Claude · Vercel',
     featured: true,
-    proof: 'Freight dispatch platform \u2014 four roles, live GPS, automated billing.',
     description:
       'Our own multi-role freight dispatch platform for carriers, brokers, shippers, and drivers, built across 20+ development phases and live at dispatchrelay.co. Autonomous load management, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, and in-platform messaging, with a public demo of every role so a prospect can work a load end to end before signing anything.',
     live: 'https://www.dispatchrelay.co',
@@ -189,16 +188,16 @@ export const experience: Experience[] = [
 
 export const services: Service[] = [
   {
-    title: 'Web & Applications',
-    desc: 'Design and development of websites and web applications for businesses of any size: marketing sites, customer portals, dashboards, e-commerce, internal tools, and custom software, with the backend, database, and hosting behind it. That includes the admin panel or CRM you need to manage it yourself. We build new, rebuild what has outgrown its platform, or extend what you already have, and hand you full ownership of the finished system.',
+    title: 'Sites and portals',
+    desc: 'The public site your customers see, built around how you sell: pricing configurators, booking and ordering, storefronts, customer portals. On your domain, in your hosting account, with the backend and database behind it. We build new, rebuild what has outgrown its platform, or extend what you already run.',
   },
   {
-    title: 'AI Automation',
-    desc: 'AI agents and automated workflows that take repetitive work off your team: lead qualification and follow-up, document processing, customer communication, data entry, reporting, and internal assistants that know your business. Every automation is scoped around a task you already do, includes a human check wherever it matters, and reports on what it did. Delivered as a working system your team can run, adjust, and expand.',
+    title: 'CRMs and admin panels',
+    desc: 'The back office behind that site or inside the app you already run. Leads, customers, deals, orders, inventory and your live site content, worked from one screen, with a log of every change. Shaped to your pipeline, and connected to the accounting, payment and email tools you already use.',
   },
   {
-    title: 'Integration',
-    desc: 'Connecting the tools your business already relies on so they share data automatically: CRMs, accounting software, payment processors, email and marketing platforms, spreadsheets, and legacy systems, linked through their APIs or custom middleware. That includes the layer that lets AI agents read from and act on those systems securely. Every connection ships with the error handling, logging, and monitoring that keeps it reliable over time.',
+    title: 'Agents inside the CRM',
+    desc: 'AI agents that work inside your own system: researching and scoring each lead, drafting the follow-up, reading documents, answering routine customer questions. Every action is logged with its cost, a person reviews wherever it matters, and the whole thing runs on accounts you hold.',
   },
 ]
 

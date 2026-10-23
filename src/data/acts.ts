@@ -15,34 +15,40 @@ export interface Act {
   align: 'left' | 'right' | 'center'
 }
 
+/*
+  The business is the payload; Syntra is the vehicle. Each act reports the
+  state the render and the telemetry HUD are in at that scroll position
+  (stacked on the pad → full stage firing → nominal on orbit), in launch
+  grammar: short, factual, one named build per act.
+*/
 export const acts: Act[] = [
   {
     n: 1,
     label: 'Stage one · Off the ground',
-    title: 'First, we build it',
-    headline: 'First, we build it.',
+    title: 'Stacked on the pad',
+    headline: 'Stacked on the pad.',
     body:
-      'Websites, CRMs, customer portals, booking and ordering systems, marketplaces, internal tools. If your business needs it and nothing off the shelf does the job, we build it from scratch.',
+      'The site your customers see and the CRM behind it, built as one stack. Hyper Racer USA: configurator, dealer map, 19-section CRM, from a blank page.',
     tone: 'ember',
     align: 'left',
   },
   {
     n: 2,
     label: 'Stage two · Full power',
-    title: 'Then we connect it',
-    headline: 'Then we connect it.',
+    title: 'All engines, one burn',
+    headline: 'All engines. One burn.',
     body:
-      'Your tools start talking to each other. Orders, customers, payments, records. Information moves where it needs to go the moment it arrives, without anyone copying it over by hand — and you get one place that shows what it all adds up to.',
+      'Orders, customers, payments and records move between the parts on their own. Your live site, edited from the screen your team works leads in.',
     tone: 'data',
     align: 'right',
   },
   {
     n: 3,
     label: 'Stage three · It flies itself',
-    title: 'Then it runs itself',
-    headline: 'Then it runs itself.',
+    title: 'Nominal, it flies itself',
+    headline: 'Nominal. It flies itself.',
     body:
-      'AI works inside your systems and handles the real tasks. Sorting requests, answering customers, routing jobs to whoever should handle them. Every step gets logged, so you can see exactly what it did.',
+      'Agents inside the CRM research each lead, score it and draft the reply. Every action logged with its cost: telemetry you can read, in a system you own.',
     tone: 'hot',
     align: 'left',
   },
