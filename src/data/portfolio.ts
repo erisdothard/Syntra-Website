@@ -280,7 +280,7 @@ export const services: Service[] = [
 export const testimonials: Testimonial[] = [
   {
     quote:
-      "I'm not a tech guy. Eris walked me through how it all works and got us off Wix. I change my own inventory and prices now, and when a lead comes in I already know who I'm calling. Couldn't go back.",
+      "I'm not a tech guy. Eris built us a CRM app that runs the whole operation. Leads, customers, deals, inventory, pricing, it's all in one place and I can change any of it myself. He moves quick too. I'd ask for something and it'd be built and live before I got to the next thing on my list. Leads come in already researched, so I know who I'm calling. Things run a lot smoother now.",
     name: 'Lou Werner',
     role: 'Principal, Hyper Racer USA',
     slug: 'hyper-racer',
