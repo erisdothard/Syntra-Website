@@ -419,3 +419,71 @@ textarea.demo-input { min-height: 132px; resize: vertical; }
     background: radial-gradient(ellipse at 50% 50%, rgba(7, 8, 12, 0.52) 0%, rgba(7, 8, 12, 0.30) 40%, rgba(7, 8, 12, 0) 74%);
   }
 }
+
+/* ─── Addressed pages (/start, /blueprint, /services, /work/*) ─── */
+.site-skip {
+  position: absolute; left: 16px; top: -60px; z-index: 60;
+  padding: 10px 14px; border-radius: 6px;
+  background: var(--color-text); color: var(--color-void);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.site-skip:focus { top: 12px; }
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--color-void);
+  border-bottom: 1px solid var(--color-border);
+}
+/* Phones: the bar plus its link row is too tall to pin over a short screen. */
+@media (max-width: 639px) { .site-header { position: static; } }
+.site-main a:focus-visible, .site-header a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 2px; }
+.site-hero { position: relative; padding: clamp(4rem, 8vw, 7rem) 0 clamp(4rem, 7vw, 6rem); overflow: hidden; isolation: isolate; }
+.site-hero--compact { padding-bottom: clamp(2.5rem, 4vw, 3.5rem); }
+/* A warm lift in the top corner, so the page opens on depth and not a flat void. */
+.site-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none;
+  background: radial-gradient(60% 80% at 88% 0%, rgba(255, 106, 26, 0.16), transparent 62%);
+}
+/* Closes the hero with the accent, fading out across the page. */
+.site-hero-rule {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, var(--color-accent) 0%, rgba(255, 106, 26, 0.35) 22%, rgba(255, 255, 255, 0.08) 60%);
+}
+.site-hero:has(.site-hero-rule) + section { border-top: 0; }
+/* The ascent still from the launch sequence: the vehicle sits in the right third,
+   the reading side fades to the void. */
+.site-hero--art::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--color-void) 0%, rgba(7, 8, 12, 0.94) 34%, rgba(7, 8, 12, 0.25) 62%, rgba(7, 8, 12, 0) 80%, rgba(7, 8, 12, 0.3) 100%),
+    linear-gradient(180deg, var(--color-void) 0%, rgba(7, 8, 12, 0) 16%, rgba(7, 8, 12, 0) 70%, var(--color-void) 100%),
+    url('/img/ascent-v1.webp') right -30vw center / auto 100% no-repeat,
+    var(--color-void);
+}
+/* Between tablet and laptop the copy runs wider, so the vehicle moves further out. */
+@media (min-width: 769px) and (max-width: 1279px) {
+  .site-hero--art::after { background-position: 0 0, 0 0, right -52vw center, 0 0; }
+}
+@media (max-width: 768px) {
+  .site-hero--art::after {
+    background:
+      linear-gradient(180deg, rgba(7, 8, 12, 0.62) 0%, rgba(7, 8, 12, 0.7) 55%, var(--color-void) 100%),
+      url('/img/ascent-v1.webp') 22% 50% / cover no-repeat;
+  }
+}
+.site-prices {
+  display: flex; flex-wrap: wrap; gap: 20px 44px;
+  margin-top: clamp(2.25rem, 4vw, 3.25rem); padding-top: 22px;
+  border-top: 1px solid var(--color-border);
+  max-width: 46rem;
+}
+.site-prices dt { margin-bottom: 8px; }
+.site-prices dd { font-size: clamp(1.05rem, 1.7vw, 1.4rem); line-height: 1; }
+.site-prices > div:first-child dd { color: var(--color-accent); }
+.site-shot {
+  display: block; width: 100%; height: auto;
+  border: 1px solid var(--color-border); border-radius: 10px;
+  background: var(--color-surface);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 106, 26, 0.04);
+}
+a:hover > .site-shot { border-color: rgba(255, 106, 26, 0.45); }
+.site-shot { transition: border-color 0.3s ease; }

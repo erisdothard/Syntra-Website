@@ -1,5 +1,6 @@
 import { MagneticButton } from '../ui/MagneticButton'
-import { services, projects, offers, buyerLine } from '../../data/portfolio'
+import { services, projects, buyerLine } from '../../data/portfolio'
+import { OfferGrid } from '../OfferGrid'
 import { track } from '../../lib/analytics'
 import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
 
@@ -96,25 +97,9 @@ export function Outro({ onTabOpen }: Props) {
             <h2 className="display text-text max-w-3xl" style={{ fontSize: 'clamp(1.7rem, 3.6vw, 3rem)', lineHeight: 1.1 }}>
               Start with a Blueprint. Know the price before you commit to the build.
             </h2>
-            <ol className="mt-12 grid lg:grid-cols-[1.25fr_1fr_1fr] gap-x-12 gap-y-10">
-              {offers.map((o, i) => (
-                <li key={o.name} className={`pt-6 border-t ${i === 0 ? 'border-accent' : 'border-border'}`}>
-                  <p className="mono-label mb-4">
-                    0{i + 1} · {o.name}
-                  </p>
-                  <p className="display text-text" style={{ fontSize: i === 0 ? 'clamp(2.4rem, 4.6vw, 3.8rem)' : 'clamp(1.5rem, 2.4vw, 2.1rem)', lineHeight: 1 }}>
-                    {o.price}
-                  </p>
-                  <p className={`hud mt-3 ${i === 0 ? 'text-accent' : ''}`}>{o.note}</p>
-                  <p className="mt-5 text-sm md:text-[15px] text-text-secondary leading-relaxed max-w-md">{o.desc}</p>
-                  {i === 0 && (
-                    <button type="button" className="btn-ghost offer-link mt-6" onClick={() => openBlueprint('pricing')}>
-                      Get a Blueprint <span aria-hidden>→</span>
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ol>
+            <div className="mt-12">
+              <OfferGrid onBlueprint={() => openBlueprint('pricing')} />
+            </div>
           </div>
         </div>
 
@@ -171,6 +156,8 @@ export function Outro({ onTabOpen }: Props) {
               <button className="btn-ghost" onClick={() => onTabOpen('portfolio')}>Portfolio</button>
               <button className="btn-ghost" onClick={() => onTabOpen('services')}>Services</button>
               <button className="btn-ghost" onClick={() => onTabOpen('about')}>About</button>
+              <a className="btn-ghost" href="/work">Case studies</a>
+              <a className="btn-ghost" href="/blueprint">Blueprint</a>
               <a className="btn-ghost" href="mailto:agent@syntraai.tech">agent@syntraai.tech</a>
             </div>
             <div className="flex gap-6">

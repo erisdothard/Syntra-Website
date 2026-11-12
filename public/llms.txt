@@ -1,0 +1,25 @@
+# Syntra AI
+
+> Syntra AI is a software consultancy in Nashville, TN. It builds the site customers see, the CRM the team works in and the AI agents inside it, as one system the client owns outright: the code, the database and the accounts.
+
+For dealers, distributors and any business that sells through inquiries and quotes.
+
+## Offers
+
+- Build Blueprint, $1,500, credited to the build: a written scope and a fixed price for the build.
+- The build, from $10,000. A full system (site, CRM and agents) is $20,000 to $30,000. Fixed price, set by the Blueprint.
+- Care plan, from $500 a month, optional after handover: changes, new features, monitoring and agent tuning.
+
+## Pages
+
+- [Start](https://www.syntraai.tech/start): who it is for, what gets built, prices
+- [Build Blueprint](https://www.syntraai.tech/blueprint): what the Blueprint covers and what the client receives
+- [Services](https://www.syntraai.tech/services): sites and portals, CRMs and admin panels, agents inside the CRM
+- [Shipped work](https://www.syntraai.tech/work): systems in production
+- [Hyper Racer USA](https://www.syntraai.tech/work/hyper-racer): Wix to Next.js rebuild with pricing configurator, 19-section CRM and an agent pipeline on every lead
+- [3 Aces Trucking](https://www.syntraai.tech/work/3-aces-trucking): carrier site with customer portal, voice AI and document automation
+- [DispatchRelay](https://www.syntraai.tech/work/dispatchrelay): Syntra's own freight dispatch platform for carriers, brokers, shippers and drivers
+
+## Contact
+
+- Email: agent@syntraai.tech
