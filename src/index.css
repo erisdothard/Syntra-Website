@@ -101,6 +101,11 @@ body {
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.45s ease, visibility 0s linear 0.45s;
+  /* The copy scrim (.act-inner::before) bleeds past the panel on purpose. Unclipped,
+     it widened the document to 496px on a 375px phone and pushed the menu button
+     off-screen. `clip` trims it at the screen edge without making a scroll container,
+     so the sticky positioning is unaffected. */
+  overflow-x: clip;
 }
 .act-panel.is-active { visibility: visible; opacity: 1; transition-delay: 0s; }
 /* Act 1 switches on at PHASES.act1Start (0.06 × 540vh = 32.4vh of scroll), but its
