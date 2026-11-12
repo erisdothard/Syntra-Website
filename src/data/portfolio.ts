@@ -151,6 +151,24 @@ export const projects: Project[] = [
       'The marketing site for a healthcare integration consultancy: services, process, about and case-study sections, with the identity work behind it.',
     live: 'https://www.ubmgroupllc.com',
   },
+  {
+    title: 'Eazl',
+    tag: 'Art Marketplace App',
+    stack: 'Expo · React Native · Supabase · Vercel',
+    featured: true,
+    description:
+      'A juried marketplace for local art, built as a mobile app with a web version. Buyers pick a city and swipe through work from artists there, then open the piece and the artist behind it.',
+    live: 'https://eazl-app.vercel.app',
+  },
+  {
+    title: 'Ken Sable',
+    tag: 'Artist Site',
+    stack: 'Vite · TypeScript · Vercel',
+    featured: false,
+    description:
+      'A site for Nashville producer and DJ Ken Sable, built as a home-video disc menu: Play, Scene Selection, Special Features and Credits, with a radio player and a press kit.',
+    live: 'https://ken-sable-seven.vercel.app',
+  },
 ]
 
 /* ── Experience ── */
@@ -262,16 +280,31 @@ export const services: Service[] = [
 export const testimonials: Testimonial[] = [
   {
     quote:
-      'Syntra took us off Wix and built the site, the configurator and the CRM we run the business from. We update our own inventory and pricing now, and every lead that comes in has already been researched and scored when we open it.',
+      'This was all new to me, and Eris showed me the inner workings as he built it. He took us off Wix and gave us a site, a configurator and a CRM we run the whole business from. I change my own inventory and pricing, and every lead reaches me already researched and scored. We own all of it.',
     name: 'Lou Werner',
     role: 'Principal, Hyper Racer USA',
     slug: 'hyper-racer',
   },
   {
-    quote: 'I think the overall concept and visual language of the site is working.',
+    quote:
+      'Eris took my portfolio off Wix and turned it into a TV you switch on. The concept and the visual language are exactly right for my work.',
     name: 'Cole Anderson',
     role: 'Visual designer, CVZ-TV',
     slug: 'cvz-tv',
+  },
+  {
+    quote:
+      'Eris built our public site, online booking and a private portal where our consultants meet clients by video. Every client has their own space, and we see each of them in one view.',
+    name: 'Lee Johnson Jr',
+    role: 'Co-founder, Safety Net Career Consulting',
+    slug: 'safety-net',
+  },
+  {
+    quote:
+      'Eris built a home for everything I do: my story, the skate club, the reel and my brand work, with one place to book me.',
+    name: 'Tony Woodland',
+    role: 'Tony Skate Club',
+    slug: 'tony-skate-club',
   },
 ]
 

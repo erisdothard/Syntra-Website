@@ -42,7 +42,7 @@ export const pages: PageMeta[] = [
   {
     path: '/work',
     key: 'work',
-    title: 'Shipped work: eight systems and sites in production | Syntra AI',
+    title: 'Shipped work: ten systems, apps and sites | Syntra AI',
     description:
       'Systems Syntra AI has built and put into production: a distributor site with configurator, CRM and lead agents; a carrier site with a customer portal; a multi-role freight dispatch platform.',
   },
@@ -109,6 +109,22 @@ export const pages: PageMeta[] = [
     title: 'UBM Group: marketing site for a healthcare integration consultancy | Syntra AI',
     description:
       'The marketing site and identity work Syntra AI built for UBM Group, a healthcare integration consultancy.',
+  },
+  {
+    path: '/work/eazl',
+    key: 'case',
+    slug: 'eazl',
+    title: 'Eazl: a juried local-art marketplace app | Syntra AI',
+    description:
+      'The mobile app and web version Syntra AI built for Eazl, a juried marketplace for local art that buyers swipe through city by city.',
+  },
+  {
+    path: '/work/ken-sable',
+    key: 'case',
+    slug: 'ken-sable',
+    title: 'Ken Sable: an artist site built as a home-video disc menu | Syntra AI',
+    description:
+      'The site Syntra AI built for Nashville producer and DJ Ken Sable: a disc menu for navigation, a radio player and a press kit.',
   },
 ]
 

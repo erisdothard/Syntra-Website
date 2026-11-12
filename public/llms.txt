@@ -23,6 +23,8 @@ For businesses that have outgrown off-the-shelf tools.
 - [CVZ-TV](https://www.syntraai.tech/work/cvz-tv): interactive portfolio built as a 1990s TV and VCR
 - [Tony Skate Club](https://www.syntraai.tech/work/tony-skate-club): personal site for a Nashville skater and his club
 - [UBM Group](https://www.syntraai.tech/work/ubm-group): marketing site for a healthcare integration consultancy
+- [Eazl](https://www.syntraai.tech/work/eazl): juried local-art marketplace, mobile app with a web version
+- [Ken Sable](https://www.syntraai.tech/work/ken-sable): artist site built as a home-video disc menu
 - [DispatchRelay](https://www.syntraai.tech/work/dispatchrelay): Syntra's own freight dispatch platform for carriers, brokers, shippers and drivers
 
 ## Contact

@@ -26,7 +26,7 @@ export function TestimonialQuote({ t, link = false }: { t: Testimonial; link?: b
 export function TestimonialBand() {
   if (testimonials.length === 0) return null
   return (
-    <div className="grid lg:grid-cols-[1.35fr_1fr] gap-x-16 gap-y-12">
+    <div className="grid lg:grid-cols-2 gap-x-16 gap-y-14">
       {testimonials.map((t) => (
         <TestimonialQuote key={t.slug} t={t} link />
       ))}

@@ -233,6 +233,33 @@ export const caseStudies: CaseStudy[] = [
     ],
     ownedBy: 'UBM Group holds the site.',
   },
+  {
+    slug: 'eazl',
+    project: 'Eazl',
+    kind: 'Partner product · art marketplace app',
+    headline: 'A juried marketplace for local art, built as an app you swipe through.',
+    job: 'Eazl is a marketplace for local art, built with a partner. Syntra built the app and its web version.',
+    built: [
+      { title: 'City by city', text: 'A buyer picks a city and sees the work being made there.' },
+      { title: 'A feed you swipe', text: 'Artwork arrives one piece at a time, ranked for the buyer.' },
+      { title: 'Artwork and artist pages', text: 'Every piece opens to its details and to the artist behind it.' },
+      { title: 'One codebase, phone and web', text: 'A mobile app in React Native, with the same app running in the browser.' },
+    ],
+    ownedBy: 'Eazl is a partner product.',
+  },
+  {
+    slug: 'ken-sable',
+    project: 'Ken Sable',
+    kind: 'Producer and DJ · artist site',
+    headline: 'An artist site you navigate like a home-video disc menu.',
+    job: 'Ken Sable is a Nashville producer and DJ. Syntra built his site as the menu of a disc you would put in a player.',
+    built: [
+      { title: 'The disc menu', text: 'Play, Scene Selection, Special Features and Credits are the navigation.' },
+      { title: 'A radio player', text: 'His music plays from the site.' },
+      { title: 'A press kit', text: 'What a booker or a writer needs, in one place.' },
+    ],
+    ownedBy: 'Ken Sable holds the site.',
+  },
 ]
 
 export function findCaseStudy(slug: string | undefined): CaseStudy | undefined {
