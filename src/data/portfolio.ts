@@ -18,10 +18,11 @@ export interface ExperienceSection {
   bullets: string[]
 }
 
+/** One block of background on the About tab. `claim` is the heading a buyer reads;
+    `org` is the evidence behind it. No job titles, no dates: that packaging lives in resume.html. */
 export interface Experience {
-  role: string
+  claim: string
   org: string
-  date: string
   bullets?: string[]
   sections?: ExperienceSection[]
 }
@@ -93,9 +94,8 @@ export const projects: Project[] = [
 
 export const experience: Experience[] = [
   {
-    role: 'Founder',
+    claim: 'Full builds, live in production',
     org: 'Syntra AI',
-    date: '2025 –',
     sections: [
       {
         label: 'Capabilities & Execution',
@@ -116,15 +116,14 @@ export const experience: Experience[] = [
     ],
   },
   {
-    role: 'Data Scientist II / AI Engineer',
+    claim: 'AI agents wired into enterprise finance workflows',
     org: 'Caterpillar Financial',
-    date: '2026 \u2013',
     sections: [
       {
         label: 'AI Engineering & Agent Integration',
         bullets: [
-          'Build and deploy AI agents into core business workflows \u2014 wiring model-driven decisioning into the systems the business already runs on, rather than standing up parallel tooling nobody adopts',
-          'Replace manual, human-in-the-loop steps with automated pipelines: identify where analyst hours go to routing, lookup, and reconciliation, then move that work to scheduled or event-driven execution',
+          'Build and deploy AI agents into core business workflows \u2014 wiring model-driven decisioning into the systems the business already runs on',
+          'Replace manual, human-in-the-loop steps with automated pipelines: identify the routing, lookup, and reconciliation work analysts do by hand, then move it to scheduled or event-driven execution',
           'Own solutions end to end \u2014 problem framing with business stakeholders, data sourcing, agent and model design, deployment, and the monitoring that keeps output trustworthy in production',
         ],
       },
@@ -146,9 +145,8 @@ export const experience: Experience[] = [
     ],
   },
   {
-    role: 'Integration and Production Support Engineer',
+    claim: 'Card-issuance integrations for 50+ banks, CJIS-certified',
     org: 'CPI Card Group',
-    date: '2021 – 2026',
     sections: [
       {
         label: 'Core Development: SQL, XML & Python',
@@ -177,11 +175,6 @@ export const experience: Experience[] = [
       },
     ],
   },
-  {
-    role: 'Technical Support',
-    org: 'Google Fiber',
-    date: '2019 – 2021',
-  },
 ]
 
 /* ── Services ── */
@@ -201,9 +194,9 @@ export const services: Service[] = [
   },
 ]
 
-/* ── Background orgs (Portfolio tab: names only, no titles or dates) ── */
+/* ── Background orgs (Portfolio and About tabs: names only, no titles or dates) ── */
 
-export const backgroundOrgs = ['Google', 'CPI Card Group', 'Caterpillar Financial']
+export const backgroundOrgs = ['Google Fiber', 'CPI Card Group', 'Caterpillar Financial']
 
 /* ── Certifications ── */
 

@@ -395,8 +395,16 @@ function AboutView() {
       {/* Experience */}
       <div style={{ marginBottom: 36 }}>
         <p className="font-mono" style={{ fontSize: 10, color: 'rgba(255,106,26,0.5)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
-          Experience
+          Track record
         </p>
+        <div data-animate="item" style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
+          {backgroundOrgs.map((org) => (
+            <div key={org} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
+              <span className="font-display" style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{org}</span>
+            </div>
+          ))}
+        </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {experience.map((item) => {
             const isExpanded = expanded === item.org
@@ -412,7 +420,7 @@ function AboutView() {
                 <AnimatedBorder />
                 <div style={{ padding: '20px 24px' }}>
                   <h3 className="font-display" style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: 2 }}>
-                    {item.role}
+                    {item.claim}
                   </h3>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>
                     {item.org}
