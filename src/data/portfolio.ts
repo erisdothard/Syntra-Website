@@ -206,7 +206,7 @@ export const services: Service[] = [
 
 /* ── Offers and prices (single source of truth for every price on the site) ── */
 
-export const buyerLine = 'For dealers, distributors and any business that sells through inquiries and quotes.'
+export const buyerLine = 'For businesses that have outgrown off-the-shelf tools.'
 
 export const offers: Offer[] = [
   {

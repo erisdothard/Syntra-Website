@@ -37,7 +37,7 @@ export const blueprint = {
   headline: 'The Build Blueprint.',
   looksAtTitle: 'What we look at',
   looksAt: [
-    { title: 'How inquiries arrive', text: 'Forms, phone, email, trade shows, dealers. Where each one goes and who picks it up.' },
+    { title: 'How inquiries arrive', text: 'Forms, phone, email, referrals, events. Where each one goes and who picks it up.' },
     { title: 'How a quote gets made', text: 'Where prices, options and stock live, and who can change them.' },
     { title: 'What the team runs on', text: 'The site platform, the spreadsheets, and the accounting, payment and email tools already in place.' },
     { title: 'What staff need to edit', text: 'The pages, listings and prices your own people should be able to change without a developer.' },

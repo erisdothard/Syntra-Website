@@ -23,7 +23,7 @@ export const pages: PageMeta[] = [
     key: 'start',
     title: 'Site, CRM and AI agents built as one system | Syntra AI',
     description:
-      'For dealers, distributors and any business that sells through inquiries and quotes. Syntra AI builds the site, the CRM behind it and the agents inside it. Builds from $10,000, starting with a $1,500 Blueprint.',
+      'For businesses that have outgrown off-the-shelf tools. Syntra AI builds the site, the CRM behind it and the agents inside it. Builds from $10,000, starting with a $1,500 Blueprint.',
   },
   {
     path: '/blueprint',
