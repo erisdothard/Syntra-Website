@@ -7,7 +7,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 /** Server-only variables the /api functions read. Never prefixed VITE_, so never in the client bundle. */
-const API_ENV_KEYS = ['RESEND_API_KEY', 'EMAIL_FROM', 'DEMO_NOTIFY_EMAIL']
+const API_ENV_KEYS = ['RESEND_API_KEY', 'EMAIL_FROM', 'DEMO_NOTIFY_EMAIL', 'DATABASE_URL', 'VITE_BOOKING_URL']
 
 /**
  * Serves /api/*.ts under `vite dev` the way Vercel serves them in production:

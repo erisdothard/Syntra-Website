@@ -1,3 +1,4 @@
+import postgres from 'postgres'
 import { Resend } from 'resend'
 import { z } from 'zod'
 
@@ -20,13 +21,13 @@ import { z } from 'zod'
  *                      the Resend account owner, which is how Hyper Racer lost
  *                      a real lead on 2026-08-26 without anyone noticing.
  *   DEMO_NOTIFY_EMAIL  optional, defaults to agent@syntraai.tech
- *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
- *                      optional pair. When both are set every submission is
+ *   DATABASE_URL       optional Postgres connection string (Railway, Supabase or
+ *                      any other host). When set every submission is
  *                      written to public.site_leads BEFORE any email is sent,
  *                      so a failed send or a bot flag still leaves a record.
  *                      The visitor confirmation is only sent when this is set,
  *                      because the table is what rate-limits it.
- *                      Schema: supabase/migrations/20261112000001_site_leads.sql
+ *                      Schema: db/migrations/20261112000001_site_leads.sql
  *   VITE_BOOKING_URL   optional. Adds a "book a call" link to the confirmation
  *                      sent to the visitor (the client reads the same variable).
  */
@@ -157,84 +158,48 @@ const CONFIRM_GLOBAL_WINDOW_MS = 60 * 60 * 1000
 const CONFIRM_GLOBAL_MAX = 20
 const STORE_TIMEOUT_MS = 5000
 
-interface LeadStore {
-  base: string
-  headers: Record<string, string>
-}
-
-/** Null when storage is not configured. Plain http is accepted only for a local stand-in. */
-function leadStore(): LeadStore | null {
-  const url = process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key) return null
-  try {
-    const parsed = new URL(url)
-    const local = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'
-    if (parsed.protocol !== 'https:' && !local) {
-      console.error('demo-request: SUPABASE_URL must be https')
-      return null
-    }
-    return {
-      base: `${parsed.origin}/rest/v1/site_leads`,
-      headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    }
-  } catch {
-    console.error('demo-request: SUPABASE_URL is not a valid URL')
-    return null
+/**
+ * Lead storage is plain Postgres over DATABASE_URL (Railway, Supabase or any other
+ * host). One short-lived connection per function instance. Null when not configured.
+ */
+let sqlClient: ReturnType<typeof postgres> | null = null
+function leadDb(): ReturnType<typeof postgres> | null {
+  const url = process.env.DATABASE_URL
+  if (!url) return null
+  if (!sqlClient) {
+    sqlClient = postgres(url, {
+      max: 1,
+      idle_timeout: 20,
+      connect_timeout: STORE_TIMEOUT_MS / 1000,
+      ssl: 'prefer',
+      onnotice: () => {},
+    })
   }
+  return sqlClient
 }
 
 /**
- * Writes the submission to Supabase over PostgREST and returns the new row id, or
- * null when storage is not configured or the write fails. The caller still sends
- * the email, so a database outage never costs a lead. Service-role key, server only.
+ * Writes the submission and returns the new row id, or null when storage is not
+ * configured or the write fails. The caller still sends the email, so a database
+ * outage never costs a lead. Every value is a bound parameter.
  */
 async function storeLead(data: DemoRequest, status: LeadStatus, flagReason: string | null): Promise<string | null> {
-  const store = leadStore()
-  if (!store) return null
+  const sql = leadDb()
+  if (!sql) return null
   const flagged = status === 'flagged'
   try {
-    const res = await fetch(`${store.base}?select=id`, {
-      method: 'POST',
-      headers: { ...store.headers, Prefer: 'return=representation' },
-      body: JSON.stringify({
-        name: data.name,
-        email: data.email,
-        email_norm: data.email.toLowerCase(),
-        company: data.company || null,
-        topic: data.topic || null,
-        message: flagged ? data.message.slice(0, FLAGGED_MESSAGE_CHARS) : data.message,
-        status,
-        flag_reason: flagReason,
-        attribution: flagged ? {} : data.attribution,
-      }),
-      signal: AbortSignal.timeout(STORE_TIMEOUT_MS),
-    })
-    if (!res.ok) {
-      console.error(`demo-request: lead store returned ${res.status}`)
-      return null
-    }
-    const rows = (await res.json().catch(() => null)) as { id?: unknown }[] | null
-    const id = rows?.[0]?.id
-    return typeof id === 'string' ? id : null
+    const rows = await sql<{ id: string }[]>`
+      insert into site_leads (name, email, email_norm, company, topic, message, status, flag_reason, attribution)
+      values (
+        ${data.name}, ${data.email}, ${data.email.toLowerCase()}, ${data.company || null}, ${data.topic || null},
+        ${flagged ? data.message.slice(0, FLAGGED_MESSAGE_CHARS) : data.message},
+        ${status}, ${flagReason}, ${sql.json(flagged ? {} : data.attribution)}
+      )
+      returning id
+    `
+    return rows[0]?.id ?? null
   } catch (err) {
     console.error('demo-request: lead store failed', err instanceof Error ? err.name : 'unknown error')
-    return null
-  }
-}
-
-/** Counts rows matching a PostgREST filter. Null means the count could not be read. */
-async function countLeads(store: LeadStore, filter: string): Promise<number | null> {
-  try {
-    const res = await fetch(`${store.base}?select=id&limit=1&${filter}`, {
-      method: 'GET',
-      headers: { ...store.headers, Prefer: 'count=exact' },
-      signal: AbortSignal.timeout(STORE_TIMEOUT_MS),
-    })
-    if (!res.ok) return null
-    const total = Number(res.headers.get('content-range')?.split('/')[1])
-    return Number.isFinite(total) ? total : null
-  } catch {
     return null
   }
 }
@@ -246,30 +211,31 @@ async function countLeads(store: LeadStore, filter: string): Promise<number | nu
  * the answer is no: an unbounded sender is worse than a missing courtesy note.
  */
 async function mayConfirm(email: string, now: number): Promise<boolean> {
-  const store = leadStore()
-  if (!store) return false
-  const addressSince = encodeURIComponent(new Date(now - CONFIRM_PER_ADDRESS_WINDOW_MS).toISOString())
-  const globalSince = encodeURIComponent(new Date(now - CONFIRM_GLOBAL_WINDOW_MS).toISOString())
-  const [sameAddress, recentConfirmations] = await Promise.all([
-    countLeads(store, `email_norm=eq.${encodeURIComponent(email.toLowerCase())}&status=eq.new&created_at=gte.${addressSince}`),
-    countLeads(store, `confirmation_sent_at=gte.${globalSince}`),
-  ])
-  if (sameAddress === null || recentConfirmations === null) return false
-  // The row for this very request is already stored, so one match is this request.
-  return sameAddress <= 1 && recentConfirmations < CONFIRM_GLOBAL_MAX
+  const sql = leadDb()
+  if (!sql) return false
+  try {
+    const addressSince = new Date(now - CONFIRM_PER_ADDRESS_WINDOW_MS)
+    const globalSince = new Date(now - CONFIRM_GLOBAL_WINDOW_MS)
+    const [counts] = await sql<{ same_address: number; recent_confirmations: number }[]>`
+      select
+        (select count(*)::int from site_leads
+          where email_norm = ${email.toLowerCase()} and status = 'new' and created_at >= ${addressSince}) as same_address,
+        (select count(*)::int from site_leads where confirmation_sent_at >= ${globalSince}) as recent_confirmations
+    `
+    if (!counts) return false
+    // The row for this very request is already stored, so one match is this request.
+    return counts.same_address <= 1 && counts.recent_confirmations < CONFIRM_GLOBAL_MAX
+  } catch (err) {
+    console.error('demo-request: confirmation check failed', err instanceof Error ? err.name : 'unknown error')
+    return false
+  }
 }
 
 async function markConfirmed(id: string, now: number): Promise<void> {
-  const store = leadStore()
-  if (!store) return
+  const sql = leadDb()
+  if (!sql) return
   try {
-    const res = await fetch(`${store.base}?id=eq.${encodeURIComponent(id)}`, {
-      method: 'PATCH',
-      headers: { ...store.headers, Prefer: 'return=minimal' },
-      body: JSON.stringify({ confirmation_sent_at: new Date(now).toISOString() }),
-      signal: AbortSignal.timeout(STORE_TIMEOUT_MS),
-    })
-    if (!res.ok) console.error(`demo-request: could not mark confirmation (${res.status})`)
+    await sql`update site_leads set confirmation_sent_at = ${new Date(now)} where id = ${id}`
   } catch (err) {
     console.error('demo-request: could not mark confirmation', err instanceof Error ? err.name : 'unknown error')
   }

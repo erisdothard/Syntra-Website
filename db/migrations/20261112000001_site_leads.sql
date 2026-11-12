@@ -1,5 +1,5 @@
 -- Every submission from the site's request form, written by api/demo-request.ts
--- with the service-role key before any email is sent.
+-- over DATABASE_URL before any email is sent.
 create table if not exists public.site_leads (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -25,6 +25,15 @@ create index if not exists site_leads_email_norm_idx on public.site_leads (email
 create index if not exists site_leads_confirmation_idx on public.site_leads (confirmation_sent_at)
   where confirmation_sent_at is not null;
 
--- No policies on purpose: only the service role (server side) reads or writes.
+-- Written and read only by the server over DATABASE_URL. On Supabase the public API
+-- roles exist and must be shut out; on plain Postgres (Railway) they do not exist.
 alter table public.site_leads enable row level security;
-revoke all on public.site_leads from anon, authenticated;
+do $$
+begin
+  if exists (select 1 from pg_roles where rolname = 'anon') then
+    revoke all on public.site_leads from anon;
+  end if;
+  if exists (select 1 from pg_roles where rolname = 'authenticated') then
+    revoke all on public.site_leads from authenticated;
+  end if;
+end $$;
