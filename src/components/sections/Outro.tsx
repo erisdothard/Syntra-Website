@@ -1,5 +1,6 @@
 import { MagneticButton } from '../ui/MagneticButton'
-import { services, projects } from '../../data/portfolio'
+import { services, projects, offers, buyerLine } from '../../data/portfolio'
+import { track } from '../../lib/analytics'
 import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
 
 /* What gets built, in the buyer's words. The stack lives in the Portfolio and About tabs. */
@@ -9,21 +10,6 @@ const marquee = [
   'Live GPS tracking', 'Voice agents',
 ]
 
-/* Things that fly under our own name. Launch Control works the market once the
-   vehicle is up; Syntra builds and flies it. The two must not sell the same thing. */
-const ventures = [
-  {
-    name: 'DispatchRelay',
-    line: 'Freight dispatch for carriers, brokers, shippers and drivers. Our own product, built the way we build for clients.',
-    href: 'https://www.dispatchrelay.co',
-  },
-  {
-    name: 'Launch Control',
-    line: 'Once the rocket is flying, they find the customers and run the outreach, on a CRM from this shop. Co-founded with Max Hartmann.',
-    href: 'https://golaunchcontrol.com',
-  },
-]
-
 interface Props {
   onTabOpen: (tab: 'portfolio' | 'services' | 'about') => void
 }
@@ -31,6 +17,10 @@ interface Props {
 /** Post-launch section: normal scroll, single strong CTA, quick links, footer. */
 export function Outro({ onTabOpen }: Props) {
   const requestDemo = useDemoRequest()
+  const openBlueprint = (place: string) => {
+    track('blueprint_cta_clicked', { place })
+    requestDemo(DEMO_TOPICS.blueprint)
+  }
   return (
     <section id="outro" className="relative z-10 pointer-events-auto">
       {/* Gradient veil so the canvas settles behind the content */}
@@ -87,29 +77,6 @@ export function Outro({ onTabOpen }: Props) {
           </div>
         </div>
 
-        {/* Ventures — our own things, kept out of the hero and the services list. */}
-        <div className="px-6 md:px-12 lg:px-16 pb-20 md:pb-24">
-          <div className="max-w-[1400px] mx-auto">
-            <p className="mono-label text-accent mb-7">Also in orbit</p>
-            <ul className="grid md:grid-cols-2 gap-x-10 gap-y-8">
-              {ventures.map((v) => (
-                <li key={v.name} className="border-t border-border pt-5">
-                  <h3 className="display text-text text-base md:text-lg mb-2">{v.name}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed max-w-md">{v.line}</p>
-                  <a
-                    className="hud inline-flex items-center gap-2 mt-3 hover:text-text transition-colors"
-                    href={v.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Visit <span aria-hidden>↗</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
         {/* Marquee */}
         <div className="overflow-hidden border-y border-border py-4">
           <div className="marquee-track gap-10">
@@ -121,23 +88,56 @@ export function Outro({ onTabOpen }: Props) {
           </div>
         </div>
 
+        {/* What it costs — the first step and the prices, in the open. Copy and
+            numbers come from `offers` so no price is ever typed into a component. */}
+        <div className="px-6 md:px-12 lg:px-16 pt-24 md:pt-32">
+          <div className="max-w-[1400px] mx-auto">
+            <p className="mono-label text-accent mb-5">What it costs</p>
+            <h2 className="display text-text max-w-3xl" style={{ fontSize: 'clamp(1.7rem, 3.6vw, 3rem)', lineHeight: 1.1 }}>
+              Start with a Blueprint. Know the price before you commit to the build.
+            </h2>
+            <ol className="mt-12 grid lg:grid-cols-[1.25fr_1fr_1fr] gap-x-12 gap-y-10">
+              {offers.map((o, i) => (
+                <li key={o.name} className={`pt-6 border-t ${i === 0 ? 'border-accent' : 'border-border'}`}>
+                  <p className="mono-label mb-4">
+                    0{i + 1} · {o.name}
+                  </p>
+                  <p className="display text-text" style={{ fontSize: i === 0 ? 'clamp(2.4rem, 4.6vw, 3.8rem)' : 'clamp(1.5rem, 2.4vw, 2.1rem)', lineHeight: 1 }}>
+                    {o.price}
+                  </p>
+                  <p className={`hud mt-3 ${i === 0 ? 'text-accent' : ''}`}>{o.note}</p>
+                  <p className="mt-5 text-sm md:text-[15px] text-text-secondary leading-relaxed max-w-md">{o.desc}</p>
+                  {i === 0 && (
+                    <button type="button" className="btn-ghost offer-link mt-6" onClick={() => openBlueprint('pricing')}>
+                      Get a Blueprint <span aria-hidden>→</span>
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
         {/* CTA — the navbar's Contact link lands here (scrollToId('contact')). */}
-        <div id="contact" className="px-6 md:px-12 lg:px-16 py-28 md:py-40 scroll-mt-16">
+        <div id="contact" className="px-6 md:px-12 lg:px-16 pt-20 pb-28 md:pt-28 md:pb-40 scroll-mt-16">
           <div className="max-w-[1400px] mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-16 items-end">
             <div>
-              <p className="mono-label mb-6 text-accent">Mission control</p>
+              <p className="mono-label mb-6 text-accent">Start here</p>
               <h2 className="display text-text" style={{ fontSize: 'clamp(2.8rem, 8vw, 7.5rem)' }}>
                 Ready for<br />liftoff?
               </h2>
               <p className="mt-8 max-w-lg text-text-secondary text-base md:text-lg leading-relaxed">
-                Tell us what you need built. We build the whole rocket, fly it with you,
-                and hand it over. You own it outright.
+                {buyerLine} Tell us what you need built. We build the whole rocket,
+                fly it with you, and hand it over. You own it outright.
               </p>
               <div className="mt-10 flex flex-wrap items-center gap-6">
-                <MagneticButton onClick={() => requestDemo(DEMO_TOPICS.launch)}>
-                  <span>Start a build</span>
+                <MagneticButton onClick={() => openBlueprint('contact')}>
+                  <span>Get a Blueprint</span>
                   <span aria-hidden>→</span>
                 </MagneticButton>
+                <button className="btn-ghost" onClick={() => requestDemo(DEMO_TOPICS.launch)}>
+                  Start a build <span aria-hidden>→</span>
+                </button>
                 <button className="btn-ghost" onClick={() => onTabOpen('portfolio')}>
                   See shipped work <span aria-hidden>↗</span>
                 </button>

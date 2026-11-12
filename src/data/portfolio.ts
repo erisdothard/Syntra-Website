@@ -32,6 +32,15 @@ export interface Service {
   desc: string
 }
 
+/** One thing a buyer can say yes to, with its price. Rendered on the home page. */
+export interface Offer {
+  name: string
+  price: string
+  /** Short qualifier shown beside the price. */
+  note: string
+  desc: string
+}
+
 export interface SkillGroup {
   category: string
   items: string[]
@@ -58,6 +67,7 @@ export const projects: Project[] = [
     description:
       'Our own multi-role freight dispatch platform for carriers, brokers, shippers, and drivers, built across 20+ development phases and live at dispatchrelay.co. Autonomous load management, live GPS fleet tracking, billing automation, carrier verification, real-time bidding, and in-platform messaging, with a public demo of every role so a prospect can work a load end to end before signing anything.',
     live: 'https://www.dispatchrelay.co',
+    proof: 'Our own freight dispatch platform, with a public demo of every role.',
   },
   {
     title: '3 Aces Trucking Inc.',
@@ -74,7 +84,7 @@ export const projects: Project[] = [
     tag: 'Healthcare Data Interoperability',
     stack: 'Mirth Connect · PostgreSQL · HL7 v2.5 · FHIR R4',
     featured: true,
-    proof: 'HL7 v2.5 / FHIR R4 \u2014 four production channels.',
+    proof: 'HL7 v2.5 / FHIR R4 integration engine across four channels.',
     description:
       'Production-style HL7 and FHIR R4 data integration engine. Orchestrates four automated pipeline channels covering high-volume ORU lab routing, clinical ADT transaction processing, and secure healthcare API infrastructure.',
     github: 'https://github.com/erisdothard/healthcare-integration-portfolio',
@@ -191,6 +201,31 @@ export const services: Service[] = [
   {
     title: 'Agents inside the CRM',
     desc: 'AI agents that work inside your own system: researching and scoring each lead, drafting the follow-up, reading documents, answering routine customer questions. Every action is logged with its cost, a person reviews wherever it matters, and the whole thing runs on accounts you hold.',
+  },
+]
+
+/* ── Offers and prices (single source of truth for every price on the site) ── */
+
+export const buyerLine = 'For dealers, distributors and any business that sells through inquiries and quotes.'
+
+export const offers: Offer[] = [
+  {
+    name: 'Build Blueprint',
+    price: '$1,500',
+    note: 'Credited to the build',
+    desc: 'We map how you sell today, what the site, the CRM and the agents have to do, and what they connect to. You get a written scope and a fixed price for the build. The $1,500 comes off that price if you go ahead.',
+  },
+  {
+    name: 'The build',
+    price: 'From $10,000',
+    note: 'Full system $20,000 to $30,000',
+    desc: 'A site, a CRM, or the full system: the site customers see, the CRM the team works in and the agents inside it. Fixed price, set by the Blueprint. The code, the database and the accounts are yours.',
+  },
+  {
+    name: 'Care plan',
+    price: 'From $500/mo',
+    note: 'Optional, after handover',
+    desc: 'Changes, new features, monitoring and agent tuning from the people who built it. Whether you take it or not, the system stays yours.',
   },
 ]
 

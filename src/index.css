@@ -203,6 +203,39 @@ body {
 .btn-primary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
 .btn-primary > * { position: relative; z-index: 1; }
 
+/* The one action that stays on screen through the whole launch scroll. */
+.nav-cta {
+  display: inline-flex; align-items: center;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 106, 26, 0.55);
+  background: rgba(255, 106, 26, 0.08);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.nav-cta:hover { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-void); }
+.nav-cta:active { transform: translateY(1px); }
+.nav-cta:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+/* Tablet: the full label shares the bar with four links, so it gets less padding. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav-cta { padding: 8px 12px; letter-spacing: 0.12em; }
+}
+/* Phone: a full-height tap target, and a near-solid fill so the pill stays legible
+   over the launch tower. No backdrop-filter: blurring over the full-screen canvas
+   is what made this site's scroll stutter before. */
+@media (max-width: 767px) {
+  .nav-cta { min-height: 44px; padding: 0 16px; background: rgba(7, 8, 12, 0.78); }
+}
+/* The paid first step is the one text link that carries the accent. */
+.btn-ghost.offer-link { padding-bottom: 6px; border-bottom: 1px solid var(--color-accent); }
+.btn-ghost.offer-link:hover { color: var(--color-accent); }
+
 .btn-ghost {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 0;

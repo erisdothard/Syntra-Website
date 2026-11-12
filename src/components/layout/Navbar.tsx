@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { scrollToId } from '../../hooks/useLaunchScroll'
+import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
+import { track } from '../../lib/analytics'
 
 type Tab = 'portfolio' | 'services' | 'about'
 
@@ -24,6 +26,13 @@ export function Navbar({ onTabOpen }: NavbarProps) {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [menuOpen])
+
+  const requestDemo = useDemoRequest()
+  const handleBlueprint = useCallback(() => {
+    setMenuOpen(false)
+    track('blueprint_cta_clicked', { place: 'navbar' })
+    requestDemo(DEMO_TOPICS.blueprint)
+  }, [requestDemo])
 
   const handleTab = useCallback((tab: Tab) => { setMenuOpen(false); onTabOpen(tab) }, [onTabOpen])
   const handleContact = useCallback((e: React.MouseEvent) => { e.preventDefault(); setMenuOpen(false); scrollToId('contact') }, [])
@@ -50,13 +59,21 @@ export function Navbar({ onTabOpen }: NavbarProps) {
             SYNTRA AI
           </a>
 
-          <ul className="hidden md:flex items-center gap-9">
+          <ul className="hidden md:flex items-center gap-6 lg:gap-9">
             {TABS.map((t) => (
               <li key={t}><button onClick={() => handleTab(t)} className={link}>{t}</button></li>
             ))}
-            <li><a href="#contact" onClick={handleContact} className={`${link} text-accent hover:text-accent-hot`}>Contact</a></li>
+            <li><a href="#contact" onClick={handleContact} className={link}>Contact</a></li>
+            <li><button type="button" onClick={handleBlueprint} className="nav-cta">Get a Blueprint</button></li>
           </ul>
 
+          {/* The wrapper carries the breakpoint: .nav-cta sets its own display, which
+              would outrank a `hidden` utility placed on the button itself. */}
+          <div className="md:hidden ml-auto mr-2">
+            <button type="button" onClick={handleBlueprint} className="nav-cta">
+              Blueprint
+            </button>
+          </div>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px]"

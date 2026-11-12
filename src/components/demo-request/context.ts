@@ -13,12 +13,19 @@ export interface DemoRequestTopic {
 const REPLY_LINE = 'Eris reads every request and replies from agent@syntraai.tech.'
 
 export const DEMO_TOPICS = {
+  blueprint: {
+    eyebrow: 'Build Blueprint · $1,500',
+    title: 'Get a Blueprint',
+    topic: 'Blueprint request',
+    lead: `A written scope and a fixed price for your build. The $1,500 comes off the build if you go ahead. ${REPLY_LINE}`,
+    placeholder: 'What you sell, how inquiries and quotes are handled today, and the tools involved.',
+  },
   launch: {
-    eyebrow: 'Mission control',
+    eyebrow: 'New build',
     title: 'Start a build',
     topic: 'Build request',
     lead: `Tell us what you need built and what it has to connect to. ${REPLY_LINE}`,
-    placeholder: 'What the team runs on today, where the hours go, and what the new system has to do.',
+    placeholder: 'What the team runs on today, where the work piles up, and what the new system has to do.',
   },
   project: {
     eyebrow: 'Services',
