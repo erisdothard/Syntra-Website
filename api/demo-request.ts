@@ -20,6 +20,15 @@ import { z } from 'zod'
  *                      the Resend account owner, which is how Hyper Racer lost
  *                      a real lead on 2026-08-26 without anyone noticing.
  *   DEMO_NOTIFY_EMAIL  optional, defaults to agent@syntraai.tech
+ *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ *                      optional pair. When both are set every submission is
+ *                      written to public.site_leads BEFORE any email is sent,
+ *                      so a failed send or a bot flag still leaves a record.
+ *                      The visitor confirmation is only sent when this is set,
+ *                      because the table is what rate-limits it.
+ *                      Schema: supabase/migrations/20261112000001_site_leads.sql
+ *   VITE_BOOKING_URL   optional. Adds a "book a call" link to the confirmation
+ *                      sent to the visitor (the client reads the same variable).
  */
 
 const NOTIFY_EMAIL = process.env.DEMO_NOTIFY_EMAIL ?? 'agent@syntraai.tech'
@@ -52,12 +61,25 @@ const requestSchema = z.object({
     .min(10, 'Add a sentence or two about what you need.')
     .max(4000, 'Keep it under 4,000 characters.'),
   renderedAt: z.number(),
+  attribution: z
+    .object({
+      utm_source: z.string().trim().max(120).optional(),
+      utm_medium: z.string().trim().max(120).optional(),
+      utm_campaign: z.string().trim().max(120).optional(),
+      utm_content: z.string().trim().max(120).optional(),
+      utm_term: z.string().trim().max(120).optional(),
+      referrer: z.string().trim().max(500).optional(),
+      landing_path: z.string().trim().max(500).optional(),
+    })
+    // A malformed value must never cost the lead: fall back to no attribution.
+    .catch({}),
   [HONEYPOT_FIELD]: z.string().max(500).default(''),
 })
 
 type DemoRequest = z.infer<typeof requestSchema>
 
-type ApiResult = { ok: true } | { ok: false; error: string; field?: string }
+/** `confirmed` is true only when the confirmation email to the visitor was accepted for sending. */
+type ApiResult = { ok: true; confirmed?: boolean } | { ok: false; error: string; field?: string }
 
 function reply(body: ApiResult, status = 200): Response {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } })
@@ -106,6 +128,11 @@ function isBurst(ip: string, now: number): boolean {
   if (ip === 'unknown') return false
   if (recentByIp.size > MAX_TRACKED_IPS) recentByIp.clear()
   const recent = (recentByIp.get(ip) ?? []).filter((t) => now - t < BURST_WINDOW_MS)
+  // Past the cap the list stops growing, so a flood cannot inflate one entry.
+  if (recent.length > BURST_MAX) {
+    recentByIp.set(ip, recent)
+    return true
+  }
   const next = [...recent, now]
   recentByIp.set(ip, next)
   return next.length > BURST_MAX
@@ -118,6 +145,169 @@ function spamReason(data: DemoRequest, now: number): string | null {
   if (elapsed < MIN_SUBMIT_MS) return `submitted in ${elapsed}ms`
   if (elapsed > MAX_SUBMIT_AGE_MS) return 'stale render timestamp'
   return null
+}
+
+type LeadStatus = 'new' | 'flagged'
+
+/** A flagged row keeps enough to recognise a real person caught by a gate, and no more. */
+const FLAGGED_MESSAGE_CHARS = 200
+/** One confirmation per address per day, and a ceiling on confirmations per hour across the site. */
+const CONFIRM_PER_ADDRESS_WINDOW_MS = 24 * 60 * 60 * 1000
+const CONFIRM_GLOBAL_WINDOW_MS = 60 * 60 * 1000
+const CONFIRM_GLOBAL_MAX = 20
+const STORE_TIMEOUT_MS = 5000
+
+interface LeadStore {
+  base: string
+  headers: Record<string, string>
+}
+
+/** Null when storage is not configured. Plain http is accepted only for a local stand-in. */
+function leadStore(): LeadStore | null {
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) return null
+  try {
+    const parsed = new URL(url)
+    const local = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'
+    if (parsed.protocol !== 'https:' && !local) {
+      console.error('demo-request: SUPABASE_URL must be https')
+      return null
+    }
+    return {
+      base: `${parsed.origin}/rest/v1/site_leads`,
+      headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    }
+  } catch {
+    console.error('demo-request: SUPABASE_URL is not a valid URL')
+    return null
+  }
+}
+
+/**
+ * Writes the submission to Supabase over PostgREST and returns the new row id, or
+ * null when storage is not configured or the write fails. The caller still sends
+ * the email, so a database outage never costs a lead. Service-role key, server only.
+ */
+async function storeLead(data: DemoRequest, status: LeadStatus, flagReason: string | null): Promise<string | null> {
+  const store = leadStore()
+  if (!store) return null
+  const flagged = status === 'flagged'
+  try {
+    const res = await fetch(`${store.base}?select=id`, {
+      method: 'POST',
+      headers: { ...store.headers, Prefer: 'return=representation' },
+      body: JSON.stringify({
+        name: data.name,
+        email: data.email,
+        email_norm: data.email.toLowerCase(),
+        company: data.company || null,
+        topic: data.topic || null,
+        message: flagged ? data.message.slice(0, FLAGGED_MESSAGE_CHARS) : data.message,
+        status,
+        flag_reason: flagReason,
+        attribution: flagged ? {} : data.attribution,
+      }),
+      signal: AbortSignal.timeout(STORE_TIMEOUT_MS),
+    })
+    if (!res.ok) {
+      console.error(`demo-request: lead store returned ${res.status}`)
+      return null
+    }
+    const rows = (await res.json().catch(() => null)) as { id?: unknown }[] | null
+    const id = rows?.[0]?.id
+    return typeof id === 'string' ? id : null
+  } catch (err) {
+    console.error('demo-request: lead store failed', err instanceof Error ? err.name : 'unknown error')
+    return null
+  }
+}
+
+/** Counts rows matching a PostgREST filter. Null means the count could not be read. */
+async function countLeads(store: LeadStore, filter: string): Promise<number | null> {
+  try {
+    const res = await fetch(`${store.base}?select=id&limit=1&${filter}`, {
+      method: 'GET',
+      headers: { ...store.headers, Prefer: 'count=exact' },
+      signal: AbortSignal.timeout(STORE_TIMEOUT_MS),
+    })
+    if (!res.ok) return null
+    const total = Number(res.headers.get('content-range')?.split('/')[1])
+    return Number.isFinite(total) ? total : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The confirmation goes to an address a stranger typed, from our own domain, so it
+ * is limited by the lead table itself: one per address per day, and a ceiling per
+ * hour overall. With no table to count against, or a count that cannot be read,
+ * the answer is no: an unbounded sender is worse than a missing courtesy note.
+ */
+async function mayConfirm(email: string, now: number): Promise<boolean> {
+  const store = leadStore()
+  if (!store) return false
+  const addressSince = encodeURIComponent(new Date(now - CONFIRM_PER_ADDRESS_WINDOW_MS).toISOString())
+  const globalSince = encodeURIComponent(new Date(now - CONFIRM_GLOBAL_WINDOW_MS).toISOString())
+  const [sameAddress, recentConfirmations] = await Promise.all([
+    countLeads(store, `email_norm=eq.${encodeURIComponent(email.toLowerCase())}&status=eq.new&created_at=gte.${addressSince}`),
+    countLeads(store, `confirmation_sent_at=gte.${globalSince}`),
+  ])
+  if (sameAddress === null || recentConfirmations === null) return false
+  // The row for this very request is already stored, so one match is this request.
+  return sameAddress <= 1 && recentConfirmations < CONFIRM_GLOBAL_MAX
+}
+
+async function markConfirmed(id: string, now: number): Promise<void> {
+  const store = leadStore()
+  if (!store) return
+  try {
+    const res = await fetch(`${store.base}?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { ...store.headers, Prefer: 'return=minimal' },
+      body: JSON.stringify({ confirmation_sent_at: new Date(now).toISOString() }),
+      signal: AbortSignal.timeout(STORE_TIMEOUT_MS),
+    })
+    if (!res.ok) console.error(`demo-request: could not mark confirmation (${res.status})`)
+  } catch (err) {
+    console.error('demo-request: could not mark confirmation', err instanceof Error ? err.name : 'unknown error')
+  }
+}
+
+function bookingUrl(): string | null {
+  const raw = process.env.VITE_BOOKING_URL
+  if (!raw) return null
+  try {
+    const parsed = new URL(raw)
+    return parsed.protocol === 'https:' ? parsed.toString() : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The note the visitor gets. Fixed wording only: nothing they typed is echoed
+ * back, so the form cannot be used to mail someone else arbitrary text.
+ */
+function renderConfirmation(): { subject: string; text: string; html: string } {
+  const booking = bookingUrl()
+  const lines = [
+    'Your request reached Syntra AI.',
+    `Eris reads every request and replies from ${NOTIFY_EMAIL}.`,
+    booking ? `If you would rather talk it through, book a call: ${booking}` : '',
+    'If you did not send a request from syntraai.tech, ignore this message.',
+  ].filter(Boolean)
+  const html = `
+    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 560px; color: #111; line-height: 1.6;">
+      <p style="margin: 0 0 4px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #FF6A1A; font-weight: 600;">Syntra AI</p>
+      <h2 style="margin: 0 0 16px; font-size: 22px;">Your request is in.</h2>
+      <p style="margin: 0 0 12px;">Eris reads every request and replies from ${escapeHtml(NOTIFY_EMAIL)}.</p>
+      ${booking ? `<p style="margin: 0 0 12px;">If you would rather talk it through, <a href="${escapeHtml(booking)}" style="color: #111; font-weight: 600;">book a call</a>.</p>` : ''}
+      <p style="margin: 24px 0 0; color: #999; font-size: 12px;">If you did not send a request from syntraai.tech, ignore this message.</p>
+    </div>
+  `
+  return { subject: 'Your request reached Syntra AI', text: lines.join('\n\n'), html }
 }
 
 function renderEmail(data: DemoRequest, receivedAt: string): { subject: string; text: string; html: string } {
@@ -135,10 +325,13 @@ function renderEmail(data: DemoRequest, receivedAt: string): { subject: string; 
     ['Email', data.email],
     ...(data.company ? ([['Company', data.company]] as [string, string][]) : []),
     ['Request', data.topic || 'General'],
+    ...(data.attribution.utm_source ? ([['Source', [data.attribution.utm_source, data.attribution.utm_medium, data.attribution.utm_campaign].filter(Boolean).join(' / ')]] as [string, string][]) : []),
+    ...(data.attribution.referrer ? ([['Referrer', data.attribution.referrer]] as [string, string][]) : []),
   ]
 
   const text = [
-    ...rows.map(([label, value]) => `${label}: ${value}`),
+    // One line per row: a value carrying a newline could otherwise forge a row.
+    ...rows.map(([label, value]) => `${label}: ${headerSafe(value, 600)}`),
     '',
     data.message,
     '',
@@ -211,31 +404,40 @@ export async function POST(request: Request): Promise<Response> {
     const data = parsed.data
     const now = Date.now()
 
-    // Dropped bots get the same success a person does: an error teaches a
-    // prober the endpoint is defended and worth probing differently. No PII in
-    // these logs, only the reason.
-    const reason = spamReason(data, now)
-    if (reason) {
-      console.warn(`demo-request dropped: ${reason}`)
-      return reply({ ok: true })
-    }
+    // Flagged submissions get the same success a person does: an error teaches a
+    // prober the endpoint is defended and worth probing differently. They are not
+    // emailed, but they are stored as 'flagged' so a real person caught by a gate
+    // can still be found. No PII in these logs, only the reason.
+    // The burst check runs on every request, flagged or not, and anything over
+    // the cap is dropped without a write, so a flood cannot fill the table.
     if (isBurst(clientIp(request), now)) {
       console.warn('demo-request dropped: burst from one address')
       return reply({ ok: true })
     }
+    const reason = spamReason(data, now)
+    if (reason) {
+      console.warn(`demo-request flagged: ${reason}`)
+      await storeLead(data, 'flagged', reason)
+      return reply({ ok: true })
+    }
+
+    const leadId = await storeLead(data, 'new', null)
+    const stored = leadId !== null
 
     const apiKey = process.env.RESEND_API_KEY
     const from = process.env.EMAIL_FROM
     if (!apiKey || !from) {
       console.error('demo-request: RESEND_API_KEY and EMAIL_FROM must both be set')
-      return reply({ ok: false, error: 'not_configured' }, 503)
+      // The lead is on record even though nobody was notified.
+      return stored ? reply({ ok: true }) : reply({ ok: false, error: 'not_configured' }, 503)
     }
 
     const { subject, text, html } = renderEmail(data, new Date(now).toISOString())
 
     // send() RESOLVES with { data, error }: a bad key or an unverified domain
     // never throws, so the error has to be read or the lead vanishes silently.
-    const { error } = await new Resend(apiKey).emails.send({
+    const resend = new Resend(apiKey)
+    const { error } = await resend.emails.send({
       from,
       to: NOTIFY_EMAIL,
       replyTo: data.email,
@@ -245,10 +447,24 @@ export async function POST(request: Request): Promise<Response> {
     })
     if (error) {
       console.error(`demo-request: Resend rejected the send (${error.name}): ${error.message}`)
-      return reply({ ok: false, error: 'send_failed' }, 502)
+      return stored ? reply({ ok: true }) : reply({ ok: false, error: 'send_failed' }, 502)
     }
 
-    return reply({ ok: true })
+    // Best effort: the request is already delivered, so a failure here is logged, not surfaced.
+    if (!leadId || !(await mayConfirm(data.email, now))) return reply({ ok: true, confirmed: false })
+    const { error: confirmError } = await resend.emails.send({
+      from,
+      to: data.email,
+      replyTo: NOTIFY_EMAIL,
+      ...renderConfirmation(),
+    })
+    if (confirmError) {
+      // The provider's message can quote the recipient address; log the error name only.
+      console.error(`demo-request: confirmation not sent (${confirmError.name})`)
+      return reply({ ok: true, confirmed: false })
+    }
+    await markConfirmed(leadId, now)
+    return reply({ ok: true, confirmed: true })
   } catch (err) {
     console.error('demo-request: unexpected failure', err instanceof Error ? err.message : err)
     return reply({ ok: false, error: 'send_failed' }, 500)

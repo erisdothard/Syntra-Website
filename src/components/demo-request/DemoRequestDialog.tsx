@@ -1,8 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import type { DemoRequestTopic } from './context'
+import { track } from '../../lib/analytics'
+import { getAttribution } from '../../lib/attribution'
 
 const INBOX = 'agent@syntraai.tech'
+/** Optional. When set, the confirmation screen and the confirmation email offer a call. */
+const BOOKING_URL: string | undefined = import.meta.env.VITE_BOOKING_URL || undefined
 /** Must match api/demo-request.ts. Named to look like a real field so form-filling bots take it. */
 const HONEYPOT_FIELD = 'company_website'
 
@@ -10,7 +14,7 @@ type Field = 'name' | 'email' | 'company' | 'message'
 type Values = Record<Field, string>
 type Errors = Partial<Record<Field, string>>
 type Status = 'idle' | 'sending' | 'sent' | 'failed'
-type ApiResult = { ok: true } | { ok: false; error: string; field?: string }
+type ApiResult = { ok: true; confirmed?: boolean } | { ok: false; error: string; field?: string }
 
 /** Mirrors the server schema so most mistakes are caught before a round trip. */
 const MAX_LENGTH: Record<Field, number> = { name: 120, email: 254, company: 160, message: 4000 }
@@ -46,15 +50,19 @@ export function DemoRequestDialog({ topic, onClose }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const honeypotRef = useRef<HTMLInputElement>(null)
   const renderedAt = useRef(0)
+  /** The topic the dialog opened with; it is remounted for each open, so this never goes stale. */
+  const openedTopic = useRef(topic.topic)
   const [values, setValues] = useState<Values>({ name: '', email: '', company: '', message: '' })
   const [errors, setErrors] = useState<Errors>({})
   const [status, setStatus] = useState<Status>('idle')
+  const [confirmed, setConfirmed] = useState(false)
 
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
     renderedAt.current = Date.now()
     dialog.showModal()
+    track('request_form_opened', { topic: openedTopic.current })
     // showModal() moves focus to the first focusable element, the close button,
     // overriding React's autoFocus. Put the cursor where the typing starts.
     dialog.querySelector<HTMLInputElement>('input[name="name"]')?.focus()
@@ -116,13 +124,16 @@ export function DemoRequestDialog({ topic, onClose }: Props) {
           message: values.message.trim(),
           topic: topic.topic,
           renderedAt: renderedAt.current,
+          attribution: getAttribution(),
           [HONEYPOT_FIELD]: honeypotRef.current?.value ?? '',
         }),
       })
       const result = (await res.json().catch(() => null)) as ApiResult | null
 
       if (res.ok && result?.ok) {
+        setConfirmed(result.confirmed === true)
         setStatus('sent')
+        track('request_sent', { topic: topic.topic })
         return
       }
       if (res.status === 400 && result && !result.ok && isField(result.field)) {
@@ -132,8 +143,10 @@ export function DemoRequestDialog({ topic, onClose }: Props) {
         return
       }
       setStatus('failed')
+      track('request_failed', { topic: topic.topic, status: res.status })
     } catch {
       setStatus('failed')
+      track('request_failed', { topic: topic.topic, status: 0 })
     }
   }
 
@@ -163,7 +176,7 @@ export function DemoRequestDialog({ topic, onClose }: Props) {
 
         {status === 'sent' ? (
           <div className="demo-sent" role="status">
-            <p className="mono-label text-accent mb-5">Signal received</p>
+            <p className="mono-label text-accent mb-5">Request received</p>
             <h2 id={`${id}-title`} className="display text-text" style={{ fontSize: 'clamp(2rem, 6vw, 3rem)' }}>
               {firstName ? `Got it, ${firstName}` : 'Got it'}
               <span className="text-accent">.</span>
@@ -172,9 +185,26 @@ export function DemoRequestDialog({ topic, onClose }: Props) {
               Your request is in the Syntra inbox. The reply comes from {INBOX} to{' '}
               <span className="text-text">{values.email.trim()}</span>.
             </p>
-            <button type="button" className="btn-ghost mt-10" onClick={close}>
-              Back to the site <span aria-hidden>→</span>
-            </button>
+            {confirmed && (
+              <p className="mt-3 text-text-secondary leading-relaxed">A confirmation is on its way to the same address.</p>
+            )}
+            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
+              {BOOKING_URL && (
+                <a
+                  className="btn-primary"
+                  href={BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => track('booking_link_clicked', { topic: topic.topic })}
+                >
+                  <span>Book a call</span>
+                  <span aria-hidden>→</span>
+                </a>
+              )}
+              <button type="button" className="btn-ghost" onClick={close}>
+                Back to the site <span aria-hidden>→</span>
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={submit} noValidate>
