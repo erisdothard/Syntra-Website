@@ -280,28 +280,26 @@ export const services: Service[] = [
 export const testimonials: Testimonial[] = [
   {
     quote:
-      'This was all new to me, and Eris showed me the inner workings as he built it. He took us off Wix and gave us a site, a configurator and a CRM we run the whole business from. I change my own inventory and pricing, and every lead reaches me already researched and scored. We own all of it.',
+      "I'm not a tech guy. Eris walked me through how it all works and got us off Wix. I change my own inventory and prices now, and when a lead comes in I already know who I'm calling. Couldn't go back.",
     name: 'Lou Werner',
     role: 'Principal, Hyper Racer USA',
     slug: 'hyper-racer',
   },
   {
-    quote:
-      'Eris took my portfolio off Wix and turned it into a TV you switch on. The concept and the visual language are exactly right for my work.',
+    quote: "My old site was on Wix. Now it's a TV. You hit power, it warms up, you pick a tape. Feels like me.",
     name: 'Cole Anderson',
     role: 'Visual designer, CVZ-TV',
     slug: 'cvz-tv',
   },
   {
     quote:
-      'Eris built our public site, online booking and a private portal where our consultants meet clients by video. Every client has their own space, and we see each of them in one view.',
+      'We needed more than a website. Eris gave us booking and a portal where we actually sit down with clients on video, and every client gets their own login. He listens, which helps.',
     name: 'Lee Johnson Jr',
     role: 'Co-founder, Safety Net Career Consulting',
     slug: 'safety-net',
   },
   {
-    quote:
-      'Eris built a home for everything I do: my story, the skate club, the reel and my brand work, with one place to book me.',
+    quote: "Everything's in one spot now. The club, my edits, the brand stuff, how to book me. Eris got what I was going for.",
     name: 'Tony Woodland',
     role: 'Tony Skate Club',
     slug: 'tony-skate-club',
