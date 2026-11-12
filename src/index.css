@@ -487,3 +487,8 @@ textarea.demo-input { min-height: 132px; resize: vertical; }
 }
 a:hover > .site-shot { border-color: rgba(255, 106, 26, 0.45); }
 .site-shot { transition: border-color 0.3s ease; }
+
+/* ─── Client quotes ─── */
+.quote { margin: 0; padding-left: clamp(1.1rem, 2vw, 1.75rem); border-left: 1px solid var(--color-accent); }
+.quote blockquote { margin: 0; font-size: clamp(1.15rem, 1.9vw, 1.65rem); line-height: 1.32; letter-spacing: -0.01em; font-weight: 500; position: relative; }
+.quote-mark { position: absolute; left: -0.62em; top: -0.08em; color: var(--color-accent); font-size: 1.5em; line-height: 1; }

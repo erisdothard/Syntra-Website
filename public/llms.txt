@@ -17,7 +17,12 @@ For businesses that have outgrown off-the-shelf tools.
 - [Services](https://www.syntraai.tech/services): sites and portals, CRMs and admin panels, agents inside the CRM
 - [Shipped work](https://www.syntraai.tech/work): systems in production
 - [Hyper Racer USA](https://www.syntraai.tech/work/hyper-racer): Wix to Next.js rebuild with pricing configurator, 19-section CRM and an agent pipeline on every lead
-- [3 Aces Trucking](https://www.syntraai.tech/work/3-aces-trucking): carrier site with customer portal, voice AI and document automation
+- [3 Aces Trucking](https://www.syntraai.tech/work/3-aces-trucking): carrier site with office, driver and broker web apps, load tracking and document uploads
+- [Launch Control](https://www.syntraai.tech/work/launch-control): site, CRM with synced inbox, lead finder and supervised outreach agents
+- [Safety Net Career Consulting](https://www.syntraai.tech/work/safety-net): site, online booking, video session rooms and a client portal
+- [CVZ-TV](https://www.syntraai.tech/work/cvz-tv): interactive portfolio built as a 1990s TV and VCR
+- [Tony Skate Club](https://www.syntraai.tech/work/tony-skate-club): personal site for a Nashville skater and his club
+- [UBM Group](https://www.syntraai.tech/work/ubm-group): marketing site for a healthcare integration consultancy
 - [DispatchRelay](https://www.syntraai.tech/work/dispatchrelay): Syntra's own freight dispatch platform for carriers, brokers, shippers and drivers
 
 ## Contact

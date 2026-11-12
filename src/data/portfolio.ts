@@ -41,6 +41,14 @@ export interface Offer {
   desc: string
 }
 
+/** A client's words about a build. `slug` ties it to the case-study page it appears on. */
+export interface Testimonial {
+  quote: string
+  name: string
+  role: string
+  slug: string
+}
+
 export interface SkillGroup {
   category: string
   items: string[]
@@ -71,13 +79,13 @@ export const projects: Project[] = [
   },
   {
     title: '3 Aces Trucking Inc.',
-    tag: 'Commercial Carrier Platform',
-    stack: 'React · TypeScript · Supabase · ElevenLabs · Python',
+    tag: 'Commercial Carrier Site and Web Apps',
+    stack: 'React 19 · Vite · Express · Supabase · Resend · Vercel',
     featured: true,
     description:
-      'Full application and web development for a commercial trucking carrier. Voice AI integration, autonomous load and document automation, and client-facing site built end-to-end.',
-    live: 'https://3acestruckinginc.com',
-    proof: 'Carrier site with a customer portal, voice AI, and automated load and document handling.',
+      'Application and web development for a commercial trucking carrier: the public site, plus office, driver and broker web apps. Loads are tracked with their documents attached (bill of lading, rate confirmation, proof of delivery), with analytics and Google Calendar sync.',
+    live: 'https://www.3acestruckinginc.com',
+    proof: 'Carrier site with office, driver and broker web apps, load tracking and document uploads.',
   },
   {
     title: 'BridgeLink Core',
@@ -97,6 +105,51 @@ export const projects: Project[] = [
     description:
       'Agentic property data extraction system that scrapes county appraiser sites via Playwright, extracts structured records through Claude tool use with per-field confidence scoring, and routes results through auto-approve, human-review, or reject lanes. Three service surfaces — FastAPI gateway, MCP server for AI agents, and Streamlit monitoring dashboard.',
     github: 'https://github.com/erisdothard/property-data-extraction-pipeline',
+  },
+  {
+    title: 'Launch Control',
+    tag: 'Site, CRM and Agent Crew',
+    stack: 'Next.js 16 · Tailwind v4 · Supabase · Python worker on Railway · Claude · Microsoft Graph · Vercel',
+    featured: true,
+    description:
+      'The site, the CRM and the agents for a business development firm. A CRM with leads, deals, customers, a synced Outlook and Gmail inbox, drafts, campaigns, calendar and tasks; a lead finder that scores prospects with Claude; and agents that draft outreach for a person to approve, with send caps and a halt switch.',
+    live: 'https://www.golaunchcontrol.com',
+  },
+  {
+    title: 'Safety Net Career Consulting',
+    tag: 'Site, Booking and Client Portal',
+    stack: 'Next.js 16 · React 19 · Tailwind v4 · Supabase · FastAPI · LiveKit · Vercel',
+    featured: true,
+    description:
+      'The public site and the portal for a career consulting practice. Clients book online, meet their consultant in a video session room, and keep a career profile in their own portal; consultants get a view of each client. Each client sees only their own records, enforced in the database and covered by an isolation test suite.',
+    live: 'https://www.safetynetconsulting.org',
+  },
+  {
+    title: 'CVZ-TV',
+    tag: 'Interactive Portfolio',
+    stack: 'Vite · TypeScript · Vercel',
+    featured: true,
+    description:
+      'A portfolio for Nashville visual designer Cole Anderson, built as a 1990s TV and VCR. Press power and the set warms up; four VHS tapes are the navigation; each tape plays its own body of work, with a volume and static sound system. 47 pieces moved over from his Wix site.',
+    live: 'https://cole-a.vercel.app',
+  },
+  {
+    title: 'Tony Skate Club',
+    tag: 'Personal Brand Site',
+    stack: 'Next.js 16 · Tailwind v4 · Vercel',
+    featured: false,
+    description:
+      'A site for Nashville skater and model Tony Woodland and the group skates he runs: his story, the club, a video reel, his brand work and a way to book him.',
+    live: 'https://tony-woodland-skates.vercel.app',
+  },
+  {
+    title: 'UBM Group',
+    tag: 'Consultancy Marketing Site',
+    stack: 'Vite · React 19 · TypeScript · Tailwind v4 · Vercel',
+    featured: false,
+    description:
+      'The marketing site for a healthcare integration consultancy: services, process, about and case-study sections, with the identity work behind it.',
+    live: 'https://www.ubmgroupllc.com',
   },
 ]
 
@@ -120,7 +173,7 @@ export const experience: Experience[] = [
           'Hyper Racer USA — full ecosystem rebuild for the US distributor of the X1 ground-effects race car, Wix to Next.js 16 and live in production: public site, pricing configurator, Mapbox dealer network, and a 19-section admin CRM the client edits their own live pages from; inbound leads run an Anthropic-SDK agent pipeline (enrich, score, prioritise) graded by an eval harness with per-request cost logging',
           'DispatchRelay — our own multi-role freight dispatch platform (dispatchrelay.co), built across 20+ phases with autonomous load management, live GPS tracking, billing automation, carrier verification, and a public demo of every role',
           'BridgeLink Core — HL7 v2.5 / FHIR R4 integration engine across four channels: ORU lab routing with NPI provider enrichment and critical-result branching, ADT admit/discharge/update with UPSERT for duplicate-admit resilience, and FHIR R4 Patient/Observation Bundles with LOINC-coded results',
-          '3 Aces Trucking Inc. — full application and web development for a commercial trucking carrier; voice AI integration, autonomous load and document automation, and client-facing site',
+          '3 Aces Trucking Inc. — application and web development for a commercial trucking carrier: the public site plus office, driver and broker web apps, with load tracking and document uploads',
         ],
       },
     ],
@@ -201,6 +254,24 @@ export const services: Service[] = [
   {
     title: 'Agents inside the CRM',
     desc: 'AI agents that work inside your own system: researching and scoring each lead, drafting the follow-up, reading documents, answering routine customer questions. Every action is logged with its cost, a person reviews wherever it matters, and the whole thing runs on accounts you hold.',
+  },
+]
+
+/* ── Testimonials ── */
+
+export const testimonials: Testimonial[] = [
+  {
+    quote:
+      'Syntra took us off Wix and built the site, the configurator and the CRM we run the business from. We update our own inventory and pricing now, and every lead that comes in has already been researched and scored when we open it.',
+    name: 'Lou Werner',
+    role: 'Principal, Hyper Racer USA',
+    slug: 'hyper-racer',
+  },
+  {
+    quote: 'I think the overall concept and visual language of the site is working.',
+    name: 'Cole Anderson',
+    role: 'Visual designer, CVZ-TV',
+    slug: 'cvz-tv',
   },
 ]
 

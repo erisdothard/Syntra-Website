@@ -1,4 +1,5 @@
-import { projects } from '../../data/portfolio'
+import { projects, testimonials } from '../../data/portfolio'
+import { TestimonialQuote } from '../../components/Testimonials'
 import { caseStudies, start, workPage } from '../content'
 import type { CaseStudy as CaseStudyContent } from '../content'
 import { Band, ClosingBand, PageHero, PointList } from '../SiteLayout'
@@ -66,6 +67,7 @@ export function Work() {
 export function CaseStudy({ study }: { study: CaseStudyContent }) {
   const project = projects.find((p) => p.title === study.project)
   const others = caseStudies.filter((c) => c.slug !== study.slug)
+  const quote = testimonials.find((t) => t.slug === study.slug)
   return (
     <>
       <PageHero eyebrow={study.kind} headline={study.headline} lead={study.job}>
@@ -88,6 +90,14 @@ export function CaseStudy({ study }: { study: CaseStudyContent }) {
           )}
         </figure>
       </section>
+
+      {quote && (
+        <section className="px-6 md:px-12 lg:px-16 pb-16 md:pb-24">
+          <div className="max-w-[1400px] mx-auto">
+            <div className="max-w-4xl"><TestimonialQuote t={quote} /></div>
+          </div>
+        </section>
+      )}
 
       <Band n="01" title="What was built">
         <PointList points={study.built} />

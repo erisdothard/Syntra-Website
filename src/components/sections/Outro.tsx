@@ -1,6 +1,7 @@
 import { MagneticButton } from '../ui/MagneticButton'
 import { services, projects, buyerLine } from '../../data/portfolio'
 import { OfferGrid } from '../OfferGrid'
+import { TestimonialBand } from '../Testimonials'
 import { track } from '../../lib/analytics'
 import { DEMO_TOPICS, useDemoRequest } from '../demo-request/context'
 
@@ -75,6 +76,17 @@ export function Outro({ onTabOpen }: Props) {
                 </li>
               ))}
             </ul>
+          </div>
+        </div>
+
+        {/* Client words, directly under the builds they are about. */}
+        <div className="px-6 md:px-12 lg:px-16 pb-20 md:pb-24">
+          <div className="max-w-[1400px] mx-auto">
+            <p className="mono-label text-accent mb-9">From clients</p>
+            <TestimonialBand />
+            <a className="btn-ghost offer-link mt-12" href="/work">
+              See all shipped work <span aria-hidden>→</span>
+            </a>
           </div>
         </div>
 

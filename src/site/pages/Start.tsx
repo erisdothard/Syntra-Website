@@ -1,5 +1,6 @@
 import { projects, services, buyerLine } from '../../data/portfolio'
 import { OfferGrid } from '../../components/OfferGrid'
+import { TestimonialBand } from '../../components/Testimonials'
 import { start, caseStudies } from '../content'
 import { Band, ClosingBand, PageHero, PointList } from '../SiteLayout'
 import { useBlueprint } from '../useBlueprint'
@@ -57,6 +58,10 @@ export function Start() {
             )
           })}
         </ul>
+      </Band>
+
+      <Band n="04" title="From clients">
+        <TestimonialBand />
       </Band>
 
       <section id="pricing" className="px-6 md:px-12 lg:px-16 border-t border-border scroll-mt-24">

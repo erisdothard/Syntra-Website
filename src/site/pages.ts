@@ -42,7 +42,7 @@ export const pages: PageMeta[] = [
   {
     path: '/work',
     key: 'work',
-    title: 'Shipped work: Hyper Racer USA, 3 Aces Trucking, DispatchRelay | Syntra AI',
+    title: 'Shipped work: eight systems and sites in production | Syntra AI',
     description:
       'Systems Syntra AI has built and put into production: a distributor site with configurator, CRM and lead agents; a carrier site with a customer portal; a multi-role freight dispatch platform.',
   },
@@ -58,9 +58,9 @@ export const pages: PageMeta[] = [
     path: '/work/3-aces-trucking',
     key: 'case',
     slug: '3-aces-trucking',
-    title: '3 Aces Trucking: carrier site, customer portal and voice AI | Syntra AI',
+    title: '3 Aces Trucking: carrier site with office, driver and broker web apps | Syntra AI',
     description:
-      'Application and web development for a commercial trucking carrier: client-facing site with a customer portal, voice AI, and automated load and document handling.',
+      'Application and web development for a commercial trucking carrier: the public site plus office, driver and broker web apps, with load tracking and document uploads.',
   },
   {
     path: '/work/dispatchrelay',
@@ -69,6 +69,46 @@ export const pages: PageMeta[] = [
     title: 'DispatchRelay: a freight dispatch platform for four roles | Syntra AI',
     description:
       'DispatchRelay is Syntra AI\'s own freight dispatch platform for carriers, brokers, shippers and drivers, with load management, live GPS tracking, billing and a public demo of every role.',
+  },
+  {
+    path: '/work/launch-control',
+    key: 'case',
+    slug: 'launch-control',
+    title: 'Launch Control: a site, a CRM and an agent crew | Syntra AI',
+    description:
+      'How Syntra AI built the site, the CRM with a synced inbox, the lead finder and the supervised outreach agents for Launch Control, a business development firm.',
+  },
+  {
+    path: '/work/safety-net',
+    key: 'case',
+    slug: 'safety-net',
+    title: 'Safety Net Career Consulting: site, booking and client portal | Syntra AI',
+    description:
+      'The public site and client portal Syntra AI built for a career consulting practice: online booking, video session rooms, a career profile and a consultant view of every client.',
+  },
+  {
+    path: '/work/cvz-tv',
+    key: 'case',
+    slug: 'cvz-tv',
+    title: 'CVZ-TV: a portfolio you operate like a 1990s TV and VCR | Syntra AI',
+    description:
+      'The interactive portfolio Syntra AI built for Nashville visual designer Cole Anderson: a television set you switch on, with VHS tapes as the navigation.',
+  },
+  {
+    path: '/work/tony-skate-club',
+    key: 'case',
+    slug: 'tony-skate-club',
+    title: 'Tony Skate Club: a site for a Nashville skater and his club | Syntra AI',
+    description:
+      'The personal site Syntra AI built for Nashville skater and model Tony Woodland: his story, his skate club, a video reel and his brand work.',
+  },
+  {
+    path: '/work/ubm-group',
+    key: 'case',
+    slug: 'ubm-group',
+    title: 'UBM Group: marketing site for a healthcare integration consultancy | Syntra AI',
+    description:
+      'The marketing site and identity work Syntra AI built for UBM Group, a healthcare integration consultancy.',
   },
 ]
 
