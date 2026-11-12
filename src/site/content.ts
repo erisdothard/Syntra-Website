@@ -32,6 +32,17 @@ export const start = {
   closing: 'Tell us how you sell today. You get a written scope and a fixed price before you commit to anything larger.',
 }
 
+export const founder = {
+  title: 'Who builds it',
+  lead: 'Syntra is Eris Dothard, in Nashville. He scopes the work, builds it and hands it over, so the person you write to is the person writing the code.',
+  points: [
+    { title: 'Regulated banking', text: 'Production integrations for 50+ bank clients at CPI Card Group, shipped under formal change control.' },
+    { title: 'Enterprise AI', text: 'AI agents and data pipelines inside enterprise finance workflows at Caterpillar Financial.' },
+    { title: 'Trained on the tools', text: 'Anthropic courses completed in the Claude API, Claude Code and the Model Context Protocol.' },
+    { title: 'Reach him by email', text: 'agent@syntraai.tech. Every request is read and answered by Eris.' },
+  ] satisfies Point[],
+}
+
 export const blueprint = {
   eyebrow: 'The first step',
   headline: 'The Build Blueprint.',

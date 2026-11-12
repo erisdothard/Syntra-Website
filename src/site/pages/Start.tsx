@@ -1,7 +1,7 @@
 import { projects, services, buyerLine } from '../../data/portfolio'
 import { OfferGrid } from '../../components/OfferGrid'
 import { TestimonialBand } from '../../components/Testimonials'
-import { start, caseStudies } from '../content'
+import { start, caseStudies, founder } from '../content'
 import { Band, ClosingBand, PageHero, PointList } from '../SiteLayout'
 import { useBlueprint } from '../useBlueprint'
 
@@ -62,6 +62,11 @@ export function Start() {
 
       <Band n="04" title="From clients">
         <TestimonialBand />
+      </Band>
+
+      <Band n="05" title={founder.title}>
+        <p className="max-w-2xl text-base md:text-lg text-text leading-relaxed mb-10">{founder.lead}</p>
+        <PointList points={founder.points} />
       </Band>
 
       <section id="pricing" className="px-6 md:px-12 lg:px-16 border-t border-border scroll-mt-24">
