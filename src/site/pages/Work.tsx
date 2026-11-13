@@ -1,3 +1,4 @@
+import { shotSrc } from '../../lib/shots'
 import { projects, testimonials } from '../../data/portfolio'
 import { TestimonialQuote } from '../../components/Testimonials'
 import { caseStudies, start, workPage } from '../content'
@@ -9,7 +10,7 @@ function Shot({ slug, name, eager = false }: { slug: string; name: string; eager
   return (
     <img
       className="site-shot"
-      src={`/img/work-${slug}-v1.jpg`}
+      src={shotSrc(slug)}
       alt={`The ${name} site as it runs in production`}
       width={1440}
       height={900}

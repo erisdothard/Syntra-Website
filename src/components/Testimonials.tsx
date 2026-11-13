@@ -1,3 +1,4 @@
+import { shotSrc } from '../lib/shots'
 import { testimonials } from '../data/portfolio'
 import type { Testimonial } from '../data/portfolio'
 
@@ -48,7 +49,7 @@ function Shot({ slug, featured = false }: { slug: string; featured?: boolean }) 
       tabIndex={-1}
       aria-hidden
     >
-      <img src={`/img/work-${slug}-v1.jpg`} alt="" width={1440} height={900} loading="lazy" decoding="async" />
+      <img src={shotSrc(slug)} alt="" width={1440} height={900} loading="lazy" decoding="async" />
     </a>
   )
 }
