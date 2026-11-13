@@ -20,6 +20,13 @@ export const DEMO_TOPICS = {
     lead: `A written scope and a fixed price for your build. The $1,500 comes off the build if you go ahead. ${REPLY_LINE}`,
     placeholder: 'What you sell, how inquiries and quotes are handled today, and the tools involved.',
   },
+  quote: {
+    eyebrow: 'Public agencies',
+    title: 'Request a quote',
+    topic: 'Quote request (public agency)',
+    lead: `Describe the need and you get a written scope and a fixed price by email. ${REPLY_LINE}`,
+    placeholder: 'The office, what it needs built or replaced, and any purchasing limits or deadlines that apply.',
+  },
   launch: {
     eyebrow: 'New build',
     title: 'Start a build',

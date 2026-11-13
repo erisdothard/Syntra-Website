@@ -1,13 +1,21 @@
-import { offers } from '../data/portfolio'
+import { offers, type Offer } from '../data/portfolio'
 
 /**
  * The three things a buyer can say yes to, with prices. Used on the home page and
  * on the addressed pages; copy and numbers come from `offers`, never from here.
  */
-export function OfferGrid({ onBlueprint }: { onBlueprint: () => void }) {
+export function OfferGrid({
+  onBlueprint,
+  items = offers,
+  cta = 'Get a Blueprint',
+}: {
+  onBlueprint: () => void
+  items?: Offer[]
+  cta?: string
+}) {
   return (
     <ol className="grid lg:grid-cols-[1.25fr_1fr_1fr] gap-x-12 gap-y-10">
-      {offers.map((o, i) => (
+      {items.map((o, i) => (
         <li key={o.name} className={`pt-6 border-t ${i === 0 ? 'border-accent' : 'border-border'}`}>
           <p className="mono-label mb-4">
             0{i + 1} · {o.name}
@@ -22,7 +30,7 @@ export function OfferGrid({ onBlueprint }: { onBlueprint: () => void }) {
           <p className="mt-5 text-sm md:text-[15px] text-text-secondary leading-relaxed max-w-md">{o.desc}</p>
           {i === 0 && (
             <button type="button" className="btn-ghost offer-link mt-6" onClick={onBlueprint}>
-              Get a Blueprint <span aria-hidden>→</span>
+              {cta} <span aria-hidden>→</span>
             </button>
           )}
         </li>

@@ -6,7 +6,7 @@
 
 export const SITE_ORIGIN = 'https://www.syntraai.tech'
 
-export type PageKey = 'start' | 'blueprint' | 'services' | 'work' | 'case'
+export type PageKey = 'start' | 'blueprint' | 'services' | 'work' | 'case' | 'government'
 
 export interface PageMeta {
   path: string
@@ -24,6 +24,13 @@ export const pages: PageMeta[] = [
     title: 'Site, CRM and AI agents built as one system | Syntra AI',
     description:
       'For businesses that have outgrown off-the-shelf tools. Syntra AI builds the site, the CRM behind it and the agents inside it. Builds from $10,000, starting with a $1,500 Blueprint.',
+  },
+  {
+    path: '/government',
+    key: 'government',
+    title: 'Software for public agencies: websites, portals and internal systems | Syntra AI',
+    description:
+      'Syntra AI builds websites, portals, internal tools and supervised AI assistance for public offices in Tennessee and beyond. Written fixed-price quotes, published prices, and full ownership by the agency.',
   },
   {
     path: '/blueprint',

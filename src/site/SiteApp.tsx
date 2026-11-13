@@ -3,6 +3,7 @@ import { findCaseStudy } from './content'
 import type { PageMeta } from './pages'
 import { SiteLayout } from './SiteLayout'
 import { Blueprint } from './pages/Blueprint'
+import { Government } from './pages/Government'
 import { Services } from './pages/Services'
 import { Start } from './pages/Start'
 import { CaseStudy, Work } from './pages/Work'
@@ -13,6 +14,8 @@ function PageBody({ page }: { page: PageMeta }) {
       return <Start />
     case 'blueprint':
       return <Blueprint />
+    case 'government':
+      return <Government />
     case 'services':
       return <Services />
     case 'work':

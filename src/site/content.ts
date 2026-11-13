@@ -1,3 +1,4 @@
+import type { Offer } from '../data/portfolio'
 /**
  * Copy for the addressed pages. Prices and service descriptions are NOT here:
  * they come from src/data/portfolio.ts so a number is never typed twice.
@@ -41,6 +42,81 @@ export const founder = {
     { title: 'Trained on the tools', text: 'Anthropic courses completed in the Claude API, Claude Code and the Model Context Protocol.' },
     { title: 'Reach him by email', text: 'erisdothard@syntraai.tech. Every request is read and answered by Eris.' },
   ] satisfies Point[],
+}
+
+export const government = {
+  eyebrow: 'For public agencies',
+  headline: 'Websites, applications and internal systems for public offices. Fixed price, in writing, and owned by the agency.',
+  lead: 'Syntra AI is a Nashville software consultancy. One senior developer scopes the work, builds it and hands it over, with the code, the database and the accounts in the agency\'s name.',
+  buildTitle: 'What we build for an office',
+  build: [
+    { title: 'Public websites', text: 'Department and program sites that staff update themselves, checked against WCAG 2.1 A and AA rules before handover.' },
+    { title: 'Portals and online services', text: 'Forms, applications, logins and status tracking for residents, vendors or staff.' },
+    { title: 'Internal tools and case tracking', text: 'Admin panels and CRMs that replace spreadsheets and shared inboxes, with a log of every change.' },
+    { title: 'AI assistance with a person in charge', text: 'Agents that research, sort and draft. Every action is logged with its cost, and a staff member approves what matters.' },
+    { title: 'Integrations', text: 'Connections to the systems already in place: payments, email, calendars and data exchange standards.' },
+    { title: 'Mobile apps', text: 'Phone apps for iOS and Android from one codebase, with a web version.' },
+  ] satisfies Point[],
+  buyTitle: 'How an office buys',
+  buy: [
+    { title: 'A written, fixed-price quote', text: 'Send the need. You get a written scope and one fixed price for it, ready for the file.' },
+    { title: 'Published prices', text: 'A scoping Blueprint is $1,500 and is credited to the build. Builds start at $10,000. The figures are on this page.' },
+    { title: 'Everything in writing', text: 'Scope, changes, handover and support are documented, so there is a record of every decision.' },
+    { title: 'The agency owns it', text: 'Source code, database and accounts are the agency\'s from the start. Any developer can take it over.' },
+  ] satisfies Point[],
+  experienceTitle: 'Experience behind the work',
+  experience: [
+    { title: 'Regulated banking', text: 'Production integrations for 50+ bank clients at CPI Card Group, shipped under formal change control.' },
+    { title: 'Ten systems in production', text: 'Sites, platforms, CRMs and apps for private clients. Each one is listed below with its write-up.' },
+  ] satisfies Point[],
+  workTitle: 'Past work, live and linked',
+  enterpriseTitle: 'Enterprise finance systems',
+  enterprise: [
+    { title: 'Inventory application', text: 'A web application that captures equipment inventory and exchanges data with Salesforce and a Snowflake data warehouse.' },
+    { title: 'AI agents for finance operations', text: 'Agents that take over processes staff ran by hand, lien processing among them.' },
+    { title: 'Collateral and residual calculators', text: 'Web applications that run the calculations behind collateral and residual factors.' },
+    { title: 'Predictive valuations', text: 'Valuation models with Power BI charts, so the numbers behind a decision are in front of the person making it.' },
+    { title: 'Risk management', text: 'Applications that find inventory the business has lost track of.' },
+    { title: 'Applications on enterprise data', text: 'Enterprise data turned into web applications that show a business unit its own numbers in detail.' },
+  ] satisfies Point[],
+  enterpriseNote: 'Eris Dothard built these as an AI engineer on staff at Caterpillar Financial. They are internal systems and cannot be shown, linked or demonstrated. Caterpillar is not a Syntra client. They are listed to show the kind of system an office can ask for.',
+  offers: [
+    {
+      name: 'Scoping Blueprint',
+      price: '$1,500',
+      note: 'Credited to the build',
+      desc: 'We document how the office works today, what the system has to do, who uses it and what it connects to. The office receives a written scope and a fixed price. The $1,500 comes off that price if the build goes ahead.',
+    },
+    {
+      name: 'The build',
+      price: 'From $10,000',
+      note: 'Full system $20,000 to $30,000',
+      desc: 'A website, a portal, an internal tool, or all of them as one system. Fixed price, set in the written scope. The code, the database and the accounts belong to the agency.',
+    },
+    {
+      name: 'Care plan',
+      price: 'From $500/mo',
+      note: 'Optional, after handover',
+      desc: 'Changes, new features and monitoring from the developer who built it. With or without it, the system stays the agency\'s.',
+    },
+  ] satisfies Offer[],
+  safeguardsTitle: 'Accessibility, access and records',
+  safeguards: [
+    { title: 'Accessibility checks', text: 'Pages are tested with axe-core against WCAG 2.1 A and AA rules. Automated checks cover part of the standard; a manual review is scoped where a project requires it.' },
+    { title: 'Access enforced in the database', text: 'Each user sees only their own records, enforced at the database and covered by an isolation test suite. Built this way for a client portal already in production.' },
+    { title: 'A record of every change', text: 'Activity logs on admin actions, so an office can answer who changed what.' },
+    { title: 'AI under supervision', text: 'Agents run in observation before they act, are graded against a fixed set of cases, and can be halted at once.' },
+  ] satisfies Point[],
+  classificationTitle: 'For the file',
+  classification: [
+    { title: 'Business', text: 'Syntra AI, Nashville, Tennessee. Sole proprietor: Eris Dothard.' },
+    { title: 'Metro Nashville supplier', text: 'Registered in Metro iSupplier. Supplier number 900002717.' },
+    { title: 'NAICS', text: '541511 Custom Computer Programming Services · 541512 Computer Systems Design Services.' },
+    { title: 'UNSPSC', text: '81112103 Website design · 81111504 Application programming · 81111500 Software engineering · 80101507 IT consultation.' },
+    { title: 'Contact', text: 'Eris Dothard · (615) 450-0233 · erisdothard@syntraai.tech' },
+  ] satisfies Point[],
+  phone: { display: '(615) 450-0233', href: 'tel:+16154500233' },
+  closing: 'Send the need in a few lines. You get a written scope and a fixed price.',
 }
 
 export const blueprint = {
