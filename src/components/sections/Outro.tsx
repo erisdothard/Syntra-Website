@@ -170,7 +170,7 @@ export function Outro({ onTabOpen }: Props) {
               <button className="btn-ghost" onClick={() => onTabOpen('about')}>About</button>
               <a className="btn-ghost" href="/work">Case studies</a>
               <a className="btn-ghost" href="/blueprint">Blueprint</a>
-              <a className="btn-ghost" href="mailto:agent@syntraai.tech">agent@syntraai.tech</a>
+              <a className="btn-ghost" href="mailto:erisdothard@syntraai.tech">erisdothard@syntraai.tech</a>
             </div>
             <div className="flex gap-6">
               <a className="hud hover:text-text transition-colors" href="/privacy.html">Privacy</a>

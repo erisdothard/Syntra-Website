@@ -533,11 +533,11 @@ function AboutView() {
           Start a build <span style={{ fontSize: 16 }}>&rarr;</span>
         </button>
         <a
-          href="mailto:agent@syntraai.tech"
+          href="mailto:erisdothard@syntraai.tech"
           className="btn-ghost"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
         >
-          agent@syntraai.tech <span style={{ fontSize: 16 }}>&rarr;</span>
+          erisdothard@syntraai.tech <span style={{ fontSize: 16 }}>&rarr;</span>
         </a>
       </div>
     </>

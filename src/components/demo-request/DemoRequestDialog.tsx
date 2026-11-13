@@ -4,7 +4,7 @@ import type { DemoRequestTopic } from './context'
 import { track } from '../../lib/analytics'
 import { getAttribution } from '../../lib/attribution'
 
-const INBOX = 'agent@syntraai.tech'
+const INBOX = 'erisdothard@syntraai.tech'
 /** Optional. When set, the confirmation screen and the confirmation email offer a call. */
 const BOOKING_URL: string | undefined = import.meta.env.VITE_BOOKING_URL || undefined
 /** Must match api/demo-request.ts. Named to look like a real field so form-filling bots take it. */

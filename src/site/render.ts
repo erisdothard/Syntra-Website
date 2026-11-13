@@ -22,7 +22,7 @@ const ORGANIZATION = {
   '@id': `${SITE_ORIGIN}/#organization`,
   name: 'Syntra AI',
   url: `${SITE_ORIGIN}/`,
-  email: 'agent@syntraai.tech',
+  email: 'erisdothard@syntraai.tech',
   description:
     'Syntra AI builds the site customers see, the CRM the team works in and the AI agents inside it, as one system the client owns.',
   address: { '@type': 'PostalAddress', addressLocality: 'Nashville', addressRegion: 'TN', addressCountry: 'US' },

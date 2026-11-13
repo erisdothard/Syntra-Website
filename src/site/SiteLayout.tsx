@@ -75,7 +75,7 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
                 {n.label}
               </a>
             ))}
-            <a className="btn-ghost py-3" href="mailto:agent@syntraai.tech">agent@syntraai.tech</a>
+            <a className="btn-ghost py-3" href="mailto:erisdothard@syntraai.tech">erisdothard@syntraai.tech</a>
           </div>
           <div className="flex gap-6">
             <a className="hud hover:text-text transition-colors" href="/privacy.html">Privacy</a>
@@ -189,8 +189,8 @@ export function ClosingBand({ text, place }: { text: string; place: string }) {
             <span>Get a Blueprint</span>
             <span aria-hidden>→</span>
           </button>
-          <a className="btn-ghost" href="mailto:agent@syntraai.tech">
-            or email agent@syntraai.tech
+          <a className="btn-ghost" href="mailto:erisdothard@syntraai.tech">
+            or email erisdothard@syntraai.tech
           </a>
         </div>
       </div>

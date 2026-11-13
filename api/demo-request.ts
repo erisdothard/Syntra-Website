@@ -20,7 +20,7 @@ import { z } from 'zod'
  *                      sandbox fallback: onboarding@resend.dev only delivers to
  *                      the Resend account owner, which is how Hyper Racer lost
  *                      a real lead on 2026-08-26 without anyone noticing.
- *   DEMO_NOTIFY_EMAIL  optional, defaults to agent@syntraai.tech
+ *   DEMO_NOTIFY_EMAIL  optional, defaults to erisdothard@syntraai.tech
  *   DATABASE_URL       optional Postgres connection string (Railway, Supabase or
  *                      any other host). When set every submission is
  *                      written to public.site_leads BEFORE any email is sent,
@@ -32,7 +32,7 @@ import { z } from 'zod'
  *                      sent to the visitor (the client reads the same variable).
  */
 
-const NOTIFY_EMAIL = process.env.DEMO_NOTIFY_EMAIL ?? 'agent@syntraai.tech'
+const NOTIFY_EMAIL = process.env.DEMO_NOTIFY_EMAIL ?? 'erisdothard@syntraai.tech'
 
 /** Bot gates, mirroring the Hyper Racer contact route that has held up against real traffic. */
 const HONEYPOT_FIELD = 'company_website'

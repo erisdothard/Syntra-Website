@@ -39,7 +39,7 @@ export const founder = {
     { title: 'Regulated banking', text: 'Production integrations for 50+ bank clients at CPI Card Group, shipped under formal change control.' },
     { title: 'Enterprise AI', text: 'AI agents and data pipelines inside enterprise finance workflows at Caterpillar Financial.' },
     { title: 'Trained on the tools', text: 'Anthropic courses completed in the Claude API, Claude Code and the Model Context Protocol.' },
-    { title: 'Reach him by email', text: 'agent@syntraai.tech. Every request is read and answered by Eris.' },
+    { title: 'Reach him by email', text: 'erisdothard@syntraai.tech. Every request is read and answered by Eris.' },
   ] satisfies Point[],
 }
 

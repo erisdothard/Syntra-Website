@@ -10,7 +10,7 @@ export interface DemoRequestTopic {
   placeholder: string
 }
 
-const REPLY_LINE = 'Eris reads every request and replies from agent@syntraai.tech.'
+const REPLY_LINE = 'Eris reads every request and replies from erisdothard@syntraai.tech.'
 
 export const DEMO_TOPICS = {
   blueprint: {
