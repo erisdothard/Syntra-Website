@@ -44,6 +44,8 @@ export interface Offer {
 /** A client's words about a build. `slug` ties it to the case-study page it appears on. */
 export interface Testimonial {
   quote: string
+  /** A sentence lifted word for word from `quote`, shown large. Never paraphrased. */
+  highlight: string
   name: string
   role: string
   slug: string
@@ -284,12 +286,14 @@ export const testimonials: Testimonial[] = [
     name: 'Lou Werner',
     role: 'Principal, Hyper Racer USA',
     slug: 'hyper-racer',
+    highlight: "it's all in one place and I can change any of it myself.",
   },
   {
     quote: "My old site was on Wix. Now it's a TV. You hit power, it warms up, you pick a tape. Feels like me.",
     name: 'Cole Anderson',
     role: 'Visual designer, CVZ-TV',
     slug: 'cvz-tv',
+    highlight: "Now it's a TV.",
   },
   {
     quote:
@@ -297,12 +301,14 @@ export const testimonials: Testimonial[] = [
     name: 'Lee Johnson Jr',
     role: 'Co-founder, Safety Net Career Consulting',
     slug: 'safety-net',
+    highlight: "every client gets their own login.",
   },
   {
     quote: "Everything's in one spot now. The club, my edits, the brand stuff, how to book me. Eris got what I was going for.",
     name: 'Tony Woodland',
     role: 'Tony Skate Club',
     slug: 'tony-skate-club',
+    highlight: "Eris got what I was going for.",
   },
 ]
 
