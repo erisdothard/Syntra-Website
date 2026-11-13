@@ -7,7 +7,7 @@ For businesses that have outgrown off-the-shelf tools.
 ## Offers
 
 - Build Blueprint, $1,500, credited to the build: a written scope and a fixed price for the build.
-- The build, from $10,000. A full system (site, CRM and agents) is $20,000 to $30,000. Fixed price, set by the Blueprint.
+- The build, from $10,000. A full system (site, CRM and agents) starts at $30,000. Fixed price, set by the Blueprint.
 - Care plan, from $500 a month, optional after handover: changes, new features, monitoring and agent tuning.
 
 ## Pages

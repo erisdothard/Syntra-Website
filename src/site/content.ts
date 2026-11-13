@@ -90,7 +90,7 @@ export const government = {
     {
       name: 'The build',
       price: 'From $10,000',
-      note: 'Full system $20,000 to $30,000',
+      note: 'Full system from $30,000',
       desc: 'A website, a portal, an internal tool, or all of them as one system. Fixed price, set in the written scope. The code, the database and the accounts belong to the agency.',
     },
     {

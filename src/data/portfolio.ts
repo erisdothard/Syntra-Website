@@ -320,7 +320,7 @@ export const offers: Offer[] = [
   {
     name: 'The build',
     price: 'From $10,000',
-    note: 'Full system $20,000 to $30,000',
+    note: 'Full system from $30,000',
     desc: 'A site, a CRM, or the full system: the site customers see, the CRM the team works in and the agents inside it. Fixed price, set by the Blueprint. The code, the database and the accounts are yours.',
   },
   {
