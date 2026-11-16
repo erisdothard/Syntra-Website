@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { getVercelOidcToken } from '@vercel/oidc'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { z } from 'zod'
 
@@ -129,11 +130,25 @@ function scrub(text: string): { text: string; removed: string[] } {
 }
 
 let client: Anthropic | null = null
-function anthropic(): Anthropic | null {
-  if (!process.env.ANTHROPIC_API_KEY) return null
-  client ??= new Anthropic({ timeout: 15_000, maxRetries: 1 })
-  return client
+let viaGateway = false
+// Direct Anthropic API when ANTHROPIC_API_KEY is set; otherwise Vercel AI Gateway,
+// authenticated with the deployment's own OIDC token (no key to manage).
+async function anthropic(): Promise<Anthropic | null> {
+  if (client) return client
+  if (process.env.ANTHROPIC_API_KEY) {
+    client = new Anthropic({ timeout: 15_000, maxRetries: 1 })
+    return client
+  }
+  try {
+    const token = process.env.AI_GATEWAY_API_KEY || (await getVercelOidcToken())
+    if (!token) return null
+    viaGateway = true
+    return new Anthropic({ apiKey: null, authToken: token, baseURL: 'https://ai-gateway.vercel.sh', timeout: 15_000, maxRetries: 1 })
+  } catch {
+    return null
+  }
 }
+const modelId = () => (viaGateway ? 'anthropic/claude-haiku-5.5' : MODEL)
 
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -155,12 +170,12 @@ export async function POST(request: Request): Promise<Response> {
     const { text, removed } = scrub(parsed.data.text)
     if (!text.replace(/\[[a-z ]+ removed\]/g, '').trim()) return reply({ ok: false, reason: 'empty' })
 
-    const sdk = anthropic()
+    const sdk = await anthropic()
     if (!sdk) return reply({ ok: false, reason: 'no_key' })
     if (isBurst(request, Date.now())) return reply({ ok: false, reason: 'busy' }, 429)
 
     const message = await sdk.messages.parse({
-      model: MODEL,
+      model: modelId(),
       max_tokens: MAX_TOKENS,
       system: SYSTEM,
       output_config: { effort: 'low', format: zodOutputFormat(ProfileSchema) },

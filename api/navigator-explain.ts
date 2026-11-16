@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { getVercelOidcToken } from '@vercel/oidc'
 import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod'
 import { z } from 'zod'
 
@@ -132,11 +133,25 @@ function grounded(line: string, facts: string): boolean {
 }
 
 let client: Anthropic | null = null
-function anthropic(): Anthropic | null {
-  if (!process.env.ANTHROPIC_API_KEY) return null
-  client ??= new Anthropic({ timeout: 30_000, maxRetries: 1 })
-  return client
+let viaGateway = false
+// Direct Anthropic API when ANTHROPIC_API_KEY is set; otherwise Vercel AI Gateway,
+// authenticated with the deployment's own OIDC token (no key to manage).
+async function anthropic(): Promise<Anthropic | null> {
+  if (client) return client
+  if (process.env.ANTHROPIC_API_KEY) {
+    client = new Anthropic({ timeout: 30_000, maxRetries: 1 })
+    return client
+  }
+  try {
+    const token = process.env.AI_GATEWAY_API_KEY || (await getVercelOidcToken())
+    if (!token) return null
+    viaGateway = true
+    return new Anthropic({ apiKey: null, authToken: token, baseURL: 'https://ai-gateway.vercel.sh', timeout: 30_000, maxRetries: 1 })
+  } catch {
+    return null
+  }
 }
+const modelId = () => (viaGateway ? 'anthropic/claude-sonnet-5.5' : MODEL)
 
 export async function POST(request: Request): Promise<Response> {
   try {
@@ -155,7 +170,7 @@ export async function POST(request: Request): Promise<Response> {
     if (!parsed.success) return reply({ ok: false, reason: 'bad_request' }, 400)
     const { lang, context, records } = parsed.data
 
-    const sdk = anthropic()
+    const sdk = await anthropic()
     if (!sdk) return reply({ ok: false, reason: 'no_key' })
     if (isBurst(request, Date.now())) return reply({ ok: false, reason: 'busy' }, 429)
 
@@ -166,10 +181,9 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const message = await sdk.beta.messages.parse({
-      model: MODEL,
+      model: modelId(),
       max_tokens: MAX_TOKENS,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
+      ...(viaGateway ? {} : { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' as const }),
       system: SYSTEM,
       output_config: { effort: 'low', format: betaZodOutputFormat(OutputSchema) },
       messages: [{ role: 'user', content: JSON.stringify(payload) }],
