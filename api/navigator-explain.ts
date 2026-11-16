@@ -231,6 +231,7 @@ export async function POST(request: Request): Promise<Response> {
   } catch (err) {
     if (err instanceof Anthropic.APIError) console.error(`navigator-explain: API error ${err.status ?? 'network'}`)
     else console.error('navigator-explain: unexpected failure', err instanceof Error ? err.name : 'unknown')
-    return reply({ ok: false, reason: 'error' })
+    const detail = err instanceof Anthropic.APIError ? `${err.status ?? 'network'} ${String(err.message).slice(0, 300)}` : err instanceof Error ? `${err.name}: ${err.message.slice(0, 300)}` : 'unknown'
+    return reply({ ok: false, reason: 'error', ...(request.headers.get('x-navigator-debug') === '1' ? { detail, gateway: viaGateway } : {}) })
   }
 }
