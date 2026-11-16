@@ -1,4 +1,4 @@
-import { BARRIER_NOUN, EDUCATION_LABELS, LANG_NAMES, money } from './i18n'
+import { EDUCATION_LABELS, LANG_NAMES, money } from './i18n'
 import { EDUCATION_RANK, LAST_JOBS, LIVING_WAGE, OCCUPATIONS, PROGRAMS, SKILLS, ZIP_REGIONS } from './data'
 import type {
   Barrier,
@@ -257,8 +257,15 @@ function list(items: string[], lang: Lang): string {
   return `${items.slice(0, -1).join(', ')}${and}${items[items.length - 1]}`
 }
 
+const NEED_PHRASE: Record<Barrier, Record<Lang, string>> = {
+  childcare: { en: 'childcare', es: 'el cuidado de niños' },
+  transportation: { en: 'transportation', es: 'el transporte' },
+  housing: { en: 'rent or housing', es: 'la renta o la vivienda' },
+  utilities: { en: 'utility bills', es: 'las facturas de luz, agua o gas' },
+}
+
 export function supportWhy(p: Partner, region: Region | null, lang: Lang): string {
-  const need = BARRIER_NOUN[p.service][lang]
+  const need = NEED_PHRASE[p.service][lang]
   const where =
     p.regions === 'county'
       ? lang === 'es' ? 'atiende a todo el condado' : 'serves all of Mecklenburg County'
@@ -267,8 +274,8 @@ export function supportWhy(p: Partner, region: Region | null, lang: Lang): strin
         : lang === 'es' ? 'atiende parte del condado' : 'serves part of the county'
   const langs = list(p.languages.map((l) => LANG_NAMES[l][lang]), lang)
   return lang === 'es'
-    ? `Usted mencionó ${need}. Esta organización ${where} y ofrece servicio en ${langs.toLowerCase()}.`
-    : `You said ${need} is in the way. This partner ${where} and helps people in ${langs}.`
+    ? `Pidió ayuda con ${need}. Esta organización ${where} y ofrece servicio en ${langs.toLowerCase()}.`
+    : `You asked for help with ${need}. This partner ${where} and helps people in ${langs}.`
 }
 
 export function supportNext(p: Partner, lang: Lang): string {
@@ -304,8 +311,8 @@ export function careerNext(c: Omit<CareerItem, 'why' | 'next'>, lang: Lang): str
       : 'You already have what it asks for. A career coach can help with your resume and applications.'
   }
   return lang === 'es'
-    ? `Desarrolle ${list(build, lang)}. La capacitación de abajo le ayuda.`
-    : `Build ${list(build, lang)}. The training below helps.`
+    ? `Desarrolle estas habilidades: ${list(build, lang)}. La capacitación de abajo le ayuda.`
+    : `Build these skills: ${list(build, lang)}. The training below helps.`
 }
 
 export function trainingWhy(t: Omit<TrainingItem, 'why' | 'next'>, careers: Omit<CareerItem, 'why' | 'next'>[], lang: Lang): string {
