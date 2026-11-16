@@ -55,6 +55,27 @@ try {
     await writeFile(file, html)
   }
 
+  // The Workforce Navigator demo: a standalone, unlisted page. The browser renders it
+  // (src/navigator), so only the head is written here; it is kept out of the sitemap
+  // and marked noindex (vercel.json also sends X-Robots-Tag on /demo/*).
+  const demoHead = [
+    '<title>Workforce Navigator demo (sample data) | Syntra AI</title>',
+    '<meta name="description" content="A working demonstration of an AI-enabled workforce and ecosystem navigator, with sample data." />',
+    '<meta name="robots" content="noindex, nofollow" />',
+  ].join('\n    ')
+  const demoHtml = template
+    .replace(HEAD_BLOCK, () => demoHead)
+    .replace('<html lang="en" style="background:#07080C">', '<html lang="en" style="background:#f5f6f2">')
+    .replace('<meta name="theme-color" content="#07080C" />', '<meta name="theme-color" content="#0d5957" />')
+    .replace(
+      ROOT_MARKER,
+      () =>
+        '<div id="root"><noscript><p style="font:17px system-ui;padding:24px;color:#1b2430">The Workforce Navigator demo needs JavaScript. For help now, call 211.</p></noscript></div>',
+    )
+  const demoFile = join(dist, 'demo', 'navigator', 'index.html')
+  await mkdir(dirname(demoFile), { recursive: true })
+  await writeFile(demoFile, demoHtml)
+
   const urls = [`${SITE_ORIGIN}/`, ...rendered.map((page) => page.url)]
   const sitemap = [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -64,7 +85,7 @@ try {
     '',
   ].join('\n')
   await writeFile(join(dist, 'sitemap.xml'), sitemap)
-  process.stdout.write(`prerender: wrote ${rendered.length} pages and sitemap.xml\n`)
+  process.stdout.write(`prerender: wrote ${rendered.length} pages, the navigator demo shell and sitemap.xml\n`)
 } finally {
   await vite.close()
 }

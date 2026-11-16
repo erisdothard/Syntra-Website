@@ -10,7 +10,11 @@ initAnalytics()
 const root = document.getElementById('root')!
 const page = findPage(window.location.pathname)
 
-if (page) {
+if (/^\/demo\/navigator\/?$/.test(window.location.pathname)) {
+  // Standalone demo: its own light public-service UI, none of the site or launch code.
+  const { default: NavigatorApp } = await import('./navigator/NavigatorApp')
+  createRoot(root).render(<NavigatorApp />)
+} else if (page) {
   // An addressed page: plain HTML written at build, with none of the launch code.
   const { SiteApp } = await import('./site/SiteApp')
   // Built pages arrive with their markup in place; under `vite dev` the root is empty.
