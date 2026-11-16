@@ -1,48 +1,8 @@
-import { LAST_JOBS } from './data'
-import { BARRIER_LABELS, EDUCATION_LABELS, GOAL_LABELS, HOUSEHOLD_LABELS } from './i18n'
-import type { QuestionKey } from './Intake'
+import { fieldLabel, profileValue, useScreenHeading, type ParseInfo, type QuestionKey } from './view'
 import type { Removed } from './text'
-import type { AiCall, Lang, Profile } from './types'
-import { Icon, useScreenHeading, type S } from './ui'
+import type { Lang, Profile } from './types'
+import { Icon, type S } from './ui'
 
-export interface ParseInfo {
-  call: AiCall
-  removed: Removed[]
-  /** Fields that were filled from the person's own words. */
-  fromText: QuestionKey[]
-}
-
-export function profileValue(q: QuestionKey, p: Profile, lang: Lang, t: S): string {
-  switch (q) {
-    case 'goal':
-      return p.goal ? GOAL_LABELS[p.goal][lang] : t.notAnswered
-    case 'barriers':
-      if (!p.barriersAnswered && p.barriers.length === 0) return t.notAnswered
-      return p.barriers.length ? p.barriers.map((b) => BARRIER_LABELS[b][lang]).join(', ') : t.noBarriers
-    case 'education':
-      return p.education ? EDUCATION_LABELS[p.education][lang] : t.notAnswered
-    case 'lastJob': {
-      if (!p.lastJob) return t.notAnswered
-      const label = LAST_JOBS.find((j) => j.id === p.lastJob)?.label[lang] ?? p.lastJob
-      return p.lastJobText ? `${label} (“${p.lastJobText}”)` : label
-    }
-    case 'zip':
-      return p.zip ?? (p.zipSkipped ? t.skipped : t.notAnswered)
-    case 'household':
-      return p.household ? HOUSEHOLD_LABELS[p.household][lang] : t.notAnswered
-  }
-}
-
-export function fieldLabel(q: QuestionKey, t: S): string {
-  return {
-    goal: t.fieldGoal,
-    barriers: t.fieldBarriers,
-    education: t.fieldEducation,
-    lastJob: t.fieldLastJob,
-    zip: t.fieldZip,
-    household: t.fieldHousehold,
-  }[q]
-}
 
 export function Heard({
   t,

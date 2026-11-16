@@ -4,10 +4,8 @@ import { isMecklenburgZip } from './engine'
 import { BARRIER_LABELS, EDUCATION_LABELS, GOAL_LABELS, HOUSEHOLD_LABELS } from './i18n'
 import { keywordParse } from './text'
 import type { Barrier, Education, Goal, Household, Lang, Profile } from './types'
-import { Choice, Icon, useScreenHeading, type S } from './ui'
-
-export type QuestionKey = 'goal' | 'barriers' | 'education' | 'lastJob' | 'zip' | 'household'
-export const QUESTION_ORDER: QuestionKey[] = ['goal', 'barriers', 'education', 'lastJob', 'zip', 'household']
+import { Choice, Icon, type S } from './ui'
+import { useScreenHeading, type QuestionKey } from './view'
 
 export function Welcome({ t, onStart }: { t: S; onStart: () => void }) {
   const h = useScreenHeading<HTMLHeadingElement>('welcome')

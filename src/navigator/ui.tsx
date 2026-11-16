@@ -1,24 +1,8 @@
-import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
-import { STRINGS } from './i18n'
+import type { S } from './view'
 import type { Lang } from './types'
 
-export type S = (typeof STRINGS)[Lang]
-
-/** Moves focus to the screen's heading when the screen changes, so screen readers hear where they are. */
-export function useScreenHeading<T extends HTMLElement>(key: string) {
-  const ref = useRef<T>(null)
-  const first = useRef(true)
-  useEffect(() => {
-    if (first.current) {
-      first.current = false
-      return
-    }
-    ref.current?.focus()
-    window.scrollTo({ top: 0 })
-  }, [key])
-  return ref
-}
+export type { S }
 
 export function Icon({ name, size = 20 }: { name: 'chat' | 'phone' | 'check' | 'globe' | 'info' | 'arrow' | 'back' | 'alert' | 'person' | 'text'; size?: number }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true }
@@ -95,14 +79,14 @@ export function Shell({
               {t.langToggle}
             </button>
           </div>
-          <div className="flex items-center justify-between gap-3 pb-2.5 pt-1">
-            <p className="nv-ai-notice">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-2.5 pt-1">
+            <p className="nv-ai-notice min-w-0 flex-[1_1_11rem]">
               <span className="mt-0.5 flex-none">
                 <Icon name="info" size={16} />
               </span>
               <span>{t.aiNotice}</span>
             </p>
-            <button type="button" className="nv-btn nv-talk nv-btn-small flex-none" onClick={onTalk}>
+            <button type="button" className="nv-btn nv-talk nv-btn-small ml-auto flex-none" onClick={onTalk}>
               <Icon name="person" size={18} />
               {t.talkToPerson}
             </button>

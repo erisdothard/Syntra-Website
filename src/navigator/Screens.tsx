@@ -1,54 +1,8 @@
 import { useState } from 'react'
-import { CAREER_CENTER, LAST_JOBS } from './data'
-import { fieldLabel, profileValue } from './Heard'
-import { LANG_NAMES } from './i18n'
-import type { QuestionKey } from './Intake'
+import { CAREER_CENTER } from './data'
 import type { Lang, Plan, Profile, Referral } from './types'
-import { Icon, useScreenHeading, type S } from './ui'
-
-export interface Destination {
-  partnerId: string
-  partnerName: string
-  phone: string
-  hours: string
-}
-
-export function careerCenterDestination(lang: Lang): Destination {
-  return { partnerId: CAREER_CENTER.id, partnerName: CAREER_CENTER.name, phone: CAREER_CENTER.phone, hours: CAREER_CENTER.hours[lang] }
-}
-
-/** Exactly the rows a referral carries. The consent screen shows this list and the queue stores this list. */
-export function sharedRows(
-  profile: Profile,
-  plan: Plan | null,
-  lang: Lang,
-  t: S,
-  contact: string,
-): { label: string; value: string }[] {
-  const order: QuestionKey[] = ['goal', 'barriers', 'education', 'lastJob', 'zip', 'household']
-  const rows = order.map((q) => {
-    // The job category only: never the words the person typed.
-    const value =
-      q === 'lastJob' && profile.lastJob
-        ? LAST_JOBS.find((j) => j.id === profile.lastJob)?.label[lang] ?? profile.lastJob
-        : profileValue(q, profile, lang, t)
-    return { label: fieldLabel(q, t), value }
-  })
-  const items = plan ? [...plan.support, ...plan.career, ...plan.training] : []
-  rows.push({
-    label: t.consentPlanItems,
-    value: items.length
-      ? items
-          .map((i) =>
-            i.kind === 'support' ? `${i.partner.name} (${i.id})` : i.kind === 'career' ? `${i.occupation.title[lang]} (${i.id})` : `${i.program.title[lang]} (${i.id})`,
-          )
-          .join('; ')
-      : t.consentNone,
-  })
-  rows.push({ label: t.consentLanguage, value: LANG_NAMES[lang][lang] })
-  if (contact.trim()) rows.push({ label: t.consentContact, value: contact.trim() })
-  return rows
-}
+import { Icon, type S } from './ui'
+import { useScreenHeading, sharedRows, type Destination } from './view'
 
 export function Consent({
   t,

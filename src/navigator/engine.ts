@@ -193,7 +193,11 @@ export function careerStepsFor(
     .filter((x): x is NonNullable<typeof x> => x !== null)
     .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
     .slice(0, CAREER_LIMIT)
-    .map(({ score: _score, ...rest }) => rest)
+    .map((row) => {
+      const rest: Omit<typeof row, 'score'> & { score?: number } = { ...row }
+      delete rest.score
+      return rest
+    })
 }
 
 /**

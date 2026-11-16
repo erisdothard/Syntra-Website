@@ -3,11 +3,9 @@ import { MODELS } from './config'
 import { CostPanel } from './CostPanel'
 import { SKILLS } from './data'
 import { BARRIER_NOUN, formatDate, LANG_NAMES, money } from './i18n'
-import type { ExplainOutcome } from './api'
 import type { AiCall, CareerItem, Lang, Plan, SupportItem, TrainingItem } from './types'
-import { Icon, IdTag, SampleTag, useScreenHeading, type S } from './ui'
-
-export type ExplainState = { status: 'loading' } | { status: 'done'; outcome: ExplainOutcome }
+import { Icon, IdTag, SampleTag, type S } from './ui'
+import { planAsText, useScreenHeading, wording, type ExplainState } from './view'
 
 function WhyNext({ t, why, next, ai }: { t: S; why: string; next: string; ai: boolean }) {
   return (
@@ -25,14 +23,6 @@ function WhyNext({ t, why, next, ai }: { t: S; why: string; next: string; ai: bo
       </div>
     </div>
   )
-}
-
-function wording(item: { id: string; why: string; next: string }, explain: ExplainState | undefined) {
-  if (explain?.status === 'done') {
-    const w = explain.outcome.items[item.id]
-    if (w) return { why: w.why, next: w.next, ai: true }
-  }
-  return { why: item.why, next: item.next, ai: false }
 }
 
 function SupportCard({ t, lang, item, explain, onSend }: { t: S; lang: Lang; item: SupportItem; explain?: ExplainState; onSend: () => void }) {
@@ -172,31 +162,6 @@ function TrainingCard({ t, lang, item, explain }: { t: S; lang: Lang; item: Trai
       <WhyNext t={t} {...w} />
     </li>
   )
-}
-
-export function planAsText(plan: Plan, lang: Lang, t: S, explain?: ExplainState): string {
-  const lines: string[] = [`${t.title} — ${t.planH1}`, t.sampleBanner, '']
-  lines.push(`== ${t.steadyH2} ==`)
-  if (plan.support.length === 0) lines.push(t.steadyNone)
-  for (const s of plan.support) {
-    const w = wording(s, explain)
-    lines.push(`• ${s.partner.name} [${s.id}] — ${s.partner.phone}, ${s.partner.hours[lang]}`, `  ${w.next}`)
-  }
-  lines.push('', `== ${t.careerH2} ==`)
-  for (const c of plan.career) {
-    const w = wording(c, explain)
-    lines.push(
-      `• ${c.occupation.title[lang]} [${c.id}] — ${money(c.occupation.sampleMedianWage, lang)}${t.perHour}, ${c.overlapPct}%`,
-      `  ${w.next}`,
-    )
-  }
-  lines.push('', `== ${t.trainingH2} ==`)
-  for (const p of plan.training) {
-    const w = wording(p, explain)
-    lines.push(`• ${p.program.title[lang]} [${p.id}] — ${t.weeks(p.program.weeks)}`, `  ${w.next}`)
-  }
-  lines.push('', t.footer)
-  return lines.join('\n')
 }
 
 export function PlanView({
