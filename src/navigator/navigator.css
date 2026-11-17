@@ -495,6 +495,10 @@ body.nv-body ::-webkit-scrollbar-thumb { background: #b9c1b8; border-radius: 5px
   .nv-plan-summary { display: flex; flex-wrap: wrap; gap: 6px 0; font-size: 1.05rem; max-width: 70ch; }
   .nv-plan-summary > span { padding-right: 14px; margin-right: 14px; border-right: 1px solid var(--nv-line); }
   .nv-plan-summary > span:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+  @media (max-width: 599px) {
+    .nv-plan-summary { flex-direction: column; gap: 2px; }
+    .nv-plan-summary > span { border-right: 0; margin-right: 0; padding-right: 0; }
+  }
   .nv-plan-summary strong { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; margin-right: 4px; }
   .nv-status { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--nv-ink-2); }
   .nv-dot { width: 8px; height: 8px; border-radius: 999px; background: #9aa39a; flex: none; }
