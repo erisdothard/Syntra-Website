@@ -44,6 +44,9 @@ export function Welcome({ t, lang, onStart }: { t: S; lang: Lang; onStart: () =>
           <Icon name="arrow" />
         </button>
         <p className="nv-muted nv-small">{t.welcomeAnon}</p>
+        <a className="nv-small" href="/video/navigator-walkthrough-v1.mp4" target="_blank" rel="noopener">
+          {c.watchVideo}
+        </a>
       </div>
     </section>
   )

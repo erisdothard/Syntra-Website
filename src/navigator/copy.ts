@@ -44,6 +44,7 @@ export const COPY = {
     send: 'Send to a person',
     callLabel: 'Call',
     details: 'Why it fits and what to do next',
+    watchVideo: 'Watch the walkthrough (video, captioned)',
     // Chat intake
     chatHello: 'Hi. I can help you find work, training, and the help that makes them possible. What brings you here today? Tell me in your own words, or tap one.',
     chatPlaceholder: 'Or type it in your own words, in English or Spanish…',
@@ -127,6 +128,7 @@ export const COPY = {
     send: 'Enviar a una persona',
     callLabel: 'Llamar',
     details: 'Por qué encaja y qué hacer ahora',
+    watchVideo: 'Ver el recorrido (video, con subtítulos en inglés)',
     chatHello: 'Hola. Puedo ayudarle a encontrar trabajo, capacitación y la ayuda que los hace posibles. ¿Qué lo trae hoy? Dígamelo con sus propias palabras o toque una opción.',
     chatPlaceholder: 'O escríbalo con sus propias palabras, en español o inglés…',
     chatInputLabel: 'Su mensaje',
