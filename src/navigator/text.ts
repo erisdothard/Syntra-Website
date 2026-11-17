@@ -93,7 +93,7 @@ export function scrubPii(text: string): { text: string; removed: Removed[] } {
     return '[phone removed]'
   })
   out = out.replace(
-    /\b(my name is|my name's|i am called|call me|me llamo|mi nombre es|soy)\s+((?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ'-]+\s?){1,3})/g,
+    /\b([Mm]y name is|[Mm]y name's|I am called|[Cc]all me|[Mm]e llamo|[Mm]i nombre es|[Ss]oy)\s+((?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ'-]+\s?){1,3})/g,
     (_m, lead: string, name: string) => {
       // "soy" is common in Spanish ("soy madre"); only treat it as a name when a capitalized word follows.
       if (lead.toLowerCase() === 'soy' && !/^[A-ZÁÉÍÓÚÑ]/.test(name)) return _m

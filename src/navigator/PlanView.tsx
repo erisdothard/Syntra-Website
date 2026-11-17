@@ -17,13 +17,16 @@ function Wording({ t, why, next, ai, loading }: { t: S; why: string; next: strin
   return (
     <div className="nv-wording" data-loading={loading}>
       <p>
-        <span className="nv-wording-k">{t.why}</span>
+        <span className="sr-only">{t.why}: </span>
         {why}
         {ai && <span className="sr-only"> (AI)</span>}
       </p>
-      <p>
-        <span className="nv-wording-k">{t.next}</span>
-        {next}
+      <p className="nv-wording-next">
+        <Icon name="arrow" size={16} />
+        <span>
+          <span className="sr-only">{t.next}: </span>
+          {next}
+        </span>
       </p>
     </div>
   )

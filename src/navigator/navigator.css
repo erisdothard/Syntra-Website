@@ -517,7 +517,8 @@ body.nv-body ::-webkit-scrollbar-thumb { background: #b9c1b8; border-radius: 5px
 
   .nv-wording { display: grid; gap: 6px; font-size: 0.95rem; transition: opacity 200ms ease-out; }
   .nv-wording[data-loading='true'] { opacity: 0.6; }
-  .nv-wording-k { display: block; font-size: 0.78rem; font-weight: 650; color: var(--nv-label); }
+  .nv-wording-next { display: flex; gap: 8px; align-items: flex-start; font-weight: 600; color: var(--nv-ink); }
+  .nv-wording-next svg { flex: none; margin-top: 3px; color: var(--nv-primary); }
 
   .nv-support { display: grid; gap: 14px; }
   @media (min-width: 760px) { .nv-support { grid-template-columns: minmax(0, 1fr) 220px; gap: 28px; } }
@@ -630,5 +631,52 @@ body.nv-body ::-webkit-scrollbar-thumb { background: #b9c1b8; border-radius: 5px
   @media print {
     .nv-rail, .nv-plan-actions, .nv-plan-foot { display: none !important; }
     .nv-list { border: 0; }
+  }
+
+  /* ─── Chat intake ─── */
+  .nv-chat { display: grid; gap: 16px; }
+  .nv-thread-end { height: 1px; scroll-margin-bottom: 170px; }
+  .nv-thread { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .nv-msg { display: grid; gap: 4px; max-width: 92%; animation: nv-in 260ms cubic-bezier(0.22, 1, 0.36, 1); }
+  @media (min-width: 760px) { .nv-msg { max-width: 82%; } }
+  .nv-msg.is-me { justify-self: end; justify-items: end; }
+  .nv-msg-who { font-size: 0.75rem; font-weight: 650; color: var(--nv-ink-2); padding-inline: 4px; }
+  .nv-bubble { padding: 12px 16px; border-radius: 16px; font-size: 1.02rem; line-height: 1.5; }
+  .nv-msg.is-bot .nv-bubble { background: var(--nv-surface); border: 1px solid var(--nv-line); border-top-left-radius: 4px; }
+  .nv-msg.is-me .nv-bubble { background: var(--nv-primary); color: #fff; border-top-right-radius: 4px; }
+  .nv-bubble p + p, .nv-bubble p + dl, .nv-bubble dl + p { margin-top: 8px; }
+  .nv-got { display: grid; gap: 4px; padding: 10px 12px; border-radius: 10px; background: var(--nv-primary-soft); }
+  .nv-got > div { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 8px; font-size: 0.92rem; }
+  .nv-got dt { color: #2c4a48; }
+  .nv-got dd { margin: 0; font-weight: 650; }
+  .nv-got-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.8rem; color: var(--nv-ink-2); }
+  .nv-qrs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .nv-qr {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 8px 16px;
+    border-radius: 999px; border: 1.5px solid var(--nv-primary); background: var(--nv-surface); color: var(--nv-primary);
+    font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: background-color 150ms, color 150ms;
+  }
+  .nv-qr:hover { background: var(--nv-primary-soft); }
+  .nv-qr[aria-pressed='true'] { background: var(--nv-primary); color: #fff; }
+  .nv-typing { display: inline-flex; align-items: center; gap: 10px; color: var(--nv-ink-2); font-size: 0.92rem; }
+  .nv-typing-dots { display: inline-flex; gap: 4px; }
+  .nv-typing-dots i { width: 7px; height: 7px; border-radius: 999px; background: var(--nv-primary); animation: nv-pulse 1s ease-in-out infinite; }
+  .nv-typing-dots i:nth-child(2) { animation-delay: 160ms; }
+  .nv-typing-dots i:nth-child(3) { animation-delay: 320ms; }
+  @keyframes nv-in { from { opacity: 0; transform: translateY(6px); } }
+  .nv-composer {
+    position: sticky; bottom: 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 10px; align-items: end;
+    padding: 10px; background: var(--nv-surface); border: 1.5px solid var(--nv-line-strong); border-radius: 18px;
+  }
+  .nv-composer:focus-within { border-color: var(--nv-focus); }
+  .nv-composer-input {
+    width: 100%; min-height: 48px; max-height: 160px; resize: none; border: 0; outline: 0; background: transparent;
+    padding: 12px 8px; font-size: 1.05rem; color: var(--nv-ink); field-sizing: content;
+  }
+  .nv .nv-composer-input:focus-visible { outline: none; }
+  .nv-composer-send { min-height: 48px; width: 48px; padding: 0; border-radius: 12px; }
+  .nv-composer-note { grid-column: 1 / -1; font-size: 0.78rem; color: var(--nv-ink-2); padding-inline: 8px; }
+  @media (prefers-reduced-motion: reduce) {
+    .nv-msg, .nv-typing-dots i { animation: none; }
   }
 }
