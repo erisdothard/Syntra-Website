@@ -227,7 +227,7 @@ function ResourceRow({ p, t, lang, onSaved }: { p: Partner; t: S; lang: Lang; on
           </button>
           <button
             type="button"
-            className="nv-btn nv-btn-secondary nv-btn-xs"
+            className="nv-btn nv-btn-ghost nv-btn-xs"
             disabled={verifiedToday}
             onClick={() => {
               savePartner(p.id, { lastVerified: todayIso() })

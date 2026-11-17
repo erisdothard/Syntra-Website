@@ -244,7 +244,23 @@ export function PlanView({
           <h1 id="nv-h1" ref={h} tabIndex={-1}>
             {t.planH1}
           </h1>
-          <p className="nv-plan-summary">{c.planSummary(plan.support.length, meets, plan.career.length, money(plan.livingWage, lang))}</p>
+          <p className="nv-plan-summary">
+            <span>
+              <strong>{plan.support.length}</strong>
+              {c.sumSupport(plan.support.length)}
+            </span>
+            <span>
+              <strong>{meets}</strong>
+              {c.sumJobs(plan.career.length)}
+            </span>
+            <span>
+              <strong>
+                {money(plan.livingWage, lang)}
+                {c.perHr}
+              </strong>
+              {c.sumLiving}
+            </span>
+          </p>
           <p className="nv-status" aria-live="polite">
             {explain?.status === 'loading' ? (
               <>

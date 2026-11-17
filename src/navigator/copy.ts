@@ -29,8 +29,9 @@ export const COPY = {
     costPending: 'Not yet',
     costTotal: 'Total',
     railToggle: 'Your answers and AI cost',
-    planSummary: (nSupport: number, nMeets: number, nJobs: number, lw: string) =>
-      `${nSupport} ${nSupport === 1 ? 'support' : 'supports'} to get steady · ${nMeets} of ${nJobs} jobs meet the sample living wage of ${lw}/hr for your household`,
+    sumSupport: (n: number) => (n === 1 ? 'support to get steady' : 'supports to get steady'),
+    sumJobs: (n: number) => `of ${n} jobs meet the living wage`,
+    sumLiving: 'sample living wage for your household',
     jobsH2: 'Jobs that fit',
     jobsIntro: 'Sample median pay against the sample living wage for your household, and how many of the skills each job needs you already have.',
     livingLine: 'Living wage',
@@ -95,8 +96,9 @@ export const COPY = {
     costPending: 'Todavía no',
     costTotal: 'Total',
     railToggle: 'Sus respuestas y el costo de IA',
-    planSummary: (nSupport: number, nMeets: number, nJobs: number, lw: string) =>
-      `${nSupport} ${nSupport === 1 ? 'apoyo' : 'apoyos'} para estabilizarse · ${nMeets} de ${nJobs} trabajos alcanzan el salario digno de muestra de ${lw}/h para su hogar`,
+    sumSupport: (n: number) => (n === 1 ? 'apoyo para estabilizarse' : 'apoyos para estabilizarse'),
+    sumJobs: (n: number) => `de ${n} trabajos alcanzan el salario digno`,
+    sumLiving: 'salario digno de muestra para su hogar',
     jobsH2: 'Trabajos que encajan',
     jobsIntro: 'Sueldo medio de muestra frente al salario digno de muestra para su hogar, y cuántas de las habilidades que pide cada trabajo ya tiene.',
     livingLine: 'Salario digno',
