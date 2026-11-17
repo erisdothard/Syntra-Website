@@ -2,25 +2,49 @@ import { useState } from 'react'
 import { LAST_JOBS } from './data'
 import { isMecklenburgZip } from './engine'
 import { BARRIER_LABELS, EDUCATION_LABELS, GOAL_LABELS, HOUSEHOLD_LABELS } from './i18n'
+import { COPY } from './copy'
 import { keywordParse } from './text'
 import type { Barrier, Education, Goal, Household, Lang, Profile } from './types'
 import { Choice, Icon, type S } from './ui'
 import { useScreenHeading, type QuestionKey } from './view'
 
-export function Welcome({ t, onStart }: { t: S; onStart: () => void }) {
+export function Welcome({ t, lang, onStart }: { t: S; lang: Lang; onStart: () => void }) {
   const h = useScreenHeading<HTMLHeadingElement>('welcome')
+  const c = COPY[lang]
   return (
-    <section aria-labelledby="nv-h1" className="space-y-5">
-      <h1 id="nv-h1" ref={h} tabIndex={-1}>
+    <section aria-labelledby="nv-h1" className="nv-welcome">
+      <h1 id="nv-h1" ref={h} tabIndex={-1} className="nv-display">
         {t.welcomeH1}
       </h1>
-      <p className="text-lg">{t.subtitle}</p>
+      <p className="nv-lede">{t.subtitle}</p>
+      <ol className="nv-preview" aria-label={t.planH1}>
+        <li>
+          <span className="nv-step-n" aria-hidden>
+            1
+          </span>
+          <span>{t.steadyH2}</span>
+        </li>
+        <li>
+          <span className="nv-step-n" aria-hidden>
+            2
+          </span>
+          <span>{c.jobsH2}</span>
+        </li>
+        <li>
+          <span className="nv-step-n" aria-hidden>
+            3
+          </span>
+          <span>{c.trainingH2}</span>
+        </li>
+      </ol>
       <p>{t.welcomeBody}</p>
-      <p className="nv-muted">{t.welcomeAnon}</p>
-      <button type="button" className="nv-btn nv-btn-primary nv-btn-block" onClick={onStart}>
-        {t.start}
-        <Icon name="arrow" />
-      </button>
+      <div className="nv-welcome-cta">
+        <button type="button" className="nv-btn nv-btn-primary nv-btn-lg" onClick={onStart}>
+          {t.start}
+          <Icon name="arrow" />
+        </button>
+        <p className="nv-muted nv-small">{t.welcomeAnon}</p>
+      </div>
     </section>
   )
 }

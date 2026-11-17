@@ -123,7 +123,7 @@ function scrub(text: string): { text: string; removed: string[] } {
   out = out.replace(/\b\d{3}[- ]\d{2}[- ]\d{4}\b/g, () => (removed.add('id'), '[number removed]'))
   out = out.replace(/(\+?1[\s.-]?)?\(?\b\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g, () => (removed.add('phone'), '[phone removed]'))
   out = out.replace(
-    /\b(my name is|my name's|i am called|call me|me llamo|mi nombre es)\s+((?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ'-]+\s?){1,3})/gi,
+    /\b([Mm]y name is|[Mm]y name's|I am called|[Cc]all me|[Mm]e llamo|[Mm]i nombre es)\s+((?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ'-]+\s?){1,3})/gi,
     (_m, lead: string) => (removed.add('name'), `${lead} [name removed] `),
   )
   return { text: out, removed: [...removed] }

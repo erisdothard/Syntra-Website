@@ -70,7 +70,7 @@ export function Heard({
               </div>
               <button
                 type="button"
-                className="nv-btn nv-btn-secondary nv-btn-small flex-none"
+                className="nv-btn nv-btn-ghost nv-btn-small flex-none"
                 onClick={() => onChange(q)}
                 aria-label={`${t.change}: ${fieldLabel(q, t)}`}
               >

@@ -1,165 +1,201 @@
 import { useState } from 'react'
 import { MODELS } from './config'
-import { CostPanel } from './CostPanel'
+import { COPY } from './copy'
 import { SKILLS } from './data'
-import { BARRIER_NOUN, formatDate, LANG_NAMES, money } from './i18n'
-import type { AiCall, CareerItem, Lang, Plan, SupportItem, TrainingItem } from './types'
-import { Icon, IdTag, SampleTag, type S } from './ui'
+import { BARRIER_NOUN, LANG_NAMES, money } from './i18n'
+import type { CareerItem, Lang, Plan, SupportItem, TrainingItem } from './types'
+import { Icon, IdTag, type S } from './ui'
 import { planAsText, useScreenHeading, wording, type ExplainState } from './view'
 
-function WhyNext({ t, why, next, ai }: { t: S; why: string; next: string; ai: boolean }) {
+/**
+ * The plan. Order is fixed by the product (steady things, then jobs, then
+ * training), but the jobs are the part that changes a life, so they carry the
+ * one strong visual on the page: pay against the living wage, drawn to scale.
+ */
+
+function Wording({ t, why, next, ai, loading }: { t: S; why: string; next: string; ai: boolean; loading: boolean }) {
   return (
-    <div className="space-y-2">
-      <div>
-        <p className="nv-field-label">
-          {t.why}
-          {ai && <span className="sr-only"> (AI)</span>}
-        </p>
-        <p>{why}</p>
-      </div>
-      <div>
-        <p className="nv-field-label">{t.next}</p>
-        <p>{next}</p>
-      </div>
+    <div className="nv-wording" data-loading={loading}>
+      <p>
+        <span className="sr-only">{t.why}: </span>
+        {why}
+        {ai && <span className="sr-only"> (AI)</span>}
+      </p>
+      <p className="nv-wording-next">
+        <Icon name="arrow" size={16} />
+        <span>
+          <span className="sr-only">{t.next}: </span>
+          {next}
+        </span>
+      </p>
     </div>
   )
 }
 
-function SupportCard({ t, lang, item, explain, onSend }: { t: S; lang: Lang; item: SupportItem; explain?: ExplainState; onSend: () => void }) {
+function SupportRow({ t, lang, item, explain, onSend }: { t: S; lang: Lang; item: SupportItem; explain?: ExplainState; onSend: () => void }) {
+  const c = COPY[lang]
   const p = item.partner
   const w = wording(item, explain)
   return (
-    <li className="nv-card space-y-3">
-      <div className="space-y-2">
-        <h3>{p.name}</h3>
-        <div className="nv-meta">
+    <li className="nv-support">
+      <div className="nv-support-main">
+        <div className="nv-support-title">
+          <h3>{p.name}</h3>
           <span className="nv-pill">{BARRIER_NOUN[p.service][lang]}</span>
           <IdTag id={p.id} t={t} />
-          <SampleTag t={t} />
         </div>
+        <Wording t={t} {...w} loading={explain?.status === 'loading'} />
       </div>
-      <WhyNext t={t} {...w} />
-      <dl className="nv-dl">
-        <dt>{t.phone}</dt>
-        <dd>
-          <a href={`tel:${p.phone.replace(/\D/g, '')}`}>{p.phone}</a>
-        </dd>
-        <dt>{t.hours}</dt>
-        <dd>{p.hours[lang]}</dd>
-        <dt>{t.eligibility}</dt>
-        <dd>{p.eligibility[lang]}</dd>
-        <dt>{t.languages}</dt>
-        <dd>{p.languages.map((l) => LANG_NAMES[l][lang]).join(', ')}</dd>
-        <dt>{t.lastVerified}</dt>
-        <dd>{formatDate(p.lastVerified, lang)}</dd>
-      </dl>
-      <button type="button" className="nv-btn nv-btn-secondary nv-btn-block nv-noprint" onClick={onSend}>
-        <Icon name="person" size={18} />
-        {t.sendToPerson}
-      </button>
+      <div className="nv-support-side">
+        <a className="nv-phone" href={`tel:${p.phone.replace(/\D/g, '')}`}>
+          <Icon name="phone" size={16} />
+          <span className="sr-only">{c.callLabel} </span>
+          {p.phone}
+        </a>
+        <p className="nv-small nv-muted">{p.hours[lang]}</p>
+        <p className="nv-small nv-muted">{p.languages.map((l) => LANG_NAMES[l][lang]).join(' · ')}</p>
+        <button type="button" className="nv-btn nv-btn-secondary nv-btn-small nv-noprint" onClick={onSend}>
+          <Icon name="person" size={16} />
+          {c.send}
+        </button>
+      </div>
     </li>
   )
 }
 
-function CareerCard({ t, lang, item, explain }: { t: S; lang: Lang; item: CareerItem; explain?: ExplainState }) {
+function JobRow({
+  t,
+  lang,
+  item,
+  scale,
+  first,
+  explain,
+}: {
+  t: S
+  lang: Lang
+  item: CareerItem
+  scale: number
+  first: boolean
+  explain?: ExplainState
+}) {
+  const c = COPY[lang]
   const o = item.occupation
-  const w = wording(item, explain)
   const meets = item.wageGap >= 0
-  const pctOfLiving = Math.min(100, Math.round((o.sampleMedianWage / item.livingWage) * 100))
+  const w = wording(item, explain)
+  const pct = (n: number) => `${Math.min(100, (n / scale) * 100).toFixed(2)}%`
   return (
-    <li className="nv-card space-y-3">
-      <div className="space-y-2">
-        <h3>{o.title[lang]}</h3>
-        <div className="nv-meta">
-          <span className="nv-pill">{o.cluster[lang]}</span>
-          <IdTag id={o.id} t={t} />
-          <SampleTag t={t} />
+    <li className="nv-job">
+      <div className="nv-job-row">
+        <div className="nv-job-name">
+          <h3>{o.title[lang]}</h3>
+          <p className="nv-small nv-muted">
+            {o.cluster[lang]} · {c.demand[o.demand - 1]}
+          </p>
         </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1">
-          <p className="nv-small nv-muted">{t.sampleWage}</p>
-          <p className="text-xl font-bold">
+        <div className="nv-job-chart" aria-hidden>
+          <div className="nv-bar">
+            <span className={`nv-bar-fill ${meets ? 'is-good' : 'is-short'}`} style={{ width: pct(o.sampleMedianWage) }} />
+            <span className="nv-living" style={{ left: pct(item.livingWage) }}>
+              {first && (
+                <span className="nv-living-label">
+                  {c.livingLine} {money(item.livingWage, lang)}
+                </span>
+              )}
+            </span>
+          </div>
+        </div>
+        <div className="nv-job-pay">
+          <p className="nv-pay">
             {money(o.sampleMedianWage, lang)}
-            <span className="text-base font-medium">{t.perHour}</span>
+            <span>{c.perHr}</span>
           </p>
-          <p className="nv-small">
-            {t.livingWage}: {money(item.livingWage, lang)}
-            {t.perHour}
+          <p className={`nv-delta ${meets ? 'is-good' : 'is-short'}`}>
+            {meets ? c.overGap(money(item.wageGap, lang)) : c.underGap(money(-item.wageGap, lang))}
           </p>
-          <div className="nv-meter" aria-hidden>
-            <span className={meets ? 'nv-meter-good' : 'nv-meter-warn'} style={{ width: `${pctOfLiving}%` }} />
-          </div>
-          <p className={`nv-tag nv-tag-wrap ${meets ? 'nv-tag-good' : 'nv-tag-warn'}`}>
-            {meets ? t.meetsLiving : t.belowLiving(money(-item.wageGap, lang))}
-          </p>
-        </div>
-        <div className="space-y-1">
-          <p className="nv-small nv-muted">{t.skillOverlap}</p>
-          <p className="text-xl font-bold">{item.overlapPct}%</p>
-          <div className="nv-meter" aria-hidden>
-            <span style={{ width: `${item.overlapPct}%` }} />
-          </div>
         </div>
       </div>
-
-      {item.haveSkills.length > 0 && (
-        <div>
-          <p className="nv-field-label">{t.skillsHave}</p>
-          <ul className="mt-1 flex flex-wrap gap-2">
-            {item.haveSkills.map((s) => (
-              <li key={s} className="nv-pill nv-pill-have">
-                {SKILLS[s][lang]}
-              </li>
-            ))}
-          </ul>
+      <div className="nv-job-detail">
+        <div className="nv-skills">
+          <div className="nv-overlap">
+            <span className="nv-overlap-n">{item.overlapPct}%</span>
+            <span className="nv-small">{t.skillOverlap}</span>
+            <span className="nv-meter" aria-hidden>
+              <span style={{ width: `${item.overlapPct}%` }} />
+            </span>
+          </div>
+          {item.haveSkills.length > 0 && (
+            <ul className="nv-chips" aria-label={t.skillsHave}>
+              {item.haveSkills.map((s) => (
+                <li key={s} className="nv-chip is-have">
+                  <Icon name="check" size={12} />
+                  {SKILLS[s][lang]}
+                </li>
+              ))}
+            </ul>
+          )}
+          {item.missingSkills.length > 0 && (
+            <ul className="nv-chips" aria-label={t.skillsBuild}>
+              {item.missingSkills.map((s) => (
+                <li key={s} className="nv-chip is-build">
+                  {SKILLS[s][lang]}
+                </li>
+              ))}
+            </ul>
+          )}
+          {item.needsCredential && <p className="nv-small nv-flag">{t.needsCredential}</p>}
         </div>
-      )}
-      {item.missingSkills.length > 0 && (
-        <div>
-          <p className="nv-field-label">{t.skillsBuild}</p>
-          <ul className="mt-1 flex flex-wrap gap-2">
-            {item.missingSkills.map((s) => (
-              <li key={s} className="nv-pill nv-pill-build">
-                {SKILLS[s][lang]}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {item.needsCredential && <p className="nv-note nv-note-rules nv-small">{t.needsCredential}</p>}
-      <WhyNext t={t} {...w} />
+        <Wording t={t} {...w} loading={explain?.status === 'loading'} />
+      </div>
+      <p className="sr-only">
+        {t.sampleWage}: {money(o.sampleMedianWage, lang)}
+        {c.perHr}. {t.livingWage}: {money(item.livingWage, lang)}
+        {c.perHr}.
+      </p>
     </li>
   )
 }
 
-function TrainingCard({ t, lang, item, explain }: { t: S; lang: Lang; item: TrainingItem; explain?: ExplainState }) {
+function TrainingRow({ t, lang, item, plan, explain }: { t: S; lang: Lang; item: TrainingItem; plan: Plan; explain?: ExplainState }) {
+  const c = COPY[lang]
   const p = item.program
   const w = wording(item, explain)
+  const opens = item.forOccupations
+    .map((id) => plan.career.find((x) => x.id === id || x.occupation.id === id)?.occupation.title[lang])
+    .filter((x): x is string => !!x)
   return (
-    <li className="nv-card space-y-3">
-      <div className="space-y-2">
-        <h3>{p.title[lang]}</h3>
-        <p className="nv-small nv-muted">{p.provider[lang]}</p>
-        <div className="nv-meta">
-          <IdTag id={p.id} t={t} />
-          <SampleTag t={t} />
+    <li className="nv-train">
+      <div className="nv-train-head">
+        <div>
+          <h3>{p.title[lang]}</h3>
+          <p className="nv-small nv-muted">
+            {p.provider[lang]} · <IdTag id={p.id} t={t} />
+          </p>
         </div>
+        <ul className="nv-facts-inline">
+          <li>{t.weeks(p.weeks)}</li>
+          <li>{t.cost[p.cost]}</li>
+          <li>{t.schedule[p.schedule]}</li>
+          <li>{p.languages.map((l) => LANG_NAMES[l][lang]).join(' / ')}</li>
+        </ul>
       </div>
-      <ul className="flex flex-wrap gap-2">
-        <li className="nv-pill">{t.weeks(p.weeks)}</li>
-        <li className="nv-pill">{t.cost[p.cost]}</li>
-        <li className="nv-pill">{t.schedule[p.schedule]}</li>
-        <li className="nv-pill">{p.languages.map((l) => LANG_NAMES[l][lang]).join(' / ')}</li>
-      </ul>
-      {item.closes.length > 0 && (
-        <p className="nv-small">
-          <span className="font-semibold">{t.closes}: </span>
-          {item.closes.map((s) => SKILLS[s][lang]).join(', ')}
+      {opens.length > 0 && (
+        <p className="nv-opens">
+          <span>{c.unlocks}</span>
+          {opens.map((o) => (
+            <strong key={o}>{o}</strong>
+          ))}
         </p>
       )}
-      <WhyNext t={t} {...w} />
+      {item.closes.length > 0 && (
+        <ul className="nv-chips" aria-label={t.closes}>
+          {item.closes.map((s) => (
+            <li key={s} className="nv-chip is-build">
+              {SKILLS[s][lang]}
+            </li>
+          ))}
+        </ul>
+      )}
+      <Wording t={t} {...w} loading={explain?.status === 'loading'} />
     </li>
   )
 }
@@ -169,8 +205,6 @@ export function PlanView({
   lang,
   plan,
   explain,
-  calls,
-  crisisChecks,
   onSend,
   onStartOver,
   onEdit,
@@ -179,123 +213,81 @@ export function PlanView({
   lang: Lang
   plan: Plan
   explain?: ExplainState
-  calls: AiCall[]
-  crisisChecks: number
   onSend: (partnerId: string | null) => void
   onStartOver: () => void
   onEdit: () => void
 }) {
   const h = useScreenHeading<HTMLHeadingElement>('plan')
-  const [showHow, setShowHow] = useState(false)
+  const c = COPY[lang]
   const [toast, setToast] = useState<string | null>(null)
-
   const explainCall = explain?.status === 'done' ? explain.outcome.call : null
   const aiCount = explain?.status === 'done' ? Object.keys(explain.outcome.items).length : 0
+  const meets = plan.career.filter((x) => x.wageGap >= 0).length
+  const scale = Math.max(plan.livingWage, ...plan.career.map((x) => x.occupation.sampleMedianWage)) * 1.12
 
   const copy = async () => {
     const text = planAsText(plan, lang, t, explain)
     try {
       await navigator.clipboard.writeText(text)
-      setToast(t.copied)
     } catch {
-      // Clipboard blocked: fall back to a download.
       const blob = new Blob([text], { type: 'text/plain' })
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
       a.download = 'my-plan.txt'
       a.click()
-      setToast(t.copied)
     }
+    setToast(t.copied)
     window.setTimeout(() => setToast(null), 3500)
   }
 
   return (
-    <section aria-labelledby="nv-h1" className="space-y-6">
-      <div className="space-y-2">
-        <h1 id="nv-h1" ref={h} tabIndex={-1}>
-          {t.planH1}
-        </h1>
-        <p>{t.planIntro}</p>
-        <div aria-live="polite">
-          {explain?.status === 'loading' ? (
-            <p className="nv-note nv-note-rules flex items-center gap-3 nv-small">
-              <span className="nv-spinner" aria-hidden />
-              {t.explainLoading}
-            </p>
-          ) : explainCall?.path === 'model' && aiCount > 0 ? (
-            <p className="nv-note nv-note-ai nv-small">
-              <span className="nv-tag nv-tag-ai mr-2">AI</span>
-              {t.explainModel.replace('Claude Sonnet 5.5', MODELS.explain.label)}
-            </p>
-          ) : (
-            <p className="nv-note nv-note-rules nv-small">
-              <span className="nv-tag nv-tag-id mr-2">{lang === 'es' ? 'REGLAS' : 'RULES'}</span>
-              {t.explainRules}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <ol className="nv-route">
-      <li className="nv-stop">
-      <span className="nv-stop-mark" aria-hidden>1</span>
-      <section aria-labelledby="nv-steady" className="space-y-3">
-        <div>
-          <h2 id="nv-steady">{t.steadyH2}</h2>
-          <p className="nv-muted">{t.steadyIntro}</p>
-        </div>
-        {plan.support.length === 0 && plan.supportGaps.length === 0 && <p className="nv-note">{t.steadyNone}</p>}
-        <ul className="space-y-3">
-          {plan.support.map((s) => (
-            <SupportCard key={s.id} t={t} lang={lang} item={s} explain={explain} onSend={() => onSend(s.partner.id)} />
-          ))}
-        </ul>
-        {plan.supportGaps.map((g) => (
-          <p key={g} className="nv-note nv-note-rules">
-            {t.steadyGap(BARRIER_NOUN[g][lang])}
+    <section aria-labelledby="nv-h1" className="nv-plan">
+      <header className="nv-plan-head">
+        <div className="space-y-2">
+          <h1 id="nv-h1" ref={h} tabIndex={-1}>
+            {t.planH1}
+          </h1>
+          <p className="nv-plan-summary">
+            <span>
+              <strong>{plan.support.length}</strong>
+              {c.sumSupport(plan.support.length)}
+            </span>
+            <span>
+              <strong>{meets}</strong>
+              {c.sumJobs(plan.career.length)}
+            </span>
+            <span>
+              <strong>
+                {money(plan.livingWage, lang)}
+                {c.perHr}
+              </strong>
+              {c.sumLiving}
+            </span>
           </p>
-        ))}
-      </section>
-
-      </li>
-      <li className="nv-stop">
-      <span className="nv-stop-mark" aria-hidden>2</span>
-      <section aria-labelledby="nv-career" className="space-y-3">
-        <div>
-          <h2 id="nv-career">{t.careerH2}</h2>
-          <p className="nv-muted">{t.careerIntro}</p>
+          <p className="nv-status" aria-live="polite">
+            {explain?.status === 'loading' ? (
+              <>
+                <span className="nv-dot is-busy" aria-hidden />
+                {t.explainLoading}
+              </>
+            ) : explainCall?.path === 'model' && aiCount > 0 ? (
+              <>
+                <span className="nv-dot is-ai" aria-hidden />
+                {t.explainModel.replace('Claude Sonnet 5.5', MODELS.explain.label)}
+              </>
+            ) : (
+              <>
+                <span className="nv-dot" aria-hidden />
+                {t.explainRules}
+              </>
+            )}
+          </p>
         </div>
-        <ul className="space-y-3">
-          {plan.career.map((c) => (
-            <CareerCard key={c.id} t={t} lang={lang} item={c} explain={explain} />
-          ))}
-        </ul>
-      </section>
-
-      </li>
-      <li className="nv-stop">
-      <span className="nv-stop-mark" aria-hidden>3</span>
-      <section aria-labelledby="nv-training" className="space-y-3">
-        <div>
-          <h2 id="nv-training">{t.trainingH2}</h2>
-          <p className="nv-muted">{t.trainingIntro}</p>
-        </div>
-        {plan.training.length === 0 && <p className="nv-note">{t.trainingNone}</p>}
-        <ul className="space-y-3">
-          {plan.training.map((p) => (
-            <TrainingCard key={p.id} t={t} lang={lang} item={p} explain={explain} />
-          ))}
-        </ul>
-      </section>
-      </li>
-      </ol>
-
-      <div className="nv-noprint flex flex-col gap-3">
-        <button type="button" className="nv-btn nv-btn-primary nv-btn-block" onClick={() => onSend(null)}>
-          <Icon name="person" />
-          {t.sendToPerson}
-        </button>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="nv-plan-actions nv-noprint">
+          <button type="button" className="nv-btn nv-btn-primary" onClick={() => onSend(null)}>
+            <Icon name="person" size={18} />
+            {t.sendToPerson}
+          </button>
           <button type="button" className="nv-btn nv-btn-secondary" onClick={copy}>
             <Icon name="text" size={18} />
             {t.saveText}
@@ -304,31 +296,83 @@ export function PlanView({
             {t.printPlan}
           </button>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" className="nv-btn nv-btn-ghost" onClick={onEdit}>
-            <Icon name="back" size={18} />
-            {t.heardH1}
-          </button>
-          <button type="button" className="nv-btn nv-btn-ghost" onClick={onStartOver}>
-            {t.startOver}
-          </button>
-        </div>
-      </div>
+      </header>
 
-      <div className="nv-noprint space-y-3">
-        <button
-          type="button"
-          className="nv-btn nv-btn-secondary nv-btn-block"
-          aria-expanded={showHow}
-          aria-controls="nv-how"
-          onClick={() => setShowHow((v) => !v)}
-        >
-          <Icon name="info" size={18} />
-          {showHow ? t.hideHowItWorks : t.howItWorks}
-        </button>
-        <div id="nv-how" hidden={!showHow}>
-          {showHow && <CostPanel t={t} lang={lang} calls={calls} crisisChecks={crisisChecks} />}
+      <section aria-labelledby="nv-steady" className="nv-part">
+        <div className="nv-part-head">
+          <span className="nv-step-n" aria-hidden>
+            1
+          </span>
+          <div>
+            <h2 id="nv-steady">{t.steadyH2}</h2>
+            <p className="nv-muted">{t.steadyIntro}</p>
+          </div>
         </div>
+        {plan.support.length === 0 && plan.supportGaps.length === 0 && <p className="nv-note">{t.steadyNone}</p>}
+        {plan.support.length > 0 && (
+          <ul className="nv-list">
+            {plan.support.map((s) => (
+              <SupportRow key={s.id} t={t} lang={lang} item={s} explain={explain} onSend={() => onSend(s.partner.id)} />
+            ))}
+          </ul>
+        )}
+        {plan.supportGaps.map((g) => (
+          <p key={g} className="nv-note nv-note-rules">
+            {t.steadyGap(BARRIER_NOUN[g][lang])}
+          </p>
+        ))}
+      </section>
+
+      <section aria-labelledby="nv-career" className="nv-part">
+        <div className="nv-part-head">
+          <span className="nv-step-n" aria-hidden>
+            2
+          </span>
+          <div>
+            <h2 id="nv-career">{c.jobsH2}</h2>
+            <p className="nv-muted">{c.jobsIntro}</p>
+          </div>
+        </div>
+        <ul className="nv-list nv-jobs">
+          {plan.career.map((x, i) => (
+            <JobRow key={x.id} t={t} lang={lang} item={x} scale={scale} first={i === 0} explain={explain} />
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="nv-training" className="nv-part">
+        <div className="nv-part-head">
+          <span className="nv-step-n" aria-hidden>
+            3
+          </span>
+          <div>
+            <h2 id="nv-training">{c.trainingH2}</h2>
+            <p className="nv-muted">{t.trainingIntro}</p>
+          </div>
+        </div>
+        {plan.training.length === 0 ? (
+          <p className="nv-note">{t.trainingNone}</p>
+        ) : (
+          <ul className="nv-list">
+            {plan.training.map((p) => (
+              <TrainingRow key={p.id} t={t} lang={lang} item={p} plan={plan} explain={explain} />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <div className="nv-plan-foot nv-noprint">
+        <button type="button" className="nv-btn nv-btn-primary" onClick={() => onSend(null)}>
+          <Icon name="person" size={18} />
+          {t.sendToPerson}
+        </button>
+        <button type="button" className="nv-btn nv-btn-ghost" onClick={onEdit}>
+          <Icon name="back" size={18} />
+          {t.heardH1}
+        </button>
+        <button type="button" className="nv-btn nv-btn-ghost" onClick={onStartOver}>
+          {t.startOver}
+        </button>
       </div>
 
       <p className={toast ? 'nv-toast' : 'sr-only'} role="status">

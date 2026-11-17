@@ -4,8 +4,10 @@ import { explainPlan, parseFreeText } from './api'
 import { buildPlan, emptyProfile, isMecklenburgZip } from './engine'
 import { Heard } from './Heard'
 import { STRINGS } from './i18n'
-import { FreeText, Question, Welcome } from './Intake'
+import { Chat, type TextResult } from './Chat'
+import { Question, Welcome } from './Intake'
 import { PlanView } from './PlanView'
+import { Rail } from './Rail'
 import { Consent, Crisis, Sent, Talk } from './Screens'
 import { careerCenterDestination, QUESTION_ORDER, type Destination, type ExplainState, type ParseInfo, type QuestionKey } from './view'
 import { Staff } from './Staff'
@@ -14,24 +16,7 @@ import { isCrisis } from './text'
 import type { AiCall, Lang, Profile, Referral } from './types'
 import { Shell } from './ui'
 
-type Screen = 'welcome' | 'freetext' | 'question' | 'heard' | 'plan' | 'consent' | 'sent' | 'crisis' | 'talk'
-
-function answered(q: QuestionKey, p: Profile): boolean {
-  switch (q) {
-    case 'goal':
-      return p.goal !== null
-    case 'barriers':
-      return p.barriersAnswered
-    case 'education':
-      return p.education !== null
-    case 'lastJob':
-      return p.lastJob !== null
-    case 'zip':
-      return p.zip !== null || p.zipSkipped
-    case 'household':
-      return p.household !== null
-  }
-}
+type Screen = 'welcome' | 'chat' | 'question' | 'heard' | 'plan' | 'consent' | 'sent' | 'crisis' | 'talk'
 
 function initialLang(): Lang {
   const param = new URLSearchParams(window.location.search).get('lang')
@@ -144,29 +129,19 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
     return true
   }
 
-  const goToQuestions = (p: Profile) => {
-    const remaining = QUESTION_ORDER.filter((q) => !answered(q, p))
-    if (remaining.length === 0) {
-      setScreen('heard')
-      return
-    }
-    setQueue(remaining)
-    setQIndex(0)
-    setScreen('question')
-  }
-
-  const submitFreeText = async (text: string) => {
-    if (!checkText(text)) return
+  /** Typed text in the chat: safety check, privacy scrub, then the parser. Fills fields; never navigates. */
+  const chatText = async (text: string): Promise<TextResult> => {
+    if (!checkText(text)) return { crisis: true }
     setBusy(true)
     const outcome = await parseFreeText(text, lang, aiOff)
     setBusy(false)
     record(outcome.call)
     const f = outcome.fields
     const next: Profile = { ...profile }
-    const fromText: QuestionKey[] = []
+    const filled: QuestionKey[] = []
     const fill = (q: QuestionKey, patch: Partial<Profile>) => {
       Object.assign(next, patch)
-      fromText.push(q)
+      filled.push(q)
     }
     if (f.goal) fill('goal', { goal: f.goal })
     if (f.barriers.length) fill('barriers', { barriers: f.barriers, barriersAnswered: true })
@@ -176,8 +151,21 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
     if (f.zip && isMecklenburgZip(f.zip)) fill('zip', { zip: f.zip, zipSkipped: false })
     if (f.household) fill('household', { household: f.household })
     setProfile(next)
-    setParse({ call: outcome.call, removed: outcome.removed, fromText })
-    goToQuestions(next)
+    setParse((prev) => ({
+      call: outcome.call,
+      removed: [...new Set([...(prev?.removed ?? []), ...outcome.removed])],
+      fromText: [...new Set([...(prev?.fromText ?? []).filter((q) => !filled.includes(q)), ...filled])],
+    }))
+    return { crisis: false, filled, call: outcome.call, removed: outcome.removed }
+  }
+
+  /** A tapped quick reply in the chat. */
+  const chatAnswer = (patch: Partial<Profile>) => {
+    setProfile((p) => ({ ...p, ...patch }))
+    const keys = Object.keys(patch)
+    setParse((prev) =>
+      prev ? { ...prev, fromText: prev.fromText.filter((q) => !keys.some((k) => k.startsWith(q))) } : prev,
+    )
   }
 
   const answer = (patch: Partial<Profile>) => {
@@ -199,7 +187,7 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
       setEditing(false)
       setScreen('heard')
     } else if (qIndex > 0) setQIndex(qIndex - 1)
-    else setScreen('freetext')
+    else setScreen('chat')
   }
 
   const startOver = () => {
@@ -231,16 +219,18 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
   let body
   switch (screen) {
     case 'welcome':
-      body = <Welcome t={t} onStart={() => setScreen('freetext')} />
+      body = <Welcome t={t} lang={lang} onStart={() => setScreen('chat')} />
       break
-    case 'freetext':
+    case 'chat':
       body = (
-        <FreeText
+        <Chat
           t={t}
+          lang={lang}
+          profile={profile}
           busy={busy}
-          onSubmit={submitFreeText}
-          onSkip={() => goToQuestions(profile)}
-          onBack={() => setScreen('welcome')}
+          onText={chatText}
+          onAnswer={chatAnswer}
+          onFinish={() => setScreen('heard')}
         />
       )
       break
@@ -293,8 +283,6 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
           lang={lang}
           plan={plan}
           explain={explain[lang]}
-          calls={calls}
-          crisisChecks={crisisChecks}
           onSend={(partnerId) => {
             const p = partnerId ? partners.find((x) => x.id === partnerId) : undefined
             openConsent(
@@ -359,7 +347,18 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
 
   return (
     <Shell t={t} lang={lang} onLang={onLang} onTalk={openTalk}>
-      {body}
+      <div className="nv-work" data-screen={screen}>
+        <div className="nv-flow">{body}</div>
+        <Rail
+          t={t}
+          lang={lang}
+          profile={profile}
+          parse={parse}
+          calls={calls}
+          crisisChecks={crisisChecks}
+          showHow={screen === 'welcome' || screen === 'talk' || screen === 'crisis'}
+        />
+      </div>
     </Shell>
   )
 }
