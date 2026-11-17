@@ -174,7 +174,8 @@ export function Chat({
       <h1 id="nv-h1" ref={h} tabIndex={-1} className="sr-only">
         {t.title}
       </h1>
-      <ol className="nv-thread" role="log" aria-live="polite" aria-relevant="additions">
+      <div role="log" aria-live="polite" aria-relevant="additions" aria-label={c.chatBot}>
+      <ol className="nv-thread">
         {msgs.map((m) => {
           switch (m.kind) {
             case 'hello':
@@ -244,6 +245,7 @@ export function Chat({
           </li>
         )}
       </ol>
+      </div>
       <div ref={endRef} className="nv-thread-end" />
 
       {pending !== null && (

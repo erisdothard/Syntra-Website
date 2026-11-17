@@ -56,7 +56,9 @@ function LiveProfile({ t, lang, profile, parse }: { t: S; lang: Lang; profile: P
                     {value}
                   </span>
                 ) : (
-                  <span className="nv-fact-blank" aria-label={t.notAnswered} />
+                  <span className="nv-fact-blank">
+                    <span className="sr-only">{t.notAnswered}</span>
+                  </span>
                 )}
                 {src && (
                   <span className={`nv-src nv-src-${src}`}>{src === 'ai' ? c.srcAi : src === 'rules' ? c.srcRules : c.srcTap}</span>
