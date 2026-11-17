@@ -106,7 +106,8 @@ export function Chat({
     if (!said || busy) return
     setText('')
     push({ kind: 'me', text: said })
-    if (pending === 'zip' && /^\d{5}$/.test(said)) {
+    // A bare 5-digit ZIP is read by rules, never sent to the model.
+    if (/^\d{5}$/.test(said)) {
       if (isMecklenburgZip(said)) onAnswer({ zip: said, zipSkipped: false })
       else push({ kind: 'zipbad' })
       return

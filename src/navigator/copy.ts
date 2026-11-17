@@ -46,7 +46,7 @@ export const COPY = {
     details: 'Why it fits and what to do next',
     // Chat intake
     chatHello: 'Hi. I can help you find work, training, and the help that makes them possible. What brings you here today? Tell me in your own words, or tap one.',
-    chatPlaceholder: 'Type here, in English or Spanish…',
+    chatPlaceholder: 'Or type it in your own words, in English or Spanish…',
     chatInputLabel: 'Your message',
     chatSend: 'Send',
     chatTyping: 'Reading what you wrote…',
@@ -128,7 +128,7 @@ export const COPY = {
     callLabel: 'Llamar',
     details: 'Por qué encaja y qué hacer ahora',
     chatHello: 'Hola. Puedo ayudarle a encontrar trabajo, capacitación y la ayuda que los hace posibles. ¿Qué lo trae hoy? Dígamelo con sus propias palabras o toque una opción.',
-    chatPlaceholder: 'Escriba aquí, en español o inglés…',
+    chatPlaceholder: 'O escríbalo con sus propias palabras, en español o inglés…',
     chatInputLabel: 'Su mensaje',
     chatSend: 'Enviar',
     chatTyping: 'Leyendo lo que escribió…',

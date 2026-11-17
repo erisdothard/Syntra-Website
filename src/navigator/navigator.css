@@ -675,6 +675,7 @@ body.nv-body ::-webkit-scrollbar-thumb { background: #b9c1b8; border-radius: 5px
   }
   .nv .nv-composer-input:focus-visible { outline: none; }
   .nv-composer-send { min-height: 48px; width: 48px; padding: 0; border-radius: 12px; }
+  .nv-composer-send:disabled { opacity: 1; background: #dfe5e1; color: #45505e; }
   .nv-composer-note { grid-column: 1 / -1; font-size: 0.78rem; color: var(--nv-ink-2); padding-inline: 8px; }
   @media (prefers-reduced-motion: reduce) {
     .nv-msg, .nv-typing-dots i { animation: none; }
