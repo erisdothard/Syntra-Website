@@ -60,14 +60,20 @@ export function Shell({
         </p>
       )}
       <header className="nv-header">
-        <div className="mx-auto max-w-2xl px-4">
-          <div className="flex items-center justify-between gap-3 pt-2">
-            <a href="/demo/navigator" className="nv-brand">
-              <span className="nv-brand-mark">
-                <Icon name="arrow" size={16} />
-              </span>
-              <span>{t.title}</span>
-            </a>
+        <div className="nv-wrap nv-header-row">
+          <a href={staff ? '/demo/navigator?view=staff' : '/demo/navigator'} className="nv-brand">
+            <span className="nv-brand-mark">
+              <Icon name="arrow" size={16} />
+            </span>
+            <span>{t.title}</span>
+          </a>
+          <p className="nv-ai-notice">
+            <span className="flex-none">
+              <Icon name="info" size={16} />
+            </span>
+            <span>{t.aiNotice}</span>
+          </p>
+          <div className="nv-header-actions">
             <button
               type="button"
               className="nv-btn nv-btn-onbrand nv-btn-small"
@@ -78,26 +84,18 @@ export function Shell({
               <Icon name="globe" size={18} />
               {t.langToggle}
             </button>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pb-2.5 pt-1">
-            <p className="nv-ai-notice min-w-0 flex-[1_1_11rem]">
-              <span className="mt-0.5 flex-none">
-                <Icon name="info" size={16} />
-              </span>
-              <span>{t.aiNotice}</span>
-            </p>
-            <button type="button" className="nv-btn nv-talk nv-btn-small ml-auto flex-none" onClick={onTalk}>
+            <button type="button" className="nv-btn nv-talk nv-btn-small" onClick={onTalk}>
               <Icon name="person" size={18} />
               {t.talkToPerson}
             </button>
           </div>
         </div>
       </header>
-      <main id="nv-main" className="mx-auto w-full max-w-2xl flex-1 px-4 pb-16 pt-6" tabIndex={-1}>
+      <main id="nv-main" className="nv-wrap flex-1 pb-16 pt-6 lg:pt-10" tabIndex={-1}>
         {children}
       </main>
       <footer className="nv-footer">
-        <div className="mx-auto max-w-2xl px-4 py-5">
+        <div className="nv-wrap py-5">
           <a href="https://www.syntraai.tech" className="nv-footer-link">
             {t.footer}
           </a>

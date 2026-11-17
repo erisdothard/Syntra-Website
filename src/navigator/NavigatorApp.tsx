@@ -6,6 +6,7 @@ import { Heard } from './Heard'
 import { STRINGS } from './i18n'
 import { FreeText, Question, Welcome } from './Intake'
 import { PlanView } from './PlanView'
+import { Rail } from './Rail'
 import { Consent, Crisis, Sent, Talk } from './Screens'
 import { careerCenterDestination, QUESTION_ORDER, type Destination, type ExplainState, type ParseInfo, type QuestionKey } from './view'
 import { Staff } from './Staff'
@@ -231,7 +232,7 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
   let body
   switch (screen) {
     case 'welcome':
-      body = <Welcome t={t} onStart={() => setScreen('freetext')} />
+      body = <Welcome t={t} lang={lang} onStart={() => setScreen('freetext')} />
       break
     case 'freetext':
       body = (
@@ -293,8 +294,6 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
           lang={lang}
           plan={plan}
           explain={explain[lang]}
-          calls={calls}
-          crisisChecks={crisisChecks}
           onSend={(partnerId) => {
             const p = partnerId ? partners.find((x) => x.id === partnerId) : undefined
             openConsent(
@@ -359,7 +358,18 @@ function Navigator({ t, lang, onLang }: { t: (typeof STRINGS)[Lang]; lang: Lang;
 
   return (
     <Shell t={t} lang={lang} onLang={onLang} onTalk={openTalk}>
-      {body}
+      <div className="nv-work" data-screen={screen}>
+        <div className="nv-flow">{body}</div>
+        <Rail
+          t={t}
+          lang={lang}
+          profile={profile}
+          parse={parse}
+          calls={calls}
+          crisisChecks={crisisChecks}
+          showHow={screen === 'welcome' || screen === 'talk' || screen === 'crisis'}
+        />
+      </div>
     </Shell>
   )
 }
