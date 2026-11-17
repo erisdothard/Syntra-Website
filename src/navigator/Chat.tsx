@@ -92,6 +92,11 @@ export function Chat({
     })
   }, [pending, busy])
 
+  // Keyboard and screen-reader users land in the message box, ready to answer.
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [msgs, busy])

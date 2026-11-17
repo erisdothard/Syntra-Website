@@ -13,8 +13,8 @@ export const STRINGS = {
     footer: 'Built by Syntra AI · syntraai.tech',
     welcomeH1: 'Let’s find your next step',
     welcomeBody:
-      'Answer a few short questions, mostly by tapping. You will get one plan: the help to get steady first, the jobs that fit, and training that closes the gap.',
-    welcomeAnon: 'No name or account needed. Takes about 2 minutes.',
+      'Tell me in your own words, or tap an answer. You will get one plan: the help to get steady first, the jobs that fit, and training that closes the gap.',
+    welcomeAnon: 'No name or account needed.',
     start: 'Start',
     freeTextQ: 'You can tell me in your own words, or answer by tapping.',
     freeTextLabel: 'Tell us in your own words (optional)',
@@ -200,8 +200,8 @@ export const STRINGS = {
     footer: 'Hecho por Syntra AI · syntraai.tech',
     welcomeH1: 'Busquemos su siguiente paso',
     welcomeBody:
-      'Conteste unas preguntas cortas, casi todas con un toque. Recibirá un plan: la ayuda para estabilizarse primero, los empleos que le quedan y la capacitación que cierra la brecha.',
-    welcomeAnon: 'No necesita dar su nombre ni crear una cuenta. Toma unos 2 minutos.',
+      'Dígamelo con sus propias palabras o toque una respuesta. Recibirá un plan: la ayuda para estabilizarse primero, los trabajos que encajan y la capacitación que cierra la brecha.',
+    welcomeAnon: 'No necesita dar su nombre ni crear una cuenta.',
     start: 'Empezar',
     freeTextQ: 'Puede contarme con sus propias palabras o contestar con toques.',
     freeTextLabel: 'Cuéntenos con sus propias palabras (opcional)',
