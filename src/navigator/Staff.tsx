@@ -66,7 +66,7 @@ function Needs({ lang }: { lang: Lang }) {
   return (
     <section aria-labelledby="nv-ops-needs" className="nv-panel nv-ops-needs">
       <h2 id="nv-ops-needs">{c.needsH2}</h2>
-      <div className="overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-needs">
+      <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-needs">
         <table className="nv-heat">
           <caption className="sr-only">{c.needsNote}</caption>
           <thead>
@@ -158,7 +158,7 @@ function Queue({ t, lang, referrals }: { t: S; lang: Lang; referrals: Referral[]
           </a>
         </div>
       ) : (
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-queue">
+        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-queue">
           <table className="nv-table nv-table-ops">
             <thead>
               <tr>
@@ -298,7 +298,7 @@ function Resources({ t, lang, partners, onSaved }: { t: S; lang: Lang; partners:
         </h2>
         <p className={`nv-state ${stale ? 'is-warn' : 'is-good'}`}>{stale ? c.staleCount(stale) : c.allFresh}</p>
       </div>
-      <div className="overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-res">
+      <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-res">
         <table className="nv-table nv-table-ops">
           <thead>
             <tr>
@@ -331,7 +331,7 @@ function CostLog({ calls, t, lang }: { calls: LoggedCall[]; t: S; lang: Lang }) 
       {calls.length === 0 ? (
         <p className="nv-empty">{t.staffNoCalls}</p>
       ) : (
-        <div className="overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-log">
+        <div className="relative overflow-x-auto" tabIndex={0} role="region" aria-labelledby="nv-ops-log">
           <table className="nv-table nv-table-ops">
             <thead>
               <tr>
